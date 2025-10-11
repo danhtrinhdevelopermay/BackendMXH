@@ -119,7 +119,7 @@ const CreatePostScreen = ({ navigation }) => {
       
       <ScrollView contentContainerStyle={styles.content}>
         <TextInput
-          placeholder="What's on your mind?"
+          placeholder="Hôm nay bạn như thế nào?"
           value={content}
           onChangeText={setContent}
           style={styles.input}
