@@ -33,14 +33,69 @@ const HomeTabs = () => {
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#1877f2',
-        tabBarInactiveTintColor: 'gray',
+        tabBarInactiveTintColor: '#65676b',
+        tabBarStyle: {
+          backgroundColor: '#fff',
+          borderTopWidth: 1,
+          borderTopColor: '#e4e6eb',
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
+        },
+        headerStyle: {
+          backgroundColor: '#fff',
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 1,
+          borderBottomColor: '#e4e6eb',
+        },
+        headerTitleStyle: {
+          fontSize: 20,
+          fontWeight: 'bold',
+          color: '#1877f2',
+        },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Friends" component={FriendsScreen} />
-      <Tab.Screen name="Messages" component={MessagesScreen} />
-      <Tab.Screen name="Notifications" component={NotificationsScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen 
+        name="Home" 
+        component={HomeScreen}
+        options={{
+          headerShown: true,
+          title: 'facebook',
+        }}
+      />
+      <Tab.Screen 
+        name="Friends" 
+        component={FriendsScreen}
+        options={{
+          headerShown: true,
+        }}
+      />
+      <Tab.Screen 
+        name="Messages" 
+        component={MessagesScreen}
+        options={{
+          headerShown: true,
+        }}
+      />
+      <Tab.Screen 
+        name="Notifications" 
+        component={NotificationsScreen}
+        options={{
+          headerShown: true,
+        }}
+      />
+      <Tab.Screen 
+        name="Profile" 
+        component={ProfileScreen}
+        options={{
+          headerShown: true,
+        }}
+      />
     </Tab.Navigator>
   );
 };

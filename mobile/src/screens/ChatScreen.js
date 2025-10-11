@@ -94,14 +94,14 @@ const ChatScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f0f2f5',
   },
   messagesList: {
-    padding: 10,
+    padding: 16,
   },
   messageContainer: {
     flexDirection: 'row',
-    marginVertical: 5,
+    marginVertical: 4,
     alignItems: 'flex-end',
   },
   myMessage: {
@@ -112,8 +112,8 @@ const styles = StyleSheet.create({
   },
   messageBubble: {
     maxWidth: '70%',
-    padding: 10,
-    borderRadius: 15,
+    padding: 12,
+    borderRadius: 18,
     marginHorizontal: 5,
   },
   myBubble: {
@@ -124,20 +124,24 @@ const styles = StyleSheet.create({
   },
   myText: {
     color: '#fff',
+    fontSize: 15,
   },
   theirText: {
-    color: '#000',
+    color: '#050505',
+    fontSize: 15,
   },
   inputContainer: {
     flexDirection: 'row',
-    padding: 10,
+    padding: 12,
+    backgroundColor: '#fff',
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: '#e4e6eb',
     alignItems: 'center',
   },
   input: {
     flex: 1,
-    marginRight: 10,
+    marginRight: 8,
+    backgroundColor: '#f0f2f5',
   },
 });
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, Alert } from 'react-native';
-import { List, Avatar, Badge, Text } from 'react-native-paper';
+import { View, FlatList, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { Avatar, Text, Card } from 'react-native-paper';
 import { messageAPI } from '../api/api';
 
 const MessagesScreen = ({ navigation }) => {
@@ -24,22 +24,42 @@ const MessagesScreen = ({ navigation }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const renderConversation = ({ item }) => (
-    <List.Item
-      title={item.full_name || item.username}
-      description={item.last_message || 'No messages yet'}
-      left={(props) => <Avatar.Text {...props} label={item.username?.[0]?.toUpperCase() || 'U'} />}
-      right={(props) => (
-        !item.is_read && item.sender_id !== item.other_user_id ? (
-          <Badge style={styles.badge}>New</Badge>
-        ) : null
-      )}
-      onPress={() => navigation.navigate('Chat', { 
-        userId: item.other_user_id, 
-        userName: item.full_name || item.username 
-      })}
-    />
-  );
+  const renderConversation = ({ item }) => {
+    const isUnread = !item.is_read && item.sender_id !== item.other_user_id;
+    
+    return (
+      <TouchableOpacity 
+        onPress={() => navigation.navigate('Chat', { 
+          userId: item.other_user_id, 
+          userName: item.full_name || item.username 
+        })}
+      >
+        <Card style={[styles.conversationCard, isUnread && styles.unreadCard]} elevation={0}>
+          <View style={styles.conversationContainer}>
+            <View style={styles.avatarContainer}>
+              <Avatar.Text 
+                size={56} 
+                label={item.username?.[0]?.toUpperCase() || 'U'}
+                style={styles.avatar}
+              />
+              {isUnread && <View style={styles.unreadBadge} />}
+            </View>
+            <View style={styles.conversationInfo}>
+              <Text style={[styles.userName, isUnread && styles.unreadText]}>
+                {item.full_name || item.username}
+              </Text>
+              <Text 
+                style={[styles.lastMessage, isUnread && styles.unreadText]} 
+                numberOfLines={1}
+              >
+                {item.last_message || 'No messages yet'}
+              </Text>
+            </View>
+          </View>
+        </Card>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -47,7 +67,12 @@ const MessagesScreen = ({ navigation }) => {
         data={conversations}
         renderItem={renderConversation}
         keyExtractor={(item) => item.other_user_id.toString()}
-        ListEmptyComponent={<Text style={styles.empty}>No conversations yet</Text>}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No conversations yet</Text>
+          </View>
+        }
+        contentContainerStyle={styles.listContent}
       />
     </View>
   );
@@ -56,15 +81,69 @@ const MessagesScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f0f2f5',
+  },
+  listContent: {
+    flexGrow: 1,
+  },
+  conversationCard: {
     backgroundColor: '#fff',
+    marginHorizontal: 0,
+    marginBottom: 1,
+    borderRadius: 0,
   },
-  badge: {
-    alignSelf: 'center',
+  unreadCard: {
+    backgroundColor: '#f0f8ff',
   },
-  empty: {
+  conversationContainer: {
+    flexDirection: 'row',
+    padding: 12,
+    alignItems: 'center',
+  },
+  avatarContainer: {
+    position: 'relative',
+  },
+  avatar: {
+    backgroundColor: '#1877f2',
+  },
+  unreadBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#1877f2',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  conversationInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#050505',
+    marginBottom: 4,
+  },
+  unreadText: {
+    fontWeight: '600',
+  },
+  lastMessage: {
+    fontSize: 14,
+    color: '#65676b',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#65676b',
     textAlign: 'center',
-    marginTop: 50,
-    color: '#666',
   },
 });
 

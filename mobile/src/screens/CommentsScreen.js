@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
-import { TextInput, IconButton, List, Avatar, Text } from 'react-native-paper';
+import { TextInput, IconButton, Avatar, Text, Card } from 'react-native-paper';
 import { commentAPI } from '../api/api';
 
 const CommentsScreen = ({ route }) => {
@@ -38,11 +38,24 @@ const CommentsScreen = ({ route }) => {
   };
 
   const renderComment = ({ item }) => (
-    <List.Item
-      title={item.full_name || item.username}
-      description={item.content}
-      left={(props) => <Avatar.Text {...props} size={40} label={item.username?.[0]?.toUpperCase() || 'U'} />}
-    />
+    <Card style={styles.commentCard} elevation={0}>
+      <View style={styles.commentContainer}>
+        <Avatar.Text 
+          size={40} 
+          label={item.username?.[0]?.toUpperCase() || 'U'}
+          style={styles.avatar}
+        />
+        <View style={styles.commentContent}>
+          <View style={styles.commentBubble}>
+            <Text style={styles.commentAuthor}>{item.full_name || item.username}</Text>
+            <Text style={styles.commentText}>{item.content}</Text>
+          </View>
+          <Text style={styles.commentTime}>
+            {new Date(item.created_at).toLocaleDateString()}
+          </Text>
+        </View>
+      </View>
+    </Card>
   );
 
   return (
@@ -55,22 +68,35 @@ const CommentsScreen = ({ route }) => {
         data={comments}
         renderItem={renderComment}
         keyExtractor={(item) => item.id.toString()}
-        ListEmptyComponent={<Text style={styles.empty}>No comments yet. Be the first to comment!</Text>}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No comments yet. Be the first to comment!</Text>
+          </View>
+        }
         contentContainerStyle={styles.commentsList}
       />
       <View style={styles.inputContainer}>
+        <Avatar.Text 
+          size={32} 
+          label="U"
+          style={styles.inputAvatar}
+        />
         <TextInput
           value={newComment}
           onChangeText={setNewComment}
           placeholder="Write a comment..."
           style={styles.input}
           mode="outlined"
+          outlineColor="transparent"
+          activeOutlineColor="#1877f2"
+          multiline
         />
         <IconButton
           icon="send"
           size={24}
           onPress={handleAddComment}
           disabled={loading || !newComment.trim()}
+          iconColor="#1877f2"
         />
       </View>
     </KeyboardAvoidingView>
@@ -80,26 +106,78 @@ const CommentsScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f0f2f5',
   },
   commentsList: {
     flexGrow: 1,
+    paddingVertical: 8,
+  },
+  commentCard: {
+    backgroundColor: 'transparent',
+    marginHorizontal: 12,
+    marginBottom: 8,
+    borderRadius: 0,
+  },
+  commentContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  avatar: {
+    backgroundColor: '#1877f2',
+  },
+  commentContent: {
+    flex: 1,
+    marginLeft: 8,
+  },
+  commentBubble: {
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    padding: 12,
+  },
+  commentAuthor: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#050505',
+    marginBottom: 4,
+  },
+  commentText: {
+    fontSize: 15,
+    color: '#050505',
+    lineHeight: 20,
+  },
+  commentTime: {
+    fontSize: 12,
+    color: '#65676b',
+    marginTop: 4,
+    marginLeft: 12,
   },
   inputContainer: {
     flexDirection: 'row',
-    padding: 10,
+    padding: 12,
+    backgroundColor: '#fff',
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: '#e4e6eb',
     alignItems: 'center',
+  },
+  inputAvatar: {
+    backgroundColor: '#1877f2',
+    marginRight: 8,
   },
   input: {
     flex: 1,
-    marginRight: 10,
+    backgroundColor: '#f0f2f5',
+    marginRight: 4,
   },
-  empty: {
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#65676b',
     textAlign: 'center',
-    marginTop: 50,
-    color: '#666',
   },
 });
 

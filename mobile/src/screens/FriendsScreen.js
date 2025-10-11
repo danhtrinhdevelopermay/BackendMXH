@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, Alert } from 'react-native';
-import { List, Avatar, Button, Searchbar, Chip, Text, Divider } from 'react-native-paper';
+import { View, FlatList, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { List, Avatar, Button, Searchbar, Text, Divider, Card } from 'react-native-paper';
 import { friendshipAPI } from '../api/api';
 
 const FriendsScreen = () => {
@@ -68,69 +68,137 @@ const FriendsScreen = () => {
   };
 
   const renderFriend = ({ item }) => (
-    <List.Item
-      title={item.full_name || item.username}
-      description={`@${item.username}`}
-      left={(props) => <Avatar.Text {...props} label={item.username[0].toUpperCase()} />}
-    />
+    <Card style={styles.friendCard} elevation={0}>
+      <View style={styles.friendContainer}>
+        <View style={styles.friendLeft}>
+          <Avatar.Text 
+            size={60} 
+            label={item.username[0].toUpperCase()}
+            style={styles.friendAvatar}
+          />
+          <View style={styles.friendInfo}>
+            <Text style={styles.friendName}>{item.full_name || item.username}</Text>
+            <Text style={styles.friendUsername}>@{item.username}</Text>
+          </View>
+        </View>
+        <Button 
+          mode="outlined" 
+          style={styles.friendButton}
+          textColor="#65676b"
+        >
+          Friends
+        </Button>
+      </View>
+    </Card>
   );
 
   const renderRequest = ({ item }) => (
-    <List.Item
-      title={item.full_name || item.username}
-      description={`@${item.username}`}
-      left={(props) => <Avatar.Text {...props} label={item.username[0].toUpperCase()} />}
-      right={(props) => (
+    <Card style={styles.requestCard} elevation={0}>
+      <View style={styles.requestContainer}>
+        <View style={styles.requestLeft}>
+          <Avatar.Text 
+            size={60} 
+            label={item.username[0].toUpperCase()}
+            style={styles.requestAvatar}
+          />
+          <View style={styles.requestInfo}>
+            <Text style={styles.requestName}>{item.full_name || item.username}</Text>
+            <Text style={styles.requestUsername}>@{item.username}</Text>
+          </View>
+        </View>
         <View style={styles.requestButtons}>
-          <Button mode="contained" onPress={() => handleRespondRequest(item.request_id, 'accepted')}>
-            Accept
+          <Button 
+            mode="contained" 
+            onPress={() => handleRespondRequest(item.request_id, 'accepted')}
+            style={styles.acceptButton}
+            buttonColor="#1877f2"
+            compact
+          >
+            Confirm
           </Button>
-          <Button mode="outlined" onPress={() => handleRespondRequest(item.request_id, 'rejected')}>
-            Reject
+          <Button 
+            mode="outlined" 
+            onPress={() => handleRespondRequest(item.request_id, 'rejected')}
+            style={styles.rejectButton}
+            textColor="#65676b"
+            compact
+          >
+            Delete
           </Button>
         </View>
-      )}
-    />
+      </View>
+    </Card>
   );
 
   const renderSearchResult = ({ item }) => (
-    <List.Item
-      title={item.full_name || item.username}
-      description={`@${item.username}`}
-      left={(props) => <Avatar.Text {...props} label={item.username[0].toUpperCase()} />}
-      right={(props) => (
-        <Button mode="outlined" onPress={() => handleSendRequest(item.id)}>
+    <Card style={styles.searchCard} elevation={0}>
+      <View style={styles.searchContainer}>
+        <View style={styles.searchLeft}>
+          <Avatar.Text 
+            size={60} 
+            label={item.username[0].toUpperCase()}
+            style={styles.searchAvatar}
+          />
+          <View style={styles.searchInfo}>
+            <Text style={styles.searchName}>{item.full_name || item.username}</Text>
+            <Text style={styles.searchUsername}>@{item.username}</Text>
+          </View>
+        </View>
+        <Button 
+          mode="contained" 
+          onPress={() => handleSendRequest(item.id)}
+          style={styles.addButton}
+          buttonColor="#1877f2"
+          compact
+        >
           Add Friend
         </Button>
-      )}
-    />
+      </View>
+    </Card>
   );
 
   return (
     <View style={styles.container}>
-      <View style={styles.tabs}>
-        <Chip
-          selected={activeTab === 'friends'}
+      <View style={styles.tabsContainer}>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'friends' && styles.activeTab]}
           onPress={() => setActiveTab('friends')}
-          style={styles.chip}
         >
-          Friends ({friends.length})
-        </Chip>
-        <Chip
-          selected={activeTab === 'requests'}
+          <Text style={[styles.tabText, activeTab === 'friends' && styles.activeTabText]}>
+            Friends
+          </Text>
+          {friends.length > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{friends.length}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'requests' && styles.activeTab]}
           onPress={() => setActiveTab('requests')}
-          style={styles.chip}
         >
-          Requests ({requests.length})
-        </Chip>
-        <Chip
-          selected={activeTab === 'search'}
+          <Text style={[styles.tabText, activeTab === 'requests' && styles.activeTabText]}>
+            Requests
+          </Text>
+          {requests.length > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{requests.length}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'search' && styles.activeTab]}
           onPress={() => setActiveTab('search')}
-          style={styles.chip}
         >
-          Search
-        </Chip>
+          <Text style={[styles.tabText, activeTab === 'search' && styles.activeTabText]}>
+            Search
+          </Text>
+        </TouchableOpacity>
       </View>
+      
+      <Divider style={styles.headerDivider} />
       
       {activeTab === 'search' && (
         <Searchbar
@@ -138,6 +206,7 @@ const FriendsScreen = () => {
           onChangeText={handleSearch}
           value={searchQuery}
           style={styles.searchbar}
+          elevation={0}
         />
       )}
 
@@ -154,12 +223,15 @@ const FriendsScreen = () => {
         }
         keyExtractor={(item) => item.id?.toString() || item.user_id?.toString()}
         ListEmptyComponent={
-          <Text style={styles.empty}>
-            {activeTab === 'friends' ? 'No friends yet' :
-             activeTab === 'requests' ? 'No pending requests' :
-             searchQuery.length > 2 ? 'No users found' : 'Search for users to add as friends'}
-          </Text>
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>
+              {activeTab === 'friends' ? 'No friends yet' :
+               activeTab === 'requests' ? 'No pending requests' :
+               searchQuery.length > 2 ? 'No users found' : 'Search for users to add as friends'}
+            </Text>
+          </View>
         }
+        contentContainerStyle={styles.listContent}
       />
     </View>
   );
@@ -168,28 +240,184 @@ const FriendsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f0f2f5',
   },
-  tabs: {
+  tabsContainer: {
     flexDirection: 'row',
-    padding: 10,
-    justifyContent: 'space-around',
+    backgroundColor: '#fff',
+    paddingVertical: 8,
   },
-  chip: {
-    margin: 5,
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    position: 'relative',
+  },
+  activeTab: {
+    borderBottomWidth: 3,
+    borderBottomColor: '#1877f2',
+  },
+  tabText: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#65676b',
+  },
+  activeTabText: {
+    color: '#1877f2',
+    fontWeight: '600',
+  },
+  badge: {
+    backgroundColor: '#e7f3ff',
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginLeft: 6,
+  },
+  badgeText: {
+    color: '#1877f2',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  headerDivider: {
+    height: 1,
+    backgroundColor: '#e4e6eb',
   },
   searchbar: {
-    margin: 10,
+    margin: 12,
+    backgroundColor: '#f0f2f5',
+  },
+  listContent: {
+    flexGrow: 1,
+    paddingBottom: 16,
+  },
+  friendCard: {
+    backgroundColor: '#fff',
+    marginHorizontal: 12,
+    marginTop: 12,
+    borderRadius: 8,
+  },
+  friendContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+  },
+  friendLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  friendAvatar: {
+    backgroundColor: '#1877f2',
+  },
+  friendInfo: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  friendName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#050505',
+  },
+  friendUsername: {
+    fontSize: 14,
+    color: '#65676b',
+    marginTop: 2,
+  },
+  friendButton: {
+    borderColor: '#ccd0d5',
+  },
+  requestCard: {
+    backgroundColor: '#fff',
+    marginHorizontal: 12,
+    marginTop: 12,
+    borderRadius: 8,
+  },
+  requestContainer: {
+    padding: 12,
+  },
+  requestLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  requestAvatar: {
+    backgroundColor: '#1877f2',
+  },
+  requestInfo: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  requestName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#050505',
+  },
+  requestUsername: {
+    fontSize: 14,
+    color: '#65676b',
+    marginTop: 2,
   },
   requestButtons: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
+    gap: 8,
   },
-  empty: {
+  acceptButton: {
+    flex: 1,
+    borderRadius: 6,
+  },
+  rejectButton: {
+    flex: 1,
+    borderRadius: 6,
+    borderColor: '#ccd0d5',
+  },
+  searchCard: {
+    backgroundColor: '#fff',
+    marginHorizontal: 12,
+    marginTop: 12,
+    borderRadius: 8,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+  },
+  searchLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  searchAvatar: {
+    backgroundColor: '#1877f2',
+  },
+  searchInfo: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  searchName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#050505',
+  },
+  searchUsername: {
+    fontSize: 14,
+    color: '#65676b',
+    marginTop: 2,
+  },
+  addButton: {
+    borderRadius: 6,
+  },
+  emptyContainer: {
+    padding: 32,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#65676b',
     textAlign: 'center',
-    marginTop: 50,
-    color: '#666',
   },
 });
 

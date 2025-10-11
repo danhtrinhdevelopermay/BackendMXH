@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, Alert } from 'react-native';
-import { List, Avatar, Button, Text } from 'react-native-paper';
+import { View, FlatList, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { Avatar, Button, Text, Card, IconButton } from 'react-native-paper';
 import { notificationAPI } from '../api/api';
 
 const NotificationsScreen = () => {
@@ -51,36 +51,74 @@ const NotificationsScreen = () => {
     }
   };
 
+  const getNotificationColor = (type) => {
+    switch (type) {
+      case 'friend_request':
+      case 'friend_accept':
+        return '#1877f2';
+      case 'comment':
+        return '#65c368';
+      case 'reaction':
+        return '#f33e58';
+      case 'message':
+        return '#9b59b6';
+      default:
+        return '#65676b';
+    }
+  };
+
   const renderNotification = ({ item }) => (
-    <List.Item
-      title={item.username || 'Someone'}
-      description={item.content}
-      left={(props) => (
-        <Avatar.Icon {...props} icon={getNotificationIcon(item.type)} />
-      )}
-      right={(props) => (
-        !item.is_read ? (
-          <Button mode="text" onPress={() => handleMarkAsRead(item.id)}>
-            Mark Read
-          </Button>
-        ) : null
-      )}
-      style={!item.is_read ? styles.unread : styles.read}
-    />
+    <Card 
+      style={[styles.notificationCard, !item.is_read && styles.unreadCard]} 
+      elevation={0}
+    >
+      <View style={styles.notificationContainer}>
+        <Avatar.Icon 
+          size={56} 
+          icon={getNotificationIcon(item.type)}
+          style={[styles.notificationIcon, { backgroundColor: getNotificationColor(item.type) }]}
+        />
+        <View style={styles.notificationContent}>
+          <Text style={styles.notificationTitle}>
+            <Text style={styles.username}>{item.username || 'Someone'}</Text>{' '}
+            <Text style={styles.notificationText}>{item.content}</Text>
+          </Text>
+        </View>
+        {!item.is_read && (
+          <IconButton
+            icon="check"
+            size={20}
+            onPress={() => handleMarkAsRead(item.id)}
+            iconColor="#1877f2"
+          />
+        )}
+      </View>
+    </Card>
   );
 
   return (
     <View style={styles.container}>
       {notifications.some(n => !n.is_read) && (
-        <Button mode="text" onPress={handleMarkAllAsRead} style={styles.markAllButton}>
-          Mark All as Read
-        </Button>
+        <View style={styles.headerContainer}>
+          <Button 
+            mode="text" 
+            onPress={handleMarkAllAsRead} 
+            textColor="#1877f2"
+          >
+            Mark All as Read
+          </Button>
+        </View>
       )}
       <FlatList
         data={notifications}
         renderItem={renderNotification}
         keyExtractor={(item) => item.id.toString()}
-        ListEmptyComponent={<Text style={styles.empty}>No notifications</Text>}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No notifications</Text>
+          </View>
+        }
+        contentContainerStyle={styles.listContent}
       />
     </View>
   );
@@ -89,22 +127,61 @@ const NotificationsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f0f2f5',
+  },
+  headerContainer: {
     backgroundColor: '#fff',
+    alignItems: 'flex-end',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e4e6eb',
   },
-  markAllButton: {
-    alignSelf: 'flex-end',
-    margin: 10,
+  listContent: {
+    flexGrow: 1,
   },
-  unread: {
-    backgroundColor: '#e3f2fd',
-  },
-  read: {
+  notificationCard: {
     backgroundColor: '#fff',
+    marginHorizontal: 0,
+    marginBottom: 1,
+    borderRadius: 0,
   },
-  empty: {
+  unreadCard: {
+    backgroundColor: '#f0f8ff',
+  },
+  notificationContainer: {
+    flexDirection: 'row',
+    padding: 12,
+    alignItems: 'center',
+  },
+  notificationIcon: {
+    backgroundColor: '#1877f2',
+  },
+  notificationContent: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  notificationTitle: {
+    fontSize: 15,
+    lineHeight: 20,
+  },
+  username: {
+    fontWeight: '600',
+    color: '#050505',
+  },
+  notificationText: {
+    color: '#050505',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#65676b',
     textAlign: 'center',
-    marginTop: 50,
-    color: '#666',
   },
 });
 
