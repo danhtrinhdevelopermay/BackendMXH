@@ -88,7 +88,7 @@ const FriendsScreen = () => {
           style={styles.friendButton}
           textColor="#65676b"
         >
-          Friends
+          Bạn bè
         </Button>
       </View>
     </Card>
@@ -167,7 +167,7 @@ const FriendsScreen = () => {
           onPress={() => setActiveTab('friends')}
         >
           <Text style={[styles.tabText, activeTab === 'friends' && styles.activeTabText]}>
-            Friends
+            Bạn bè
           </Text>
           {friends.length > 0 && (
             <View style={styles.badge}>
@@ -181,7 +181,7 @@ const FriendsScreen = () => {
           onPress={() => setActiveTab('requests')}
         >
           <Text style={[styles.tabText, activeTab === 'requests' && styles.activeTabText]}>
-            Requests
+            Yêu cầu
           </Text>
           {requests.length > 0 && (
             <View style={styles.badge}>
@@ -195,7 +195,7 @@ const FriendsScreen = () => {
           onPress={() => setActiveTab('search')}
         >
           <Text style={[styles.tabText, activeTab === 'search' && styles.activeTabText]}>
-            Search
+            Tìm kiếm
           </Text>
         </TouchableOpacity>
       </View>
@@ -228,7 +228,7 @@ const FriendsScreen = () => {
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>
               {activeTab === 'friends' ? 'No friends yet' :
-               activeTab === 'requests' ? 'No pending requests' :
+               activeTab === 'requests' ? 'Không có yêu cầu nào' :
                searchQuery.length > 2 ? 'No users found' : 'Search for users to add as friends'}
             </Text>
           </View>

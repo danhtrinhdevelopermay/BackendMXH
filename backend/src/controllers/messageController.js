@@ -13,7 +13,7 @@ const sendMessage = async (req, res) => {
     await pool.query(
       `INSERT INTO notifications (user_id, type, content, related_user_id) 
        VALUES ($1, $2, $3, $4)`,
-      [receiver_id, 'message', 'sent you a message', sender_id]
+      [receiver_id, 'message', 'gửi một yêu cầu kết bạn đến bạn', sender_id]
     );
 
     res.status(201).json(result.rows[0]);

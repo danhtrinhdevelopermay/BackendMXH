@@ -107,7 +107,7 @@ const NotificationsScreen = () => {
             onPress={handleMarkAllAsRead} 
             textColor="#1877f2"
           >
-            Mark All as Read
+            Xóa Tất Cả
           </Button>
         </View>
       )}

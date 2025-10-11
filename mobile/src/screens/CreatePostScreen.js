@@ -163,7 +163,7 @@ const CreatePostScreen = ({ navigation }) => {
             onPress={() => pickMedia('image')}
           >
             <Text style={styles.photoIcon}>📷</Text>
-            <Text style={styles.addPhotoText}>Photo</Text>
+            <Text style={styles.addPhotoText}>Ảnh</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -183,7 +183,7 @@ const CreatePostScreen = ({ navigation }) => {
           style={styles.postButton}
           buttonColor="#1877f2"
         >
-          Post
+          Đăng bài viết
         </Button>
       </View>
     </View>

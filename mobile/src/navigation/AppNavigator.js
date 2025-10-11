@@ -32,10 +32,10 @@ const HomeTabs = () => {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           if (route.name === 'Home') iconName = focused ? 'home' : 'home-outline';
-          else if (route.name === 'Friends') iconName = focused ? 'people' : 'people-outline';
-          else if (route.name === 'Messages') iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
-          else if (route.name === 'Notifications') iconName = focused ? 'notifications' : 'notifications-outline';
-          else if (route.name === 'Profile') iconName = focused ? 'person' : 'person-outline';
+          else if (route.name === 'Bạn bè') iconName = focused ? 'people' : 'people-outline';
+          else if (route.name === 'Tin nhắn') iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
+          else if (route.name === 'Thông báo') iconName = focused ? 'notifications' : 'notifications-outline';
+          else if (route.name === 'Hồ sơ') iconName = focused ? 'person' : 'person-outline';
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#1877f2',
@@ -71,7 +71,7 @@ const HomeTabs = () => {
         component={HomeScreen}
         options={({ navigation }) => ({
           headerShown: true,
-          title: 'Layedia',
+          title: 'Trang chủ',
           headerRight: () => (
             <TouchableOpacity
               onPress={() => navigation.navigate('Search')}
@@ -83,28 +83,28 @@ const HomeTabs = () => {
         })}
       />
       <Tab.Screen 
-        name="Friends" 
+        name="Bạn bè" 
         component={FriendsScreen}
         options={{
           headerShown: true,
         }}
       />
       <Tab.Screen 
-        name="Messages" 
+        name="Tin nhắn" 
         component={MessagesScreen}
         options={{
           headerShown: true,
         }}
       />
       <Tab.Screen 
-        name="Notifications" 
+        name="Thông báo" 
         component={NotificationsScreen}
         options={{
           headerShown: true,
         }}
       />
       <Tab.Screen 
-        name="Profile" 
+        name="Hồ sơ" 
         component={ProfileScreen}
         options={{
           headerShown: true,
@@ -128,7 +128,7 @@ const AppNavigator = () => {
           <>
             <Stack.Screen name="MainTabs" component={HomeTabs} />
             <Stack.Screen name="Search" component={SearchScreen} options={{ headerShown: true, title: 'Tìm kiếm' }} />
-            <Stack.Screen name="CreatePost" component={CreatePostScreen} options={{ headerShown: true, title: 'Create Post' }} />
+            <Stack.Screen name="CreatePost" component={CreatePostScreen} options={{ headerShown: true, title: 'Tạo bài viết' }} />
             <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: true }} />
             <Stack.Screen name="Comments" component={CommentsScreen} options={{ headerShown: true, title: 'Comments' }} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: true, title: 'Chỉnh sửa hồ sơ' }} />

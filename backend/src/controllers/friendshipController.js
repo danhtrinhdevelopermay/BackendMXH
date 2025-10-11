@@ -26,7 +26,7 @@ const sendFriendRequest = async (req, res) => {
     await pool.query(
       `INSERT INTO notifications (user_id, type, content, related_user_id) 
        VALUES ($1, $2, $3, $4)`,
-      [addressee_id, 'friend_request', 'sent you a friend request', requester_id]
+      [addressee_id, 'friend_request', 'gửi một yêu cầu kết bạn đến bạn', requester_id]
     );
 
     res.status(201).json(result.rows[0]);
