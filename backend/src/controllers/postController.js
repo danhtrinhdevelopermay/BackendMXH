@@ -1,14 +1,27 @@
 const pool = require('../config/database');
 
 const createPost = async (req, res) => {
-  const { content, image_url } = req.body;
+  const { content, media_id } = req.body;
   const user_id = req.user.id;
 
   try {
-    const result = await pool.query(
-      'INSERT INTO posts (user_id, content, image_url) VALUES ($1, $2, $3) RETURNING *',
-      [user_id, content, image_url]
-    );
+    let result;
+    
+    if (media_id) {
+      result = await pool.query(
+        'UPDATE posts SET content = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
+        [content, media_id, user_id]
+      );
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Media not found or unauthorized' });
+      }
+    } else {
+      result = await pool.query(
+        'INSERT INTO posts (user_id, content) VALUES ($1, $2) RETURNING *',
+        [user_id, content]
+      );
+    }
 
     const post = result.rows[0];
     
