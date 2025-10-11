@@ -3,6 +3,7 @@ import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform } from 'reac
 import { TextInput, IconButton, Text, Avatar } from 'react-native-paper';
 import { messageAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
+import UserAvatar from '../components/UserAvatar';
 
 const ChatScreen = ({ route, navigation }) => {
   const { userId, userName } = route.params;
@@ -50,7 +51,7 @@ const ChatScreen = ({ route, navigation }) => {
     return (
       <View style={[styles.messageContainer, isMyMessage ? styles.myMessage : styles.theirMessage]}>
         {!isMyMessage && (
-          <Avatar.Text size={30} label={item.sender_username?.[0]?.toUpperCase() || 'U'} />
+          <UserAvatar user={{ ...item, user_id: item.sender_id }} size={30} />
         )}
         <View style={[styles.messageBubble, isMyMessage ? styles.myBubble : styles.theirBubble]}>
           <Text style={isMyMessage ? styles.myText : styles.theirText}>{item.content}</Text>

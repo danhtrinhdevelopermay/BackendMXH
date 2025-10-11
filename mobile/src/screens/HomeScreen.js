@@ -6,6 +6,7 @@ import Constants from 'expo-constants';
 import { postAPI, reactionAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
+import UserAvatar from '../components/UserAvatar';
 
 const HomeScreen = ({ navigation }) => {
   const { user } = useContext(AuthContext);
@@ -109,9 +110,9 @@ const HomeScreen = ({ navigation }) => {
         style={styles.postInputContainer}
         onPress={() => navigation.navigate('CreatePost')}
       >
-        <Avatar.Text 
-          size={40} 
-          label={user?.username?.[0]?.toUpperCase() || 'U'}
+        <UserAvatar 
+          user={user} 
+          size={40}
           style={styles.headerAvatar}
         />
         <View style={styles.postInput}>
@@ -126,9 +127,9 @@ const HomeScreen = ({ navigation }) => {
     <Card style={styles.card} elevation={0}>
       <View style={styles.postHeader}>
         <View style={styles.postHeaderLeft}>
-          <Avatar.Text 
-            size={40} 
-            label={item.username[0].toUpperCase()}
+          <UserAvatar 
+            user={item}
+            size={40}
             style={styles.avatar}
           />
           <View style={styles.postHeaderInfo}>

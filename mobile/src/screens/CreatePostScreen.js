@@ -7,6 +7,7 @@ import { postAPI, uploadAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
 import { Ionicons } from '@expo/vector-icons';
+import UserAvatar from '../components/UserAvatar';
 
 const CreatePostScreen = ({ navigation }) => {
   const { user } = useContext(AuthContext);
@@ -67,9 +68,9 @@ const CreatePostScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.userInfo}>
-          <Avatar.Text 
-            size={40} 
-            label={user?.username?.[0]?.toUpperCase() || 'U'}
+          <UserAvatar 
+            user={user}
+            size={40}
             style={styles.avatar}
           />
           <View style={styles.userDetails}>

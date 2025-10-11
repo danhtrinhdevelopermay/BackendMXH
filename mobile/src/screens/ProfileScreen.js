@@ -5,6 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
 import { postAPI, userAPI, friendshipAPI, messageAPI } from '../api/api';
 import Constants from 'expo-constants';
+import UserAvatar from '../components/UserAvatar';
 
 const ProfileScreen = ({ route, navigation }) => {
   const { user: currentUser, logout } = useContext(AuthContext);
@@ -256,9 +257,9 @@ const ProfileScreen = ({ route, navigation }) => {
     <Card style={styles.postCard} elevation={0}>
       <View style={styles.postHeader}>
         <View style={styles.postHeaderLeft}>
-          <Avatar.Text 
-            size={40} 
-            label={profileUser?.username?.[0]?.toUpperCase() || 'U'}
+          <UserAvatar 
+            user={profileUser}
+            size={40}
             style={styles.postAvatar}
           />
           <View style={styles.postHeaderInfo}>

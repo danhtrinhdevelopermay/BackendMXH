@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { TextInput, IconButton, Avatar, Text, Card } from 'react-native-paper';
 import { commentAPI } from '../api/api';
 import { useAlert } from '../context/AlertContext';
+import { AuthContext } from '../context/AuthContext';
+import UserAvatar from '../components/UserAvatar';
 
 const CommentsScreen = ({ route }) => {
   const { showAlert } = useAlert();
+  const { user } = useContext(AuthContext);
   const { postId } = route.params;
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
@@ -42,9 +45,9 @@ const CommentsScreen = ({ route }) => {
   const renderComment = ({ item }) => (
     <Card style={styles.commentCard} elevation={0}>
       <View style={styles.commentContainer}>
-        <Avatar.Text 
-          size={40} 
-          label={item.username?.[0]?.toUpperCase() || 'U'}
+        <UserAvatar 
+          user={item}
+          size={40}
           style={styles.avatar}
         />
         <View style={styles.commentContent}>
@@ -78,9 +81,9 @@ const CommentsScreen = ({ route }) => {
         contentContainerStyle={styles.commentsList}
       />
       <View style={styles.inputContainer}>
-        <Avatar.Text 
-          size={32} 
-          label="U"
+        <UserAvatar 
+          user={user}
+          size={32}
           style={styles.inputAvatar}
         />
         <TextInput

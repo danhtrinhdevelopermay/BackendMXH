@@ -3,6 +3,7 @@ import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Avatar, Text, Card } from 'react-native-paper';
 import { messageAPI } from '../api/api';
 import { useAlert } from '../context/AlertContext';
+import UserAvatar from '../components/UserAvatar';
 
 const MessagesScreen = ({ navigation }) => {
   const { showAlert } = useAlert();
@@ -39,9 +40,9 @@ const MessagesScreen = ({ navigation }) => {
         <Card style={[styles.conversationCard, isUnread && styles.unreadCard]} elevation={0}>
           <View style={styles.conversationContainer}>
             <View style={styles.avatarContainer}>
-              <Avatar.Text 
-                size={56} 
-                label={item.username?.[0]?.toUpperCase() || 'U'}
+              <UserAvatar 
+                user={item}
+                size={56}
                 style={styles.avatar}
               />
               {isUnread && <View style={styles.unreadBadge} />}

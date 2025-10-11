@@ -3,6 +3,7 @@ import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { List, Avatar, Button, Searchbar, Text, Divider, Card } from 'react-native-paper';
 import { friendshipAPI } from '../api/api';
 import { useAlert } from '../context/AlertContext';
+import UserAvatar from '../components/UserAvatar';
 
 const FriendsScreen = () => {
   const { showAlert } = useAlert();
@@ -73,9 +74,9 @@ const FriendsScreen = () => {
     <Card style={styles.friendCard} elevation={0}>
       <View style={styles.friendContainer}>
         <View style={styles.friendLeft}>
-          <Avatar.Text 
-            size={60} 
-            label={item.username[0].toUpperCase()}
+          <UserAvatar 
+            user={item}
+            size={60}
             style={styles.friendAvatar}
           />
           <View style={styles.friendInfo}>
@@ -98,9 +99,9 @@ const FriendsScreen = () => {
     <Card style={styles.requestCard} elevation={0}>
       <View style={styles.requestContainer}>
         <View style={styles.requestLeft}>
-          <Avatar.Text 
-            size={60} 
-            label={item.username[0].toUpperCase()}
+          <UserAvatar 
+            user={item}
+            size={60}
             style={styles.requestAvatar}
           />
           <View style={styles.requestInfo}>
