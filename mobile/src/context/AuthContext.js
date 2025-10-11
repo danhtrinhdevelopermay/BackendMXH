@@ -20,7 +20,12 @@ export const AuthProvider = ({ children }) => {
         setUser(response.data);
       }
     } catch (error) {
-      await SecureStore.deleteItemAsync('token');
+      console.log('Auth check error:', error.message);
+      try {
+        await SecureStore.deleteItemAsync('token');
+      } catch (e) {
+        console.log('Error deleting token:', e);
+      }
     } finally {
       setLoading(false);
     }
