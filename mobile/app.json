@@ -3,7 +3,6 @@
     "name": "Social Media",
     "slug": "social-media-mobile",
     "version": "1.0.0",
-    "owner": "rogofe8643",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
