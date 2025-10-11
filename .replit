@@ -38,12 +38,12 @@ outputType = "webview"
 name = "Expo Mobile App"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd mobile && EXPO_NO_TELEMETRY=1 npx expo start --tunnel --clear --no-dev --non-interactive"
-
 [workflows.workflow.metadata]
 outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd mobile && EXPO_NO_TELEMETRY=1 npx expo start --lan --clear"
 
 [[ports]]
 localPort = 5000
