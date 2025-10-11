@@ -2,43 +2,53 @@ import React, { useState, useContext } from 'react';
 import { View, StyleSheet, Alert, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Avatar, Text, Divider } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
+import { Video } from 'expo-av';
 import { postAPI, uploadAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
 
 const CreatePostScreen = ({ navigation }) => {
   const { user } = useContext(AuthContext);
   const [content, setContent] = useState('');
-  const [imageUri, setImageUri] = useState(null);
+  const [mediaUri, setMediaUri] = useState(null);
+  const [mediaType, setMediaType] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const pickImage = async () => {
+  const pickMedia = async (type = 'all') => {
+    const mediaTypeOption = type === 'video' 
+      ? ImagePicker.MediaTypeOptions.Videos 
+      : ImagePicker.MediaTypeOptions.All;
+
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
+      mediaTypes: mediaTypeOption,
+      allowsEditing: type !== 'video',
+      aspect: [16, 9],
       quality: 0.8,
+      videoMaxDuration: 60,
     });
 
     if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
+      const asset = result.assets[0];
+      setMediaUri(asset.uri);
+      setMediaType(asset.type);
     }
   };
 
   const handleCreatePost = async () => {
-    if (!content && !imageUri) {
-      Alert.alert('Error', 'Please add some content or an image');
+    if (!content && !mediaUri) {
+      Alert.alert('Error', 'Please add some content or media');
       return;
     }
 
     setLoading(true);
     try {
-      let imageUrl = null;
-      if (imageUri) {
-        const uploadResponse = await uploadAPI.uploadImage(imageUri);
-        imageUrl = uploadResponse.url;
+      let mediaId = null;
+      if (mediaUri) {
+        const mimeType = mediaType === 'video' ? 'video/mp4' : 'image/jpeg';
+        const uploadResponse = await uploadAPI.uploadMedia(mediaUri, mimeType);
+        mediaId = uploadResponse.id;
       }
 
-      await postAPI.createPost({ content, image_url: imageUrl });
+      await postAPI.createPost({ content, media_id: mediaId });
       Alert.alert('Success', 'Post created successfully');
       navigation.goBack();
     } catch (error) {
@@ -76,12 +86,25 @@ const CreatePostScreen = ({ navigation }) => {
           activeUnderlineColor="transparent"
         />
         
-        {imageUri && (
+        {mediaUri && (
           <View style={styles.imageContainer}>
-            <Image source={{ uri: imageUri }} style={styles.image} />
+            {mediaType === 'video' ? (
+              <Video
+                source={{ uri: mediaUri }}
+                style={styles.image}
+                useNativeControls
+                resizeMode="contain"
+                isLooping
+              />
+            ) : (
+              <Image source={{ uri: mediaUri }} style={styles.image} />
+            )}
             <TouchableOpacity 
               style={styles.removeImageButton}
-              onPress={() => setImageUri(null)}
+              onPress={() => {
+                setMediaUri(null);
+                setMediaType(null);
+              }}
             >
               <Text style={styles.removeImageText}>✕</Text>
             </TouchableOpacity>
@@ -90,21 +113,29 @@ const CreatePostScreen = ({ navigation }) => {
       </ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity 
-          style={styles.addPhotoButton}
-          onPress={pickImage}
-        >
-          <Text style={styles.photoIcon}>📷</Text>
-          <Text style={styles.addPhotoText}>
-            {imageUri ? 'Change Photo' : 'Add Photo'}
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.mediaButtons}>
+          <TouchableOpacity 
+            style={[styles.addPhotoButton, { flex: 1, marginRight: 8 }]}
+            onPress={() => pickMedia('image')}
+          >
+            <Text style={styles.photoIcon}>📷</Text>
+            <Text style={styles.addPhotoText}>Photo</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[styles.addPhotoButton, { flex: 1 }]}
+            onPress={() => pickMedia('video')}
+          >
+            <Text style={styles.photoIcon}>🎥</Text>
+            <Text style={styles.addPhotoText}>Video</Text>
+          </TouchableOpacity>
+        </View>
         
         <Button
           mode="contained"
           onPress={handleCreatePost}
           loading={loading}
-          disabled={loading || (!content && !imageUri)}
+          disabled={loading || (!content && !mediaUri)}
           style={styles.postButton}
           buttonColor="#1877f2"
         >
@@ -175,13 +206,17 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#e4e6eb',
   },
+  mediaButtons: {
+    flexDirection: 'row',
+    marginBottom: 12,
+  },
   addPhotoButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     padding: 12,
     backgroundColor: '#f0f2f5',
     borderRadius: 8,
-    marginBottom: 12,
   },
   photoIcon: {
     fontSize: 24,

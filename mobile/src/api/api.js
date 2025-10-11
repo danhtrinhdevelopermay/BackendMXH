@@ -68,12 +68,14 @@ export const notificationAPI = {
 };
 
 export const uploadAPI = {
-  uploadImage: async (uri) => {
+  uploadMedia: async (uri, type) => {
     const formData = new FormData();
-    formData.append('image', {
+    const isVideo = type?.startsWith('video/');
+    
+    formData.append('media', {
       uri,
-      type: 'image/jpeg',
-      name: 'photo.jpg',
+      type: type || (isVideo ? 'video/mp4' : 'image/jpeg'),
+      name: isVideo ? 'video.mp4' : 'photo.jpg',
     });
 
     const token = await SecureStore.getItemAsync('token');
@@ -84,6 +86,10 @@ export const uploadAPI = {
       },
     });
     return response.data;
+  },
+  
+  uploadImage: async (uri) => {
+    return uploadAPI.uploadMedia(uri, 'image/jpeg');
   },
 };
 
