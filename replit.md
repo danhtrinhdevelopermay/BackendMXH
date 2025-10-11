@@ -26,6 +26,7 @@ Preferred communication style: Simple, everyday language.
 - Unauthenticated flow: Login/Register screens via Stack Navigator
 - Authenticated flow: Bottom Tab Navigator with 5 main tabs (Home, Friends, Messages, Notifications, Profile)
 - Modal screens: CreatePost, Chat, Comments accessed via Stack Navigator
+- User Profile: Clicking on a user in search results opens their profile with posts, friendship status, and action buttons (add friend/message)
 
 **State Management Approach:**
 - AuthContext provides centralized authentication state and methods
@@ -50,6 +51,7 @@ Preferred communication style: Simple, everyday language.
 
 **Route Organization:**
 - `/api/auth` - User registration, login, profile retrieval
+- `/api/users/:userId` - Get user information by ID with friendship status
 - `/api/posts` - Post creation, news feed, user posts, deletion
 - `/api/comments` - Comment management per post
 - `/api/reactions` - Like/reaction system (6 types: like, love, haha, wow, sad, angry)
@@ -75,6 +77,8 @@ Preferred communication style: Simple, everyday language.
 - Notification creation triggered automatically on social actions (comments, reactions, friend requests, messages)
 - Conversations view shows latest message per unique user pair
 - User reactions stored with ability to update reaction type
+- User profile view returns user info with friendship status (friends, request_sent, request_received, or null)
+- ProfileScreen handles both own profile (edit/logout) and other users' profiles (add friend/message buttons with state-aware UI)
 
 ## External Dependencies
 
