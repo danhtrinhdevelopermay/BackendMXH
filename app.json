@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "e9f35945-3e89-4db8-8323-608574b44f0c"
+      }
+    },
+    "android": {
+      "package": "com.danhtrinh2k10a.workspace"
+    },
+    "ios": {
+      "bundleIdentifier": "com.danhtrinh2k10a.workspace",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    }
+  }
+}
