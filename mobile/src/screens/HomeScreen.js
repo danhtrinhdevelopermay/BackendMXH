@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { View, FlatList, StyleSheet, RefreshControl, Alert, TouchableOpacity, Pressable } from 'react-native';
 import { Card, Avatar, IconButton, Text, Menu, Divider } from 'react-native-paper';
+import { Video } from 'expo-av';
+import Constants from 'expo-constants';
 import { postAPI, reactionAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
 
@@ -158,14 +160,30 @@ const HomeScreen = ({ navigation }) => {
 
       {item.content && <Text style={styles.postContent}>{item.content}</Text>}
       
-      {item.image_url && (
-        <Pressable onPress={() => {}}>
-          <Card.Cover 
-            source={{ uri: item.image_url }} 
-            style={styles.postImage}
-          />
-        </Pressable>
-      )}
+      {item.media_type && (() => {
+        const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
+        const mediaUrl = `${API_URL}/api/media/${item.id}`;
+        const isVideo = item.media_type?.startsWith('video/');
+        
+        return (
+          <Pressable onPress={() => {}}>
+            {isVideo ? (
+              <Video
+                source={{ uri: mediaUrl }}
+                style={styles.postImage}
+                useNativeControls
+                resizeMode="contain"
+                shouldPlay={false}
+              />
+            ) : (
+              <Card.Cover 
+                source={{ uri: mediaUrl }} 
+                style={styles.postImage}
+              />
+            )}
+          </Pressable>
+        );
+      })()}
 
       {(item.reaction_count > 0 || item.comment_count > 0) && (
         <View style={styles.statsContainer}>

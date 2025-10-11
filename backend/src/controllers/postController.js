@@ -47,7 +47,8 @@ const getNewsFeed = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT p.*, u.username, u.full_name, u.avatar_url,
+      `SELECT p.id, p.user_id, p.content, p.media_type, p.created_at, p.updated_at,
+       u.username, u.full_name, u.avatar_url,
        (SELECT COUNT(*) FROM reactions WHERE post_id = p.id) as reaction_count,
        (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count,
        (SELECT reaction_type FROM reactions WHERE post_id = p.id AND user_id = $1) as user_reaction
@@ -79,7 +80,8 @@ const getUserPosts = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT p.*, u.username, u.full_name, u.avatar_url,
+      `SELECT p.id, p.user_id, p.content, p.media_type, p.created_at, p.updated_at,
+       u.username, u.full_name, u.avatar_url,
        (SELECT COUNT(*) FROM reactions WHERE post_id = p.id) as reaction_count,
        (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count,
        (SELECT reaction_type FROM reactions WHERE post_id = p.id AND user_id = $2) as user_reaction
