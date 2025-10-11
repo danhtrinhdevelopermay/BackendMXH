@@ -1,8 +1,15 @@
-# Social Media App - React Native + Expo
+# Layedia - Social Media App (React Native + Expo)
 
 ## Overview
 
-This is a full-stack social media application similar to Facebook, built with React Native/Expo for the mobile frontend and Node.js/Express with PostgreSQL for the backend API. The application provides core social networking features including posts, reactions, comments, friend connections, direct messaging, and real-time notifications.
+Layedia is a full-stack social media application similar to Facebook, built with React Native/Expo for the mobile frontend and Node.js/Express with PostgreSQL for the backend API. The application provides core social networking features including posts, reactions, comments, friend connections, direct messaging, and real-time notifications.
+
+## App Branding
+
+- **App Name:** Layedia
+- **Logo:** Custom gradient checkmark logo (located at `mobile/assets/logo.png`)
+- **Branding Colors:** Blue gradient theme (#1877f2)
+- **Logo Display:** Login screen shows logo image (120x120) with app name "Layedia" below
 
 ## User Preferences
 

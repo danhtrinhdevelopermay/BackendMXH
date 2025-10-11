@@ -28,7 +28,12 @@ const LoginScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.logo}>facebook</Text>
+        <Image 
+          source={require('../../assets/logo.png')} 
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <Text style={styles.appName}>Layedia</Text>
         <Text style={styles.subtitle}>Connect with friends and the world around you.</Text>
         
         <View style={styles.formContainer}>
@@ -95,7 +100,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   logo: {
-    fontSize: 48,
+    width: 120,
+    height: 120,
+    alignSelf: 'center',
+    marginBottom: 16,
+  },
+  appName: {
+    fontSize: 36,
     fontWeight: 'bold',
     color: '#1877f2',
     textAlign: 'center',

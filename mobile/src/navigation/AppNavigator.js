@@ -71,7 +71,7 @@ const HomeTabs = () => {
         component={HomeScreen}
         options={({ navigation }) => ({
           headerShown: true,
-          title: 'facebook',
+          title: 'Layedia',
           headerRight: () => (
             <TouchableOpacity
               onPress={() => navigation.navigate('Search')}
