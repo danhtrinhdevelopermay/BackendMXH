@@ -34,6 +34,7 @@ export const postAPI = {
   getNewsFeed: (params) => api.get('/posts/feed', { params }),
   getUserPosts: (userId) => api.get(`/posts/user/${userId}`),
   deletePost: (postId) => api.delete(`/posts/${postId}`),
+  searchPosts: (query) => api.get('/posts/search', { params: { query } }),
 };
 
 export const commentAPI = {

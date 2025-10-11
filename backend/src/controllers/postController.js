@@ -127,4 +127,29 @@ const deletePost = async (req, res) => {
   }
 };
 
-module.exports = { createPost, getNewsFeed, getUserPosts, deletePost };
+const searchPosts = async (req, res) => {
+  const { query } = req.query;
+  const user_id = req.user.id;
+
+  try {
+    const result = await pool.query(
+      `SELECT p.id, p.user_id, p.content, p.media_type, p.created_at, p.updated_at,
+       u.username, u.full_name as author_name, u.avatar_url,
+       (SELECT COUNT(*) FROM reactions WHERE post_id = p.id) as reaction_count,
+       (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count
+       FROM posts p
+       JOIN users u ON p.user_id = u.id
+       WHERE p.content ILIKE $1
+       ORDER BY p.created_at DESC
+       LIMIT 30`,
+      [`%${query}%`]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Search posts error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+module.exports = { createPost, getNewsFeed, getUserPosts, deletePost, searchPosts };
