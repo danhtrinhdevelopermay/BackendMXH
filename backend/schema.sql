@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS posts (
   content TEXT,
   media_data BYTEA,
   media_type VARCHAR(50),
+  privacy VARCHAR(20) DEFAULT 'public',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
