@@ -1,5 +1,8 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
-# Auto-select "Proceed anonymously" by simulating down arrow and enter
-(sleep 2; printf "\x1b[B\n") | EXPO_NO_TELEMETRY=1 npx expo start --tunnel --clear
+# Bypass login prompt and start Expo in tunnel mode
+export EXPO_NO_TELEMETRY=1
+
+# Continuously send down arrow + enter every 3 seconds to auto-select "Proceed anonymously"
+{ while true; do sleep 3; printf "\e[B\r"; done; } | npx expo start --tunnel --clear
