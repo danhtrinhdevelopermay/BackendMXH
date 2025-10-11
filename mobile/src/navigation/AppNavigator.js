@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext';
 
 import LoginScreen from '../screens/LoginScreen';
@@ -20,6 +21,8 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const HomeTabs = () => {
+  const insets = useSafeAreaInsets();
+  
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -38,8 +41,8 @@ const HomeTabs = () => {
           backgroundColor: '#fff',
           borderTopWidth: 1,
           borderTopColor: '#e4e6eb',
-          height: 60,
-          paddingBottom: 8,
+          height: 60 + insets.bottom,
+          paddingBottom: insets.bottom + 8,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
