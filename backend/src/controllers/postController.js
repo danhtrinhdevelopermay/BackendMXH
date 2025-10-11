@@ -4,6 +4,10 @@ const createPost = async (req, res) => {
   const { content, media_id, privacy = 'public' } = req.body;
   const user_id = req.user.id;
 
+  if (privacy && !['public', 'friends'].includes(privacy)) {
+    return res.status(400).json({ error: 'Invalid privacy value. Must be "public" or "friends"' });
+  }
+
   try {
     console.log(`Creating post for user ${user_id}, media_id: ${media_id}, content: "${content}", privacy: ${privacy}`);
     let result;
@@ -145,16 +149,27 @@ const searchPosts = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT p.id, p.user_id, p.content, p.media_type, p.created_at, p.updated_at,
+      `SELECT p.id, p.user_id, p.content, p.media_type, p.privacy, p.created_at, p.updated_at,
        u.username, u.full_name as author_name, u.avatar_url,
        (SELECT COUNT(*) FROM reactions WHERE post_id = p.id) as reaction_count,
        (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count
        FROM posts p
        JOIN users u ON p.user_id = u.id
-       WHERE p.content ILIKE $1
+       WHERE p.content ILIKE $1 AND (
+         p.user_id = $2
+         OR p.privacy = 'public'
+         OR (p.privacy = 'friends' AND p.user_id IN (
+           SELECT CASE 
+             WHEN requester_id = $2 THEN addressee_id 
+             ELSE requester_id 
+           END 
+           FROM friendships 
+           WHERE status = 'accepted' AND (requester_id = $2 OR addressee_id = $2)
+         ))
+       )
        ORDER BY p.created_at DESC
        LIMIT 30`,
-      [`%${query}%`]
+      [`%${query}%`, user_id]
     );
 
     res.json(result.rows);
