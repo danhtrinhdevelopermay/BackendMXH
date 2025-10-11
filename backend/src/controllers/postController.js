@@ -1,18 +1,18 @@
 const pool = require('../config/database');
 
 const createPost = async (req, res) => {
-  const { content, media_id } = req.body;
+  const { content, media_id, privacy = 'public' } = req.body;
   const user_id = req.user.id;
 
   try {
-    console.log(`Creating post for user ${user_id}, media_id: ${media_id}, content: "${content}"`);
+    console.log(`Creating post for user ${user_id}, media_id: ${media_id}, content: "${content}", privacy: ${privacy}`);
     let result;
     
     if (media_id) {
-      console.log(`Updating existing post (media_id: ${media_id}) with content`);
+      console.log(`Updating existing post (media_id: ${media_id}) with content and privacy`);
       result = await pool.query(
-        'UPDATE posts SET content = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
-        [content, media_id, user_id]
+        'UPDATE posts SET content = $1, privacy = $2 WHERE id = $3 AND user_id = $4 RETURNING *',
+        [content, privacy, media_id, user_id]
       );
       
       if (result.rows.length === 0) {
@@ -23,8 +23,8 @@ const createPost = async (req, res) => {
     } else {
       console.log('Creating new post without media');
       result = await pool.query(
-        'INSERT INTO posts (user_id, content) VALUES ($1, $2) RETURNING *',
-        [user_id, content]
+        'INSERT INTO posts (user_id, content, privacy) VALUES ($1, $2, $3) RETURNING *',
+        [user_id, content, privacy]
       );
       console.log(`Post created successfully - ID: ${result.rows[0].id}`);
     }
@@ -54,21 +54,24 @@ const getNewsFeed = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT p.id, p.user_id, p.content, p.media_type, p.created_at, p.updated_at,
+      `SELECT p.id, p.user_id, p.content, p.media_type, p.privacy, p.created_at, p.updated_at,
        u.username, u.full_name, u.avatar_url,
        (SELECT COUNT(*) FROM reactions WHERE post_id = p.id) as reaction_count,
        (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count,
        (SELECT reaction_type FROM reactions WHERE post_id = p.id AND user_id = $1) as user_reaction
        FROM posts p
        JOIN users u ON p.user_id = u.id
-       WHERE p.user_id = $1 
-       OR p.user_id IN (
-         SELECT CASE 
-           WHEN requester_id = $1 THEN addressee_id 
-           ELSE requester_id 
-         END 
-         FROM friendships 
-         WHERE status = 'accepted' AND (requester_id = $1 OR addressee_id = $1)
+       WHERE (
+         p.user_id = $1 
+         OR (p.privacy = 'public')
+         OR (p.privacy = 'friends' AND p.user_id IN (
+           SELECT CASE 
+             WHEN requester_id = $1 THEN addressee_id 
+             ELSE requester_id 
+           END 
+           FROM friendships 
+           WHERE status = 'accepted' AND (requester_id = $1 OR addressee_id = $1)
+         ))
        )
        ORDER BY p.created_at DESC
        LIMIT $2 OFFSET $3`,
@@ -84,19 +87,28 @@ const getNewsFeed = async (req, res) => {
 
 const getUserPosts = async (req, res) => {
   const { userId } = req.params;
+  const currentUserId = req.user.id;
 
   try {
     const result = await pool.query(
-      `SELECT p.id, p.user_id, p.content, p.media_type, p.created_at, p.updated_at,
+      `SELECT p.id, p.user_id, p.content, p.media_type, p.privacy, p.created_at, p.updated_at,
        u.username, u.full_name, u.avatar_url,
        (SELECT COUNT(*) FROM reactions WHERE post_id = p.id) as reaction_count,
        (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count,
        (SELECT reaction_type FROM reactions WHERE post_id = p.id AND user_id = $2) as user_reaction
        FROM posts p
        JOIN users u ON p.user_id = u.id
-       WHERE p.user_id = $1
+       WHERE p.user_id = $1 AND (
+         $1 = $2
+         OR p.privacy = 'public'
+         OR (p.privacy = 'friends' AND EXISTS (
+           SELECT 1 FROM friendships 
+           WHERE status = 'accepted' 
+           AND ((requester_id = $1 AND addressee_id = $2) OR (requester_id = $2 AND addressee_id = $1))
+         ))
+       )
        ORDER BY p.created_at DESC`,
-      [userId, req.user.id]
+      [userId, currentUserId]
     );
 
     res.json(result.rows);
