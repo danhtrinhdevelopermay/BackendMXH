@@ -1,17 +1,19 @@
 import React, { useState, useContext } from 'react';
-import { View, StyleSheet, Alert, Image } from 'react-native';
+import { View, StyleSheet, Image } from 'react-native';
 import { TextInput, Button, Text, Divider } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
+import { useAlert } from '../context/AlertContext';
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
+  const { showAlert } = useAlert();
 
   const handleLogin = async () => {
     if (!username || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      showAlert('Error', 'Please fill in all fields', 'error');
       return;
     }
 
@@ -19,7 +21,7 @@ const LoginScreen = ({ navigation }) => {
     try {
       await login(username, password);
     } catch (error) {
-      Alert.alert('Error', error.response?.data?.error || 'Login failed');
+      showAlert('Error', error.response?.data?.error || 'Login failed', 'error');
     } finally {
       setLoading(false);
     }

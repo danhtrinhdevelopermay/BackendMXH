@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { View, FlatList, StyleSheet, RefreshControl, Alert, TouchableOpacity, Pressable } from 'react-native';
+import { View, FlatList, StyleSheet, RefreshControl, TouchableOpacity, Pressable } from 'react-native';
 import { Card, Avatar, IconButton, Text, Menu, Divider } from 'react-native-paper';
 import { Video } from 'expo-av';
 import Constants from 'expo-constants';
 import { postAPI, reactionAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
+import { useAlert } from '../context/AlertContext';
 
 const HomeScreen = ({ navigation }) => {
   const { user } = useContext(AuthContext);
+  const { showAlert } = useAlert();
   const [posts, setPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -19,7 +21,7 @@ const HomeScreen = ({ navigation }) => {
       const response = await postAPI.getNewsFeed();
       setPosts(response.data);
     } catch (error) {
-      Alert.alert('Error', 'Failed to fetch posts');
+      showAlert('Error', 'Failed to fetch posts', 'error');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -41,14 +43,15 @@ const HomeScreen = ({ navigation }) => {
       setReactionMenuVisible({});
       fetchPosts();
     } catch (error) {
-      Alert.alert('Error', 'Failed to add reaction');
+      showAlert('Error', 'Failed to add reaction', 'error');
     }
   };
 
   const handleDeletePost = async (postId) => {
-    Alert.alert(
+    showAlert(
       'Delete Post',
       'Are you sure you want to delete this post?',
+      'warning',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -58,9 +61,9 @@ const HomeScreen = ({ navigation }) => {
             try {
               await postAPI.deletePost(postId);
               fetchPosts();
-              Alert.alert('Success', 'Post deleted successfully');
+              showAlert('Success', 'Post deleted successfully', 'success');
             } catch (error) {
-              Alert.alert('Error', 'Failed to delete post');
+              showAlert('Error', 'Failed to delete post', 'error');
             }
           },
         },

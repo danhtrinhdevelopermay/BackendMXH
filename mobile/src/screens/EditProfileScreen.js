@@ -1,13 +1,15 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, StyleSheet, Alert, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { TextInput, Button, Text, Avatar } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { AuthContext } from '../context/AuthContext';
+import { useAlert } from '../context/AlertContext';
 import { authAPI } from '../api/api';
 import Constants from 'expo-constants';
 
 const EditProfileScreen = ({ navigation }) => {
   const { user } = useContext(AuthContext);
+  const { showAlert } = useAlert();
   const [fullName, setFullName] = useState(user?.full_name || '');
   const [bio, setBio] = useState(user?.bio || '');
   const [loading, setLoading] = useState(false);
@@ -20,7 +22,7 @@ const EditProfileScreen = ({ navigation }) => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     
     if (permissionResult.granted === false) {
-      Alert.alert('Lỗi', 'Bạn cần cấp quyền truy cập thư viện ảnh');
+      showAlert('Lỗi', 'Bạn cần cấp quyền truy cập thư viện ảnh', 'error');
       return;
     }
 
@@ -56,14 +58,14 @@ const EditProfileScreen = ({ navigation }) => {
         bio: bio,
       });
 
-      Alert.alert('Thành công', 'Đã cập nhật thông tin cá nhân', [
+      showAlert('Thành công', 'Đã cập nhật thông tin cá nhân', 'success', [
         {
           text: 'OK',
           onPress: () => navigation.goBack()
         }
       ]);
     } catch (error) {
-      Alert.alert('Lỗi', 'Không thể cập nhật thông tin');
+      showAlert('Lỗi', 'Không thể cập nhật thông tin', 'error');
     } finally {
       setLoading(false);
     }

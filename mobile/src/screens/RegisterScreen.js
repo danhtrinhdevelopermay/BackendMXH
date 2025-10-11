@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { View, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Text, IconButton } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
+import { useAlert } from '../context/AlertContext';
 
 const RegisterScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -10,10 +11,11 @@ const RegisterScreen = ({ navigation }) => {
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const { register } = useContext(AuthContext);
+  const { showAlert } = useAlert();
 
   const handleRegister = async () => {
     if (!username || !email || !password) {
-      Alert.alert('Error', 'Please fill in all required fields');
+      showAlert('Error', 'Please fill in all required fields', 'error');
       return;
     }
 
@@ -21,7 +23,7 @@ const RegisterScreen = ({ navigation }) => {
     try {
       await register({ username, email, password, full_name: fullName });
     } catch (error) {
-      Alert.alert('Error', error.response?.data?.error || 'Registration failed');
+      showAlert('Error', error.response?.data?.error || 'Registration failed', 'error');
     } finally {
       setLoading(false);
     }

@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, FlatList, StyleSheet, Alert, Image, TouchableOpacity } from 'react-native';
+import { View, FlatList, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { Card, Avatar, Button, Text, Divider } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
+import { useAlert } from '../context/AlertContext';
 import { postAPI, userAPI, friendshipAPI, messageAPI } from '../api/api';
 import Constants from 'expo-constants';
 
 const ProfileScreen = ({ route, navigation }) => {
   const { user: currentUser, logout } = useContext(AuthContext);
+  const { showAlert } = useAlert();
   const userId = route?.params?.userId;
   const isOwnProfile = !userId || userId === currentUser?.id;
   
@@ -33,7 +35,7 @@ const ProfileScreen = ({ route, navigation }) => {
         setPosts(postsResponse.data);
       }
     } catch (error) {
-      Alert.alert('Lỗi', 'Không thể tải thông tin người dùng');
+      showAlert('Lỗi', 'Không thể tải thông tin người dùng', 'error');
     } finally {
       setLoading(false);
     }
@@ -46,9 +48,10 @@ const ProfileScreen = ({ route, navigation }) => {
   }, [userId, currentUser]);
 
   const handleLogout = () => {
-    Alert.alert(
+    showAlert(
       'Đăng xuất',
       'Bạn có chắc muốn đăng xuất?',
+      'warning',
       [
         { text: 'Hủy', style: 'cancel' },
         { text: 'Đăng xuất', onPress: logout, style: 'destructive' },
@@ -59,10 +62,10 @@ const ProfileScreen = ({ route, navigation }) => {
   const handleAddFriend = async () => {
     try {
       await friendshipAPI.sendFriendRequest({ addressee_id: userId });
-      Alert.alert('Thành công', 'Đã gửi lời mời kết bạn');
+      showAlert('Thành công', 'Đã gửi lời mời kết bạn', 'success');
       setFriendshipStatus('request_sent');
     } catch (error) {
-      Alert.alert('Lỗi', 'Không thể gửi lời mời kết bạn');
+      showAlert('Lỗi', 'Không thể gửi lời mời kết bạn', 'error');
     }
   };
 
@@ -74,9 +77,10 @@ const ProfileScreen = ({ route, navigation }) => {
   };
 
   const handleRespondRequest = () => {
-    Alert.alert(
+    showAlert(
       'Lời mời kết bạn',
       `${profileUser?.full_name || profileUser?.username} muốn kết bạn với bạn`,
+      'info',
       [
         {
           text: 'Từ chối',
@@ -84,10 +88,10 @@ const ProfileScreen = ({ route, navigation }) => {
           onPress: async () => {
             try {
               await friendshipAPI.respondToFriendRequest(profileUser.friendship_id, { status: 'rejected' });
-              Alert.alert('Thành công', 'Đã từ chối lời mời');
+              showAlert('Thành công', 'Đã từ chối lời mời', 'success');
               setFriendshipStatus(null);
             } catch (error) {
-              Alert.alert('Lỗi', 'Không thể từ chối lời mời');
+              showAlert('Lỗi', 'Không thể từ chối lời mời', 'error');
             }
           }
         },
@@ -96,10 +100,10 @@ const ProfileScreen = ({ route, navigation }) => {
           onPress: async () => {
             try {
               await friendshipAPI.respondToFriendRequest(profileUser.friendship_id, { status: 'accepted' });
-              Alert.alert('Thành công', 'Đã chấp nhận lời mời kết bạn');
+              showAlert('Thành công', 'Đã chấp nhận lời mời kết bạn', 'success');
               setFriendshipStatus('friends');
             } catch (error) {
-              Alert.alert('Lỗi', 'Không thể chấp nhận lời mời');
+              showAlert('Lỗi', 'Không thể chấp nhận lời mời', 'error');
             }
           }
         },

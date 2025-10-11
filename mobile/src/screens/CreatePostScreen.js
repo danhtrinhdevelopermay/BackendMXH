@@ -1,14 +1,16 @@
 import React, { useState, useContext } from 'react';
-import { View, StyleSheet, Alert, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Avatar, Text, Divider, Menu } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { Video } from 'expo-av';
 import { postAPI, uploadAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
+import { useAlert } from '../context/AlertContext';
 import { Ionicons } from '@expo/vector-icons';
 
 const CreatePostScreen = ({ navigation }) => {
   const { user } = useContext(AuthContext);
+  const { showAlert } = useAlert();
   const [content, setContent] = useState('');
   const [mediaUri, setMediaUri] = useState(null);
   const [mediaType, setMediaType] = useState(null);
@@ -38,7 +40,7 @@ const CreatePostScreen = ({ navigation }) => {
 
   const handleCreatePost = async () => {
     if (!content && !mediaUri) {
-      Alert.alert('Error', 'Please add some content or media');
+      showAlert('Error', 'Please add some content or media', 'error');
       return;
     }
 
@@ -52,10 +54,10 @@ const CreatePostScreen = ({ navigation }) => {
       }
 
       await postAPI.createPost({ content, media_id: mediaId, privacy });
-      Alert.alert('Success', 'Post created successfully');
+      showAlert('Success', 'Post created successfully', 'success');
       navigation.goBack();
     } catch (error) {
-      Alert.alert('Error', error.response?.data?.error || 'Failed to create post');
+      showAlert('Error', error.response?.data?.error || 'Failed to create post', 'error');
     } finally {
       setLoading(false);
     }

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Avatar, Button, Text, Card, IconButton } from 'react-native-paper';
 import { notificationAPI } from '../api/api';
+import { useAlert } from '../context/AlertContext';
 
 const NotificationsScreen = () => {
+  const { showAlert } = useAlert();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -12,7 +14,7 @@ const NotificationsScreen = () => {
       const response = await notificationAPI.getNotifications();
       setNotifications(response.data);
     } catch (error) {
-      Alert.alert('Error', 'Failed to fetch notifications');
+      showAlert('Error', 'Failed to fetch notifications', 'error');
     } finally {
       setLoading(false);
     }
@@ -27,7 +29,7 @@ const NotificationsScreen = () => {
       await notificationAPI.markAsRead(id);
       fetchNotifications();
     } catch (error) {
-      Alert.alert('Error', 'Failed to mark as read');
+      showAlert('Error', 'Failed to mark as read', 'error');
     }
   };
 
@@ -36,7 +38,7 @@ const NotificationsScreen = () => {
       await notificationAPI.markAllAsRead();
       fetchNotifications();
     } catch (error) {
-      Alert.alert('Error', 'Failed to mark all as read');
+      showAlert('Error', 'Failed to mark all as read', 'error');
     }
   };
 

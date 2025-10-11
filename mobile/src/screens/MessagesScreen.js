@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Avatar, Text, Card } from 'react-native-paper';
 import { messageAPI } from '../api/api';
+import { useAlert } from '../context/AlertContext';
 
 const MessagesScreen = ({ navigation }) => {
+  const { showAlert } = useAlert();
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -12,7 +14,7 @@ const MessagesScreen = ({ navigation }) => {
       const response = await messageAPI.getConversations();
       setConversations(response.data);
     } catch (error) {
-      Alert.alert('Error', 'Failed to fetch conversations');
+      showAlert('Error', 'Failed to fetch conversations', 'error');
     } finally {
       setLoading(false);
     }

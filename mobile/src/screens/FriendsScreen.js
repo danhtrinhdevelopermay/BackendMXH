@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { List, Avatar, Button, Searchbar, Text, Divider, Card } from 'react-native-paper';
 import { friendshipAPI } from '../api/api';
+import { useAlert } from '../context/AlertContext';
 
 const FriendsScreen = () => {
+  const { showAlert } = useAlert();
   const [friends, setFriends] = useState([]);
   const [requests, setRequests] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -15,7 +17,7 @@ const FriendsScreen = () => {
       const response = await friendshipAPI.getFriends();
       setFriends(response.data);
     } catch (error) {
-      Alert.alert('Error', 'Failed to fetch friends');
+      showAlert('Error', 'Failed to fetch friends', 'error');
     }
   };
 
@@ -24,7 +26,7 @@ const FriendsScreen = () => {
       const response = await friendshipAPI.getFriendRequests();
       setRequests(response.data);
     } catch (error) {
-      Alert.alert('Error', 'Failed to fetch requests');
+      showAlert('Error', 'Failed to fetch requests', 'error');
     }
   };
 
@@ -40,7 +42,7 @@ const FriendsScreen = () => {
         const response = await friendshipAPI.searchUsers(query);
         setSearchResults(response.data);
       } catch (error) {
-        Alert.alert('Error', 'Search failed');
+        showAlert('Error', 'Search failed', 'error');
       }
     } else {
       setSearchResults([]);
@@ -50,20 +52,20 @@ const FriendsScreen = () => {
   const handleSendRequest = async (userId) => {
     try {
       await friendshipAPI.sendFriendRequest({ addressee_id: userId });
-      Alert.alert('Success', 'Friend request sent');
+      showAlert('Success', 'Friend request sent', 'success');
     } catch (error) {
-      Alert.alert('Error', 'Failed to send request');
+      showAlert('Error', 'Failed to send request', 'error');
     }
   };
 
   const handleRespondRequest = async (requestId, status) => {
     try {
       await friendshipAPI.respondToFriendRequest(requestId, { status });
-      Alert.alert('Success', `Request ${status}`);
+      showAlert('Success', `Request ${status}`, 'success');
       fetchRequests();
       fetchFriends();
     } catch (error) {
-      Alert.alert('Error', 'Failed to respond');
+      showAlert('Error', 'Failed to respond', 'error');
     }
   };
 

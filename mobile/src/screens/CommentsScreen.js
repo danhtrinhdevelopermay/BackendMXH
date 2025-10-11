@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { TextInput, IconButton, Avatar, Text, Card } from 'react-native-paper';
 import { commentAPI } from '../api/api';
+import { useAlert } from '../context/AlertContext';
 
 const CommentsScreen = ({ route }) => {
+  const { showAlert } = useAlert();
   const { postId } = route.params;
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
@@ -14,7 +16,7 @@ const CommentsScreen = ({ route }) => {
       const response = await commentAPI.getComments(postId);
       setComments(response.data);
     } catch (error) {
-      Alert.alert('Error', 'Failed to fetch comments');
+      showAlert('Error', 'Failed to fetch comments', 'error');
     }
   };
 
@@ -31,7 +33,7 @@ const CommentsScreen = ({ route }) => {
       setNewComment('');
       fetchComments();
     } catch (error) {
-      Alert.alert('Error', 'Failed to add comment');
+      showAlert('Error', 'Failed to add comment', 'error');
     } finally {
       setLoading(false);
     }
