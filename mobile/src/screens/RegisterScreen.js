@@ -54,13 +54,13 @@ const RegisterScreen = ({ navigation }) => {
         contentContainerStyle={styles.cardContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>Create Your Account</Text>
+        <Text style={styles.title}>Tạo tài khoản</Text>
         <Text style={styles.subtitle}>
-          We're here to help you reach the peaks{'\n'}of learning. Are you ready?
+          Chúng tôi ở đây để giúp bạn đạt đến đỉnh cao{'\n'}của việc học. Bạn đã sẵn sàng chưa?
         </Text>
 
         <TextInput
-          placeholder="Enter full name"
+          placeholder="Nhập tên đầy đủ"
           value={fullName}
           onChangeText={setFullName}
           style={styles.input}
@@ -77,7 +77,7 @@ const RegisterScreen = ({ navigation }) => {
         />
 
         <TextInput
-          placeholder="Enter email"
+          placeholder="Nhập email"
           value={email}
           onChangeText={setEmail}
           style={styles.input}
@@ -95,7 +95,7 @@ const RegisterScreen = ({ navigation }) => {
         />
 
         <TextInput
-          placeholder="Enter password"
+          placeholder="Nhập mật khẩu"
           value={password}
           onChangeText={setPassword}
           style={styles.input}
@@ -118,7 +118,7 @@ const RegisterScreen = ({ navigation }) => {
         />
 
         <TouchableOpacity style={styles.forgotContainer}>
-          <Text style={styles.forgotText}>Forgot password?</Text>
+          <Text style={styles.forgotText}>Quên mật khẩu?</Text>
         </TouchableOpacity>
 
         <LinearGradient
@@ -133,15 +133,15 @@ const RegisterScreen = ({ navigation }) => {
             style={styles.buttonTouchable}
           >
             <Text style={styles.buttonText}>
-              {loading ? 'Loading...' : 'Get Started'}
+              {loading ? 'Đang tải...' : 'Bắt đầu'}
             </Text>
           </TouchableOpacity>
         </LinearGradient>
 
         <View style={styles.loginContainer}>
-          <Text style={styles.loginText}>Already have an account? </Text>
+          <Text style={styles.loginText}>Bạn đã có tài khoản? </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.loginLink}>Log In</Text>
+            <Text style={styles.loginLink}>Đăng nhập</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

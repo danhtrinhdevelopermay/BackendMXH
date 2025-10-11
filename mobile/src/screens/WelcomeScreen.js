@@ -15,8 +15,8 @@ const WelcomeScreen = ({ navigation }) => {
         <Text style={styles.title}>Chào mừng</Text>
         <Text style={styles.greeting}>Xin chào</Text>
         <Text style={styles.subtitle}>
-          Hãy tham mạng{'\n'}
-          The choice is yours: Log in or create an account.
+          Hãy tham mạng xã hội này {'\n'}
+          Trước tiên hãy đăng nhập hoặc đăng ký 
         </Text>
 
         <Image
@@ -34,7 +34,7 @@ const WelcomeScreen = ({ navigation }) => {
             textColor="#000000"
             labelStyle={styles.buttonLabel}
           >
-            Create Account
+            Tạo tài khoản mới
           </Button>
 
           <Button
@@ -45,7 +45,7 @@ const WelcomeScreen = ({ navigation }) => {
             theme={{ colors: { outline: '#FFFFFF' }}}
             labelStyle={styles.buttonLabel}
           >
-            Log In
+            Đăng nhập
           </Button>
         </View>
       </View>

@@ -49,13 +49,13 @@ const LoginScreen = ({ navigation }) => {
       </LinearGradient>
 
       <View style={styles.card}>
-        <Text style={styles.title}>Welcome Back</Text>
+        <Text style={styles.title}>Chào mừng trở lại</Text>
         <Text style={styles.subtitle}>
-          Ready to continue your learning journey?{'\n'}Your path is right here.
+          Bạn đã sẵn sàng tiếp tục hành trình học tập của mình chưa?{'\n'}Đường đi của bạn ở ngay đây.
         </Text>
 
         <TextInput
-          placeholder="Enter email"
+          placeholder="Nhập email"
           value={email}
           onChangeText={setEmail}
           style={styles.input}
@@ -73,7 +73,7 @@ const LoginScreen = ({ navigation }) => {
         />
 
         <TextInput
-          placeholder="Password"
+          placeholder="Mật khẩu"
           value={password}
           onChangeText={setPassword}
           style={styles.input}
@@ -102,10 +102,10 @@ const LoginScreen = ({ navigation }) => {
               onPress={() => setRememberMe(!rememberMe)}
               color="#9C7BB0"
             />
-            <Text style={styles.rememberText}>Remember me</Text>
+            <Text style={styles.rememberText}>Nhớ tôi nhé</Text>
           </View>
           <TouchableOpacity>
-            <Text style={styles.forgotText}>Forgot password?</Text>
+            <Text style={styles.forgotText}>Quên mật khẩu?</Text>
           </TouchableOpacity>
         </View>
 
@@ -121,15 +121,15 @@ const LoginScreen = ({ navigation }) => {
             style={styles.buttonTouchable}
           >
             <Text style={styles.buttonText}>
-              {loading ? 'Loading...' : 'Log In'}
+              {loading ? 'Đang tải...' : 'Đăng nhập'}
             </Text>
           </TouchableOpacity>
         </LinearGradient>
 
         <View style={styles.signupContainer}>
-          <Text style={styles.signupText}>Don't have an account? </Text>
+          <Text style={styles.signupText}>Bạn chưa có tài khoản? </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-            <Text style={styles.signupLink}>Sign Up</Text>
+            <Text style={styles.signupLink}>Đăng ký</Text>
           </TouchableOpacity>
         </View>
       </View>
