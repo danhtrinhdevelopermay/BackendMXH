@@ -12,10 +12,10 @@ const WelcomeScreen = ({ navigation }) => {
       style={styles.container}
     >
       <View style={styles.content}>
-        <Text style={styles.title}>Welcome =)</Text>
-        <Text style={styles.greeting}>Hi there!</Text>
+        <Text style={styles.title}>Chào mừng</Text>
+        <Text style={styles.greeting}>Xin chào</Text>
         <Text style={styles.subtitle}>
-          We're here to help you learn new skills.{'\n'}
+          Hãy tham mạng{'\n'}
           The choice is yours: Log in or create an account.
         </Text>
 
