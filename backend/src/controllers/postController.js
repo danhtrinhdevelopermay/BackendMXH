@@ -5,22 +5,28 @@ const createPost = async (req, res) => {
   const user_id = req.user.id;
 
   try {
+    console.log(`Creating post for user ${user_id}, media_id: ${media_id}, content: "${content}"`);
     let result;
     
     if (media_id) {
+      console.log(`Updating existing post (media_id: ${media_id}) with content`);
       result = await pool.query(
         'UPDATE posts SET content = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
         [content, media_id, user_id]
       );
       
       if (result.rows.length === 0) {
+        console.log(`Media not found or unauthorized - media_id: ${media_id}, user_id: ${user_id}`);
         return res.status(404).json({ error: 'Media not found or unauthorized' });
       }
+      console.log(`Post updated successfully - ID: ${result.rows[0].id}`);
     } else {
+      console.log('Creating new post without media');
       result = await pool.query(
         'INSERT INTO posts (user_id, content) VALUES ($1, $2) RETURNING *',
         [user_id, content]
       );
+      console.log(`Post created successfully - ID: ${result.rows[0].id}`);
     }
 
     const post = result.rows[0];
@@ -33,6 +39,7 @@ const createPost = async (req, res) => {
       [post.id]
     );
 
+    console.log(`Returning post with media_type: ${postWithUser.rows[0].media_type}`);
     res.status(201).json(postWithUser.rows[0]);
   } catch (error) {
     console.error('Create post error:', error);

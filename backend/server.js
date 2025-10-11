@@ -40,12 +40,18 @@ app.use('/api/notifications', notificationRoutes);
 
 app.post('/api/upload', authenticateToken, upload.single('media'), async (req, res) => {
   try {
+    console.log('Upload request received from user:', req.user.id);
+    
     if (!req.file) {
+      console.log('No file in request');
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
     const mediaData = req.file.buffer;
     const mediaType = req.file.mimetype;
+    const fileSize = req.file.size;
+    
+    console.log(`Uploading media - Type: ${mediaType}, Size: ${fileSize} bytes`);
     
     const result = await pool.query(
       'INSERT INTO posts (user_id, media_data, media_type) VALUES ($1, $2, $3) RETURNING id',
@@ -53,6 +59,8 @@ app.post('/api/upload', authenticateToken, upload.single('media'), async (req, r
     );
 
     const mediaId = result.rows[0].id;
+    console.log(`Media uploaded successfully with ID: ${mediaId}`);
+    
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     res.json({ 
       id: mediaId,
