@@ -20,7 +20,7 @@ args = "Backend Server"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Expo Mobile"
+args = "Expo Dev"
 
 [[workflows.workflow]]
 name = "Backend Server"
@@ -35,12 +35,12 @@ waitForPort = 5000
 outputType = "webview"
 
 [[workflows.workflow]]
-name = "Expo Mobile"
+name = "Expo Dev"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd mobile && EXPO_NO_TELEMETRY=1 npx expo start --tunnel --non-interactive"
+args = "cd mobile && npx expo start --tunnel"
 
 [workflows.workflow.metadata]
 outputType = "console"
