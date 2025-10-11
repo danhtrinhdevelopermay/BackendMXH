@@ -115,7 +115,7 @@ const HomeScreen = ({ navigation }) => {
           style={styles.headerAvatar}
         />
         <View style={styles.postInput}>
-          <Text style={styles.postInputText}>What's on your mind?</Text>
+          <Text style={styles.postInputText}>Hôm nay bạn như thế nào?</Text>
         </View>
       </Pressable>
       <Divider style={styles.headerDivider} />
