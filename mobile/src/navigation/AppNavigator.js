@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -16,6 +17,7 @@ import NotificationsScreen from '../screens/NotificationsScreen';
 import CreatePostScreen from '../screens/CreatePostScreen';
 import ChatScreen from '../screens/ChatScreen';
 import CommentsScreen from '../screens/CommentsScreen';
+import SearchScreen from '../screens/SearchScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -66,10 +68,18 @@ const HomeTabs = () => {
       <Tab.Screen 
         name="Home" 
         component={HomeScreen}
-        options={{
+        options={({ navigation }) => ({
           headerShown: true,
           title: 'facebook',
-        }}
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Search')}
+              style={{ marginRight: 16 }}
+            >
+              <Ionicons name="search" size={24} color="#050505" />
+            </TouchableOpacity>
+          ),
+        })}
       />
       <Tab.Screen 
         name="Friends" 
@@ -116,6 +126,7 @@ const AppNavigator = () => {
         {user ? (
           <>
             <Stack.Screen name="MainTabs" component={HomeTabs} />
+            <Stack.Screen name="Search" component={SearchScreen} options={{ headerShown: true, title: 'Tìm kiếm' }} />
             <Stack.Screen name="CreatePost" component={CreatePostScreen} options={{ headerShown: true, title: 'Create Post' }} />
             <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: true }} />
             <Stack.Screen name="Comments" component={CommentsScreen} options={{ headerShown: true, title: 'Comments' }} />
