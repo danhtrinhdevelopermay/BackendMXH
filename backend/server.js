@@ -49,7 +49,8 @@ app.post('/api/upload', authenticateToken, upload.single('image'), (req, res) =>
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
   }
-  res.json({ url: `/uploads/${req.file.filename}` });
+  const baseUrl = `${req.protocol}://${req.get('host')}`;
+  res.json({ url: `${baseUrl}/uploads/${req.file.filename}` });
 });
 
 app.use((err, req, res, next) => {
