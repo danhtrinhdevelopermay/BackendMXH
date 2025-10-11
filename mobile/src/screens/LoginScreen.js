@@ -1,25 +1,31 @@
 import React, { useState, useContext } from 'react';
-import { View, StyleSheet, Image } from 'react-native';
-import { TextInput, Button, Text, Divider } from 'react-native-paper';
+import { View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { TextInput, Button, Text, Checkbox } from 'react-native-paper';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
 
+const { width, height } = Dimensions.get('window');
+
 const LoginScreen = ({ navigation }) => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
   const { showAlert } = useAlert();
 
   const handleLogin = async () => {
-    if (!username || !password) {
+    if (!email || !password) {
       showAlert('Error', 'Please fill in all fields', 'error');
       return;
     }
 
     setLoading(true);
     try {
-      await login(username, password);
+      await login(email, password);
     } catch (error) {
       showAlert('Error', error.response?.data?.error || 'Login failed', 'error');
     } finally {
@@ -29,62 +35,102 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
-        <Image 
-          source={require('../../assets/logo.png')} 
-          style={styles.logo}
-          resizeMode="contain"
+      <LinearGradient
+        colors={['#E8D5F2', '#F5C5D8']}
+        style={styles.gradientTop}
+      >
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="chevron-back" size={24} color="#000" />
+          <Text style={styles.backText}>Back</Text>
+        </TouchableOpacity>
+      </LinearGradient>
+
+      <View style={styles.card}>
+        <Text style={styles.title}>Welcome Back</Text>
+        <Text style={styles.subtitle}>
+          Ready to continue your learning journey?{'\n'}Your path is right here.
+        </Text>
+
+        <TextInput
+          placeholder="Enter email"
+          value={email}
+          onChangeText={setEmail}
+          style={styles.input}
+          mode="outlined"
+          autoCapitalize="none"
+          keyboardType="email-address"
+          outlineColor="transparent"
+          activeOutlineColor="transparent"
+          theme={{ 
+            colors: { 
+              background: '#F5F5F5',
+            },
+            roundness: 12,
+          }}
         />
-        <Text style={styles.appName}>Layedia</Text>
-        <Text style={styles.subtitle}>Connect with friends and the world around you.</Text>
-        
-        <View style={styles.formContainer}>
-          <TextInput
-            placeholder="Email or Username"
-            value={username}
-            onChangeText={setUsername}
-            style={styles.input}
-            mode="outlined"
-            autoCapitalize="none"
-            outlineColor="#dddfe2"
-            activeOutlineColor="#1877f2"
-          />
-          <TextInput
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            style={styles.input}
-            mode="outlined"
-            secureTextEntry
-            outlineColor="#dddfe2"
-            activeOutlineColor="#1877f2"
-          />
-          <Button
-            mode="contained"
+
+        <TextInput
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          style={styles.input}
+          mode="outlined"
+          secureTextEntry={!showPassword}
+          outlineColor="transparent"
+          activeOutlineColor="transparent"
+          theme={{ 
+            colors: { 
+              background: '#F5F5F5',
+            },
+            roundness: 12,
+          }}
+          right={
+            <TextInput.Icon 
+              icon={showPassword ? "eye-off-outline" : "eye-outline"}
+              onPress={() => setShowPassword(!showPassword)}
+            />
+          }
+        />
+
+        <View style={styles.optionsRow}>
+          <View style={styles.rememberContainer}>
+            <Checkbox
+              status={rememberMe ? 'checked' : 'unchecked'}
+              onPress={() => setRememberMe(!rememberMe)}
+              color="#9C7BB0"
+            />
+            <Text style={styles.rememberText}>Remember me</Text>
+          </View>
+          <TouchableOpacity>
+            <Text style={styles.forgotText}>Forgot password?</Text>
+          </TouchableOpacity>
+        </View>
+
+        <LinearGradient
+          colors={['#F5C5D8', '#B8A4E8']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.gradientButton}
+        >
+          <TouchableOpacity
             onPress={handleLogin}
-            loading={loading}
             disabled={loading}
-            style={styles.loginButton}
-            buttonColor="#1877f2"
-            contentStyle={styles.loginButtonContent}
-            labelStyle={styles.loginButtonLabel}
+            style={styles.buttonTouchable}
           >
-            Log In
-          </Button>
-          
-          <Text style={styles.forgotPassword}>Forgot Password?</Text>
-          
-          <Divider style={styles.divider} />
-          
-          <Button
-            mode="outlined"
-            onPress={() => navigation.navigate('Register')}
-            style={styles.createButton}
-            textColor="#42b72a"
-            theme={{ colors: { outline: '#42b72a' }}}
-          >
-            Create New Account
-          </Button>
+            <Text style={styles.buttonText}>
+              {loading ? 'Loading...' : 'Log In'}
+            </Text>
+          </TouchableOpacity>
+        </LinearGradient>
+
+        <View style={styles.signupContainer}>
+          <Text style={styles.signupText}>Don't have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+            <Text style={styles.signupLink}>Sign Up</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -94,70 +140,96 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f2f5',
+    backgroundColor: '#F5F5F5',
   },
-  content: {
+  gradientTop: {
+    height: height * 0.25,
+    paddingTop: 50,
+    paddingHorizontal: 20,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backText: {
+    fontSize: 16,
+    color: '#000',
+    marginLeft: 4,
+  },
+  card: {
     flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    marginTop: -20,
+    paddingHorizontal: 32,
+    paddingTop: 32,
   },
-  logo: {
-    width: 120,
-    height: 120,
-    alignSelf: 'center',
-    marginBottom: 16,
-  },
-  appName: {
-    fontSize: 36,
+  title: {
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#1877f2',
+    color: '#000',
     textAlign: 'center',
     marginBottom: 12,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#65676b',
+    fontSize: 14,
+    color: '#666',
     textAlign: 'center',
-    marginBottom: 40,
-    paddingHorizontal: 20,
-  },
-  formContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 24,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    marginBottom: 32,
+    lineHeight: 20,
   },
   input: {
-    marginBottom: 12,
-    backgroundColor: '#fff',
+    marginBottom: 16,
+    backgroundColor: '#F5F5F5',
   },
-  loginButton: {
-    marginTop: 12,
-    borderRadius: 8,
+  optionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
   },
-  loginButtonContent: {
-    paddingVertical: 8,
+  rememberContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  loginButtonLabel: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  forgotPassword: {
-    textAlign: 'center',
-    color: '#1877f2',
-    marginTop: 16,
+  rememberText: {
     fontSize: 14,
+    color: '#666',
+    marginLeft: -8,
   },
-  divider: {
-    marginVertical: 24,
+  forgotText: {
+    fontSize: 14,
+    color: '#9C7BB0',
+    fontWeight: '500',
   },
-  createButton: {
-    borderRadius: 8,
-    borderWidth: 2,
+  gradientButton: {
+    borderRadius: 25,
+    overflow: 'hidden',
+    marginBottom: 24,
+  },
+  buttonTouchable: {
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  signupContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  signupText: {
+    fontSize: 14,
+    color: '#666',
+  },
+  signupLink: {
+    fontSize: 14,
+    color: '#9C7BB0',
+    fontWeight: '600',
   },
 });
 

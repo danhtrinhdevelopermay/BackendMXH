@@ -1,26 +1,31 @@
 import React, { useState, useContext } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { TextInput, Button, Text, IconButton } from 'react-native-paper';
+import { View, StyleSheet, TouchableOpacity, Dimensions, ScrollView } from 'react-native';
+import { TextInput, Button, Text } from 'react-native-paper';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
 
+const { width, height } = Dimensions.get('window');
+
 const RegisterScreen = ({ navigation }) => {
-  const [username, setUsername] = useState('');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { register } = useContext(AuthContext);
   const { showAlert } = useAlert();
 
   const handleRegister = async () => {
-    if (!username || !email || !password) {
-      showAlert('Error', 'Please fill in all required fields', 'error');
+    if (!fullName || !email || !password) {
+      showAlert('Error', 'Please fill in all fields', 'error');
       return;
     }
 
     setLoading(true);
     try {
+      const username = email.split('@')[0];
       await register({ username, email, password, full_name: fullName });
     } catch (error) {
       showAlert('Error', error.response?.data?.error || 'Registration failed', 'error');
@@ -31,84 +36,112 @@ const RegisterScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <IconButton
-          icon="arrow-left"
-          size={24}
+      <LinearGradient
+        colors={['#E8D5F2', '#F5C5D8']}
+        style={styles.gradientTop}
+      >
+        <TouchableOpacity 
+          style={styles.backButton}
           onPress={() => navigation.goBack()}
-          iconColor="#050505"
+        >
+          <Ionicons name="chevron-back" size={24} color="#000" />
+          <Text style={styles.backText}>Back</Text>
+        </TouchableOpacity>
+      </LinearGradient>
+
+      <ScrollView 
+        style={styles.card}
+        contentContainerStyle={styles.cardContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.title}>Create Your Account</Text>
+        <Text style={styles.subtitle}>
+          We're here to help you reach the peaks{'\n'}of learning. Are you ready?
+        </Text>
+
+        <TextInput
+          placeholder="Enter full name"
+          value={fullName}
+          onChangeText={setFullName}
+          style={styles.input}
+          mode="outlined"
+          autoCapitalize="words"
+          outlineColor="transparent"
+          activeOutlineColor="transparent"
+          theme={{ 
+            colors: { 
+              background: '#F5F5F5',
+            },
+            roundness: 12,
+          }}
         />
-        <Text style={styles.headerTitle}>Sign Up</Text>
-        <View style={{ width: 40 }} />
-      </View>
-      
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.subtitle}>It's quick and easy.</Text>
-        
-        <View style={styles.formContainer}>
-          <TextInput
-            placeholder="Full Name"
-            value={fullName}
-            onChangeText={setFullName}
-            style={styles.input}
-            mode="outlined"
-            outlineColor="#dddfe2"
-            activeOutlineColor="#1877f2"
-          />
-          <TextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-            mode="outlined"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            outlineColor="#dddfe2"
-            activeOutlineColor="#1877f2"
-          />
-          <TextInput
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
-            style={styles.input}
-            mode="outlined"
-            autoCapitalize="none"
-            outlineColor="#dddfe2"
-            activeOutlineColor="#1877f2"
-          />
-          <TextInput
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            style={styles.input}
-            mode="outlined"
-            secureTextEntry
-            outlineColor="#dddfe2"
-            activeOutlineColor="#1877f2"
-          />
-          
-          <Text style={styles.terms}>
-            By signing up, you agree to our Terms, Data Policy and Cookie Policy.
-          </Text>
-          
-          <Button
-            mode="contained"
+
+        <TextInput
+          placeholder="Enter email"
+          value={email}
+          onChangeText={setEmail}
+          style={styles.input}
+          mode="outlined"
+          autoCapitalize="none"
+          keyboardType="email-address"
+          outlineColor="transparent"
+          activeOutlineColor="transparent"
+          theme={{ 
+            colors: { 
+              background: '#F5F5F5',
+            },
+            roundness: 12,
+          }}
+        />
+
+        <TextInput
+          placeholder="Enter password"
+          value={password}
+          onChangeText={setPassword}
+          style={styles.input}
+          mode="outlined"
+          secureTextEntry={!showPassword}
+          outlineColor="transparent"
+          activeOutlineColor="transparent"
+          theme={{ 
+            colors: { 
+              background: '#F5F5F5',
+            },
+            roundness: 12,
+          }}
+          right={
+            <TextInput.Icon 
+              icon={showPassword ? "eye-off-outline" : "eye-outline"}
+              onPress={() => setShowPassword(!showPassword)}
+            />
+          }
+        />
+
+        <TouchableOpacity style={styles.forgotContainer}>
+          <Text style={styles.forgotText}>Forgot password?</Text>
+        </TouchableOpacity>
+
+        <LinearGradient
+          colors={['#F5C5D8', '#B8A4E8']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.gradientButton}
+        >
+          <TouchableOpacity
             onPress={handleRegister}
-            loading={loading}
             disabled={loading}
-            style={styles.signUpButton}
-            buttonColor="#42b72a"
-            contentStyle={styles.signUpButtonContent}
-            labelStyle={styles.signUpButtonLabel}
+            style={styles.buttonTouchable}
           >
-            Sign Up
-          </Button>
-          
-          <TouchableOpacity 
-            style={styles.loginLink}
-            onPress={() => navigation.navigate('Login')}
-          >
-            <Text style={styles.loginLinkText}>Already have an account?</Text>
+            <Text style={styles.buttonText}>
+              {loading ? 'Loading...' : 'Get Started'}
+            </Text>
+          </TouchableOpacity>
+        </LinearGradient>
+
+        <View style={styles.loginContainer}>
+          <Text style={styles.loginText}>Already have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.loginLink}>Log In</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -119,73 +152,88 @@ const RegisterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f2f5',
+    backgroundColor: '#F5F5F5',
   },
-  header: {
+  gradientTop: {
+    height: height * 0.25,
+    paddingTop: 50,
+    paddingHorizontal: 20,
+  },
+  backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#fff',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e4e6eb',
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#050505',
+  backText: {
+    fontSize: 16,
+    color: '#000',
+    marginLeft: 4,
   },
-  content: {
-    flexGrow: 1,
-    padding: 24,
+  card: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    marginTop: -20,
+  },
+  cardContent: {
+    paddingHorizontal: 32,
+    paddingTop: 32,
+    paddingBottom: 40,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#000',
+    textAlign: 'center',
+    marginBottom: 12,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#65676b',
-    marginBottom: 24,
-  },
-  formContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 32,
+    lineHeight: 20,
   },
   input: {
-    marginBottom: 12,
-    backgroundColor: '#fff',
-  },
-  terms: {
-    fontSize: 12,
-    color: '#65676b',
-    textAlign: 'center',
-    marginTop: 12,
-    marginBottom: 20,
-    lineHeight: 18,
-  },
-  signUpButton: {
-    borderRadius: 8,
     marginBottom: 16,
+    backgroundColor: '#F5F5F5',
   },
-  signUpButtonContent: {
-    paddingVertical: 8,
+  forgotContainer: {
+    alignItems: 'flex-end',
+    marginBottom: 24,
   },
-  signUpButtonLabel: {
-    fontSize: 18,
-    fontWeight: 'bold',
+  forgotText: {
+    fontSize: 14,
+    color: '#9C7BB0',
+    fontWeight: '500',
+  },
+  gradientButton: {
+    borderRadius: 25,
+    overflow: 'hidden',
+    marginBottom: 24,
+  },
+  buttonTouchable: {
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  loginContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loginText: {
+    fontSize: 14,
+    color: '#666',
   },
   loginLink: {
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  loginLinkText: {
     fontSize: 14,
-    color: '#1877f2',
-    fontWeight: '500',
+    color: '#9C7BB0',
+    fontWeight: '600',
   },
 });
 
