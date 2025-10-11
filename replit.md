@@ -81,10 +81,19 @@ Preferred communication style: Simple, everyday language.
 - Mobile app uses expo-av for video playback
 - Avatar and cover photos uploaded separately via dedicated endpoints
 
+**Privacy & Visibility:**
+- Posts support privacy settings: `public` (visible to everyone) or `friends` (visible only to friends)
+- Privacy filtering applied across all endpoints:
+  - News feed: Shows own posts, public posts, and friends-only posts from accepted friends
+  - User profile: Shows all posts if viewing own profile; applies privacy filter for others
+  - Search: Respects privacy settings, only returns posts user is authorized to view
+- Privacy validation on post creation prevents invalid values
+- Default privacy is 'public' for backward compatibility
+
 **Data Flow Pattern:**
 - Media upload creates post with media_data, returns media ID
-- CreatePost updates that post with content
-- News feed returns post metadata with media_type (not media_data for efficiency)
+- CreatePost updates that post with content and privacy setting
+- News feed returns post metadata with media_type and privacy (not media_data for efficiency)
 - Frontend constructs media URL from post ID: /api/media/{post.id}
 - Notification creation triggered automatically on social actions (comments, reactions, friend requests, messages)
 - Conversations view shows latest message per unique user pair
