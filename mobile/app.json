@@ -32,10 +32,7 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "apiUrl": "https://backendmxh.onrender.com",
-      "eas": {
-        "projectId": "6dd21af6-8a58-4864-bb82-e41e74ca3c72"
-      }
+      "apiUrl": "https://backendmxh.onrender.com"
     },
     "plugins": [
       "expo-secure-store"
