@@ -1,12 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { View, FlatList, StyleSheet, RefreshControl, Alert } from 'react-native';
-import { FAB, Card, Avatar, IconButton, Text, Chip } from 'react-native-paper';
+import { FAB, Card, Avatar, IconButton, Text, Chip, Menu } from 'react-native-paper';
 import { postAPI, reactionAPI } from '../api/api';
+import { AuthContext } from '../context/AuthContext';
 
 const HomeScreen = ({ navigation }) => {
+  const { user } = useContext(AuthContext);
   const [posts, setPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [menuVisible, setMenuVisible] = useState({});
 
   const fetchPosts = async () => {
     try {
@@ -38,12 +41,63 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
+  const handleDeletePost = async (postId) => {
+    Alert.alert(
+      'Delete Post',
+      'Are you sure you want to delete this post?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await postAPI.deletePost(postId);
+              fetchPosts();
+              Alert.alert('Success', 'Post deleted successfully');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to delete post');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const toggleMenu = (postId) => {
+    setMenuVisible((prev) => ({ ...prev, [postId]: !prev[postId] }));
+  };
+
   const renderPost = ({ item }) => (
     <Card style={styles.card}>
       <Card.Title
         title={item.full_name || item.username}
         subtitle={new Date(item.created_at).toLocaleDateString()}
         left={(props) => <Avatar.Text {...props} label={item.username[0].toUpperCase()} />}
+        right={(props) =>
+          user?.id === item.user_id ? (
+            <Menu
+              visible={menuVisible[item.id] || false}
+              onDismiss={() => toggleMenu(item.id)}
+              anchor={
+                <IconButton
+                  {...props}
+                  icon="dots-vertical"
+                  onPress={() => toggleMenu(item.id)}
+                />
+              }
+            >
+              <Menu.Item
+                leadingIcon="delete"
+                onPress={() => {
+                  toggleMenu(item.id);
+                  handleDeletePost(item.id);
+                }}
+                title="Delete"
+              />
+            </Menu>
+          ) : null
+        }
       />
       <Card.Content>
         {item.content && <Text style={styles.content}>{item.content}</Text>}
