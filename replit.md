@@ -84,7 +84,7 @@ Preferred communication style: Simple, everyday language.
   
 - **Deployment:**
   - Backend deployed on Replit infrastructure
-  - API URL: `https://a8bd23f7-87d2-4aa4-8e60-6425fe004656-00-33auajo5tz84q.kirk.replit.dev`
+  - API URL: `https://b0f4cf19-856b-4c85-94aa-7e706915c721-00-1ot8heuucu3xd.pike.replit.dev`
   - Static file serving for uploaded images via Express static middleware
 
 ### Key Environment Variables
