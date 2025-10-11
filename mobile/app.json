@@ -30,6 +30,9 @@
     },
     "extra": {
       "apiUrl": "https://a8bd23f7-87d2-4aa4-8e60-6425fe004656-00-33auajo5tz84q.kirk.replit.dev"
-    }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }
