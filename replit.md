@@ -25,8 +25,9 @@ Preferred communication style: Simple, everyday language.
 **Navigation Structure:**
 - Unauthenticated flow: Login/Register screens via Stack Navigator
 - Authenticated flow: Bottom Tab Navigator with 5 main tabs (Home, Friends, Messages, Notifications, Profile)
-- Modal screens: CreatePost, Chat, Comments accessed via Stack Navigator
+- Modal screens: CreatePost, Chat, Comments, EditProfile accessed via Stack Navigator
 - User Profile: Clicking on a user in search results opens their profile with posts, friendship status, and action buttons (add friend/message)
+- Profile Editing: Users can edit their full name, bio, avatar, and cover photo via EditProfileScreen
 
 **State Management Approach:**
 - AuthContext provides centralized authentication state and methods
@@ -50,7 +51,7 @@ Preferred communication style: Simple, everyday language.
 - 7-day token expiration period
 
 **Route Organization:**
-- `/api/auth` - User registration, login, profile retrieval
+- `/api/auth` - User registration, login, profile retrieval, profile update (PUT /auth/profile)
 - `/api/users/:userId` - Get user information by ID with friendship status
 - `/api/posts` - Post creation, news feed, user posts, deletion
 - `/api/comments` - Comment management per post
@@ -60,14 +61,18 @@ Preferred communication style: Simple, everyday language.
 - `/api/notifications` - Notification feed, read status management
 - `/api/upload` - Media upload (images/videos) stored directly in database
 - `/api/media/:id` - Retrieve media from database by post ID
+- `/api/avatar` - Upload/retrieve user avatar (POST with image, GET /api/avatar/:userId)
+- `/api/cover` - Upload/retrieve user cover photo (POST with image, GET /api/cover/:userId)
 
 **Media Storage (Updated):**
 - Media (images/videos) stored directly in database as BYTEA
 - Posts table includes: `media_data` (bytea), `media_type` (varchar)
+- Users table includes: `avatar_data` (bytea), `avatar_type` (varchar), `cover_data` (bytea), `cover_type` (varchar)
 - Upload endpoint stores media in memory, then saves to database
 - Media retrieval endpoint serves binary data with appropriate Content-Type
 - Supports both images (JPEG, PNG) and videos (MP4) up to 50MB
 - Mobile app uses expo-av for video playback
+- Avatar and cover photos uploaded separately via dedicated endpoints
 
 **Data Flow Pattern:**
 - Media upload creates post with media_data, returns media ID
@@ -79,6 +84,8 @@ Preferred communication style: Simple, everyday language.
 - User reactions stored with ability to update reaction type
 - User profile view returns user info with friendship status (friends, request_sent, request_received, or null)
 - ProfileScreen handles both own profile (edit/logout) and other users' profiles (add friend/message buttons with state-aware UI)
+- Profile editing: Users update full_name, bio via PUT /auth/profile; Avatar/cover uploaded separately then displayed via /api/avatar/:userId and /api/cover/:userId
+- Avatar and cover images load with cache-busting query params to show latest updates immediately
 
 ## External Dependencies
 
