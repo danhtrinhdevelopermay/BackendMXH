@@ -96,6 +96,58 @@ app.get('/api/media/:id', async (req, res) => {
   }
 });
 
+app.post('/api/avatar', authenticateToken, upload.single('avatar'), async (req, res) => {
+  const { updateAvatar } = require('./src/controllers/authController');
+  updateAvatar(req, res);
+});
+
+app.get('/api/avatar/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const result = await pool.query(
+      'SELECT avatar_data, avatar_type FROM users WHERE id = $1',
+      [userId]
+    );
+
+    if (result.rows.length === 0 || !result.rows[0].avatar_data) {
+      return res.status(404).json({ error: 'Avatar not found' });
+    }
+
+    const { avatar_data, avatar_type } = result.rows[0];
+    res.set('Content-Type', avatar_type);
+    res.send(avatar_data);
+  } catch (error) {
+    console.error('Get avatar error:', error);
+    res.status(500).json({ error: 'Failed to get avatar' });
+  }
+});
+
+app.post('/api/cover', authenticateToken, upload.single('cover'), async (req, res) => {
+  const { updateCover } = require('./src/controllers/authController');
+  updateCover(req, res);
+});
+
+app.get('/api/cover/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const result = await pool.query(
+      'SELECT cover_data, cover_type FROM users WHERE id = $1',
+      [userId]
+    );
+
+    if (result.rows.length === 0 || !result.rows[0].cover_data) {
+      return res.status(404).json({ error: 'Cover not found' });
+    }
+
+    const { cover_data, cover_type } = result.rows[0];
+    res.set('Content-Type', cover_type);
+    res.send(cover_data);
+  } catch (error) {
+    console.error('Get cover error:', error);
+    res.status(500).json({ error: 'Failed to get cover' });
+  }
+});
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
