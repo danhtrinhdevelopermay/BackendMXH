@@ -174,6 +174,7 @@ const HomeScreen = ({ navigation }) => {
                 useNativeControls
                 resizeMode="contain"
                 shouldPlay={false}
+                onError={(error) => console.log('Video error:', error)}
               />
             ) : (
               <Card.Cover 
@@ -347,8 +348,11 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   postImage: {
+    width: '100%',
+    height: 250,
     borderRadius: 0,
     marginTop: 0,
+    backgroundColor: '#000',
   },
   statsContainer: {
     flexDirection: 'row',
