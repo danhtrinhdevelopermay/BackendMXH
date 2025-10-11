@@ -69,6 +69,10 @@ export const notificationAPI = {
   markAllAsRead: () => api.put('/notifications/read-all'),
 };
 
+export const userAPI = {
+  getUserById: (userId) => api.get(`/users/${userId}`),
+};
+
 export const uploadAPI = {
   uploadMedia: async (uri, type) => {
     const formData = new FormData();
