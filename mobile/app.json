@@ -16,7 +16,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.socialmedia.app"
+      "bundleIdentifier": "com.socialmedia.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -29,7 +32,7 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "apiUrl": "https://b0f4cf19-856b-4c85-94aa-7e706915c721-00-1ot8heuucu3xd.pike.replit.dev",
+      "apiUrl": "https://4fa4174a-6d36-49a4-aadd-5d38cae31a20-00-39g7ulfupr0.pike.replit.dev",
       "eas": {
         "projectId": "6dd21af6-8a58-4864-bb82-e41e74ca3c72"
       }
