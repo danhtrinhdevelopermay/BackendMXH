@@ -1,10 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { View, StyleSheet, Alert, Image, ScrollView, TouchableOpacity } from 'react-native';
-import { TextInput, Button, Avatar, Text, Divider } from 'react-native-paper';
+import { TextInput, Button, Avatar, Text, Divider, Menu } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { Video } from 'expo-av';
 import { postAPI, uploadAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
 
 const CreatePostScreen = ({ navigation }) => {
   const { user } = useContext(AuthContext);
@@ -12,6 +13,8 @@ const CreatePostScreen = ({ navigation }) => {
   const [mediaUri, setMediaUri] = useState(null);
   const [mediaType, setMediaType] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [privacy, setPrivacy] = useState('public');
+  const [privacyMenuVisible, setPrivacyMenuVisible] = useState(false);
 
   const pickMedia = async (type = 'all') => {
     const mediaTypeOption = type === 'video' 
@@ -48,7 +51,7 @@ const CreatePostScreen = ({ navigation }) => {
         mediaId = uploadResponse.id;
       }
 
-      await postAPI.createPost({ content, media_id: mediaId });
+      await postAPI.createPost({ content, media_id: mediaId, privacy });
       Alert.alert('Success', 'Post created successfully');
       navigation.goBack();
     } catch (error) {
@@ -67,7 +70,46 @@ const CreatePostScreen = ({ navigation }) => {
             label={user?.username?.[0]?.toUpperCase() || 'U'}
             style={styles.avatar}
           />
-          <Text style={styles.userName}>{user?.full_name || user?.username}</Text>
+          <View style={styles.userDetails}>
+            <Text style={styles.userName}>{user?.full_name || user?.username}</Text>
+            <Menu
+              visible={privacyMenuVisible}
+              onDismiss={() => setPrivacyMenuVisible(false)}
+              anchor={
+                <TouchableOpacity 
+                  style={styles.privacyButton}
+                  onPress={() => setPrivacyMenuVisible(true)}
+                >
+                  <Ionicons 
+                    name={privacy === 'public' ? 'globe-outline' : 'people-outline'} 
+                    size={14} 
+                    color="#65676b" 
+                  />
+                  <Text style={styles.privacyText}>
+                    {privacy === 'public' ? 'Công khai' : 'Bạn bè'}
+                  </Text>
+                  <Ionicons name="chevron-down" size={14} color="#65676b" />
+                </TouchableOpacity>
+              }
+            >
+              <Menu.Item 
+                onPress={() => {
+                  setPrivacy('public');
+                  setPrivacyMenuVisible(false);
+                }}
+                title="Công khai"
+                leadingIcon="globe-outline"
+              />
+              <Menu.Item 
+                onPress={() => {
+                  setPrivacy('friends');
+                  setPrivacyMenuVisible(false);
+                }}
+                title="Bạn bè"
+                leadingIcon="people-outline"
+              />
+            </Menu>
+          </View>
         </View>
       </View>
       
@@ -161,11 +203,30 @@ const styles = StyleSheet.create({
   avatar: {
     backgroundColor: '#1877f2',
   },
-  userName: {
+  userDetails: {
     marginLeft: 12,
+    flex: 1,
+  },
+  userName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#050505',
+  },
+  privacyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+    backgroundColor: '#f0f2f5',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+  },
+  privacyText: {
+    fontSize: 12,
+    color: '#65676b',
+    marginLeft: 4,
+    marginRight: 2,
   },
   content: {
     flexGrow: 1,
