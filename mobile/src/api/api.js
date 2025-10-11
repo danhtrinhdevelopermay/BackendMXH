@@ -27,6 +27,39 @@ export const authAPI = {
   register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),
   getProfile: () => api.get('/auth/profile'),
+  updateProfile: (data) => api.put('/auth/profile', data),
+  uploadAvatar: async (uri) => {
+    const formData = new FormData();
+    formData.append('avatar', {
+      uri,
+      type: 'image/jpeg',
+      name: 'avatar.jpg',
+    });
+    const token = await SecureStore.getItemAsync('token');
+    const response = await axios.post(`${API_URL}/api/avatar`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+  uploadCover: async (uri) => {
+    const formData = new FormData();
+    formData.append('cover', {
+      uri,
+      type: 'image/jpeg',
+      name: 'cover.jpg',
+    });
+    const token = await SecureStore.getItemAsync('token');
+    const response = await axios.post(`${API_URL}/api/cover`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
 };
 
 export const postAPI = {

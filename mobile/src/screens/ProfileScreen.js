@@ -3,6 +3,7 @@ import { View, FlatList, StyleSheet, Alert, Image, TouchableOpacity } from 'reac
 import { Card, Avatar, Button, Text, Divider } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
 import { postAPI, userAPI, friendshipAPI, messageAPI } from '../api/api';
+import Constants from 'expo-constants';
 
 const ProfileScreen = ({ route, navigation }) => {
   const { user: currentUser, logout } = useContext(AuthContext);
@@ -13,6 +14,8 @@ const ProfileScreen = ({ route, navigation }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [friendshipStatus, setFriendshipStatus] = useState(null);
+  
+  const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
 
   const fetchUserData = async () => {
     try {
@@ -108,19 +111,31 @@ const ProfileScreen = ({ route, navigation }) => {
     <View style={styles.headerContainer}>
       <View style={styles.coverContainer}>
         <Image
-          source={{ uri: 'https://via.placeholder.com/400x200/1877f2/ffffff?text=Cover+Photo' }}
+          source={{ 
+            uri: profileUser?.id ? `${API_URL}/api/cover/${profileUser.id}?${Date.now()}` : 'https://via.placeholder.com/400x200/1877f2/ffffff?text=Cover+Photo' 
+          }}
           style={styles.coverPhoto}
           resizeMode="cover"
+          defaultSource={require('../../assets/icon.png')}
+          onError={() => console.log('Cover photo load error')}
         />
       </View>
       
       <View style={styles.profileSection}>
         <View style={styles.avatarContainer}>
-          <Avatar.Text
-            size={120}
-            label={profileUser?.username?.[0]?.toUpperCase() || 'U'}
-            style={styles.avatar}
-          />
+          {profileUser?.id ? (
+            <Image
+              source={{ uri: `${API_URL}/api/avatar/${profileUser.id}?${Date.now()}` }}
+              style={styles.avatarImage}
+              onError={() => console.log('Avatar load error')}
+            />
+          ) : (
+            <Avatar.Text
+              size={120}
+              label={profileUser?.username?.[0]?.toUpperCase() || 'U'}
+              style={styles.avatar}
+            />
+          )}
         </View>
         
         <View style={styles.profileInfo}>
@@ -151,6 +166,7 @@ const ProfileScreen = ({ route, navigation }) => {
             <>
               <Button 
                 mode="contained" 
+                onPress={() => navigation.navigate('EditProfile')}
                 style={styles.editButton}
                 buttonColor="#e4e6eb"
                 textColor="#050505"
@@ -311,6 +327,13 @@ const styles = StyleSheet.create({
   },
   avatar: {
     backgroundColor: '#1877f2',
+    borderWidth: 4,
+    borderColor: '#fff',
+  },
+  avatarImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     borderWidth: 4,
     borderColor: '#fff',
   },

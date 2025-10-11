@@ -18,6 +18,7 @@ import CreatePostScreen from '../screens/CreatePostScreen';
 import ChatScreen from '../screens/ChatScreen';
 import CommentsScreen from '../screens/CommentsScreen';
 import SearchScreen from '../screens/SearchScreen';
+import EditProfileScreen from '../screens/EditProfileScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -130,6 +131,7 @@ const AppNavigator = () => {
             <Stack.Screen name="CreatePost" component={CreatePostScreen} options={{ headerShown: true, title: 'Create Post' }} />
             <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: true }} />
             <Stack.Screen name="Comments" component={CommentsScreen} options={{ headerShown: true, title: 'Comments' }} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: true, title: 'Chỉnh sửa hồ sơ' }} />
           </>
         ) : (
           <>
