@@ -19,7 +19,8 @@ Preferred communication style: Simple, everyday language.
 - Context API for global state management (authentication)
 - Axios for HTTP requests with interceptor-based JWT token injection
 - Expo SecureStore for secure token storage
-- Expo Image Picker for media selection
+- Expo Image Picker for media selection (images and videos)
+- Expo AV for video playback in posts
 
 **Navigation Structure:**
 - Unauthenticated flow: Login/Register screens via Stack Navigator
@@ -55,11 +56,23 @@ Preferred communication style: Simple, everyday language.
 - `/api/friendships` - Friend requests, acceptance/rejection, search
 - `/api/messages` - Direct messaging, conversations list
 - `/api/notifications` - Notification feed, read status management
-- `/api/upload` - Image upload with multer (disk storage)
+- `/api/upload` - Media upload (images/videos) stored directly in database
+- `/api/media/:id` - Retrieve media from database by post ID
+
+**Media Storage (Updated):**
+- Media (images/videos) stored directly in database as BYTEA
+- Posts table includes: `media_data` (bytea), `media_type` (varchar)
+- Upload endpoint stores media in memory, then saves to database
+- Media retrieval endpoint serves binary data with appropriate Content-Type
+- Supports both images (JPEG, PNG) and videos (MP4) up to 50MB
+- Mobile app uses expo-av for video playback
 
 **Data Flow Pattern:**
+- Media upload creates post with media_data, returns media ID
+- CreatePost updates that post with content
+- News feed returns post metadata with media_type (not media_data for efficiency)
+- Frontend constructs media URL from post ID: /api/media/{post.id}
 - Notification creation triggered automatically on social actions (comments, reactions, friend requests, messages)
-- News feed aggregates posts from user and accepted friends
 - Conversations view shows latest message per unique user pair
 - User reactions stored with ability to update reaction type
 
@@ -74,18 +87,19 @@ Preferred communication style: Simple, everyday language.
 ### Third-Party Services & APIs
 - **Expo Services:**
   - Expo SecureStore - Encrypted credential storage
-  - Expo Image Picker - Native image selection
+  - Expo Image Picker - Media selection (images/videos, max 60s for video)
+  - Expo AV - Video playback with native controls
   - Expo Constants - Configuration access
   
 - **Backend Services:**
-  - Multer - File upload middleware (disk storage in `/uploads` directory)
+  - Multer - File upload middleware (memory storage, 50MB limit)
   - JWT (jsonwebtoken) - Token generation and verification
   - Bcrypt - Password hashing
   
 - **Deployment:**
   - Backend deployed on Replit infrastructure
-  - API URL: `https://b0f4cf19-856b-4c85-94aa-7e706915c721-00-1ot8heuucu3xd.pike.replit.dev`
-  - Static file serving for uploaded images via Express static middleware
+  - API URL: `https://4fa4174a-6d36-49a4-aadd-5d38cae31a20-00-39g7ulfupr0.pike.replit.dev`
+  - Media served directly from PostgreSQL database via API endpoint
 
 ### Key Environment Variables
 - `DATABASE_URL` - PostgreSQL connection string
