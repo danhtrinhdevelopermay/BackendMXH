@@ -97,9 +97,10 @@ Preferred communication style: Simple, everyday language.
   - Bcrypt - Password hashing
   
 - **Deployment:**
-  - Backend can be deployed on Render, Railway, or similar platforms
-  - Current Replit URL: `https://0ef1aeac-3e91-4d81-8d9d-c33937b51d90-00-znd0j4yczh4.pike.replit.dev`
-  - For stable production: Deploy to Render using instructions in `DEPLOY_RENDER.md`
+  - Backend deployed on Render for stable production
+  - Production URL: `https://backendmxh.onrender.com`
+  - Backup Replit URL: `https://0ef1aeac-3e91-4d81-8d9d-c33937b51d90-00-znd0j4yczh4.pike.replit.dev`
+  - Render deployment instructions: `DEPLOY_RENDER.md`
   - Media served directly from PostgreSQL database via API endpoint
 
 ### Key Environment Variables
