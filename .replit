@@ -40,7 +40,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd mobile && EXPO_NO_TELEMETRY=1 EXPO_NO_DOTENV=1 npx expo start --tunnel --clear"
+args = "bash mobile/start-expo.sh"
 
 [workflows.workflow.metadata]
 outputType = "console"
