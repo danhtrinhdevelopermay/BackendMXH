@@ -2,37 +2,104 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, FlatList, StyleSheet, Alert, Image, TouchableOpacity } from 'react-native';
 import { Card, Avatar, Button, Text, Divider } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
-import { postAPI } from '../api/api';
+import { postAPI, userAPI, friendshipAPI, messageAPI } from '../api/api';
 
-const ProfileScreen = () => {
-  const { user, logout } = useContext(AuthContext);
+const ProfileScreen = ({ route, navigation }) => {
+  const { user: currentUser, logout } = useContext(AuthContext);
+  const userId = route?.params?.userId;
+  const isOwnProfile = !userId || userId === currentUser?.id;
+  
+  const [profileUser, setProfileUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [friendshipStatus, setFriendshipStatus] = useState(null);
 
-  const fetchUserPosts = async () => {
+  const fetchUserData = async () => {
     try {
-      const response = await postAPI.getUserPosts(user.id);
-      setPosts(response.data);
+      if (isOwnProfile) {
+        setProfileUser(currentUser);
+        const response = await postAPI.getUserPosts(currentUser.id);
+        setPosts(response.data);
+      } else {
+        const [userResponse, postsResponse] = await Promise.all([
+          userAPI.getUserById(userId),
+          postAPI.getUserPosts(userId)
+        ]);
+        setProfileUser(userResponse.data);
+        setFriendshipStatus(userResponse.data.friendship_status);
+        setPosts(postsResponse.data);
+      }
     } catch (error) {
-      Alert.alert('Error', 'Failed to fetch posts');
+      Alert.alert('Lỗi', 'Không thể tải thông tin người dùng');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (user) {
-      fetchUserPosts();
+    if (currentUser) {
+      fetchUserData();
     }
-  }, [user]);
+  }, [userId, currentUser]);
 
   const handleLogout = () => {
     Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
+      'Đăng xuất',
+      'Bạn có chắc muốn đăng xuất?',
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Logout', onPress: logout, style: 'destructive' },
+        { text: 'Hủy', style: 'cancel' },
+        { text: 'Đăng xuất', onPress: logout, style: 'destructive' },
+      ]
+    );
+  };
+
+  const handleAddFriend = async () => {
+    try {
+      await friendshipAPI.sendFriendRequest({ addressee_id: userId });
+      Alert.alert('Thành công', 'Đã gửi lời mời kết bạn');
+      setFriendshipStatus('request_sent');
+    } catch (error) {
+      Alert.alert('Lỗi', 'Không thể gửi lời mời kết bạn');
+    }
+  };
+
+  const handleMessage = () => {
+    navigation.navigate('Chat', { 
+      userId: userId, 
+      userName: profileUser?.full_name || profileUser?.username 
+    });
+  };
+
+  const handleRespondRequest = () => {
+    Alert.alert(
+      'Lời mời kết bạn',
+      `${profileUser?.full_name || profileUser?.username} muốn kết bạn với bạn`,
+      [
+        {
+          text: 'Từ chối',
+          style: 'cancel',
+          onPress: async () => {
+            try {
+              await friendshipAPI.respondToFriendRequest(profileUser.friendship_id, { status: 'rejected' });
+              Alert.alert('Thành công', 'Đã từ chối lời mời');
+              setFriendshipStatus(null);
+            } catch (error) {
+              Alert.alert('Lỗi', 'Không thể từ chối lời mời');
+            }
+          }
+        },
+        {
+          text: 'Chấp nhận',
+          onPress: async () => {
+            try {
+              await friendshipAPI.respondToFriendRequest(profileUser.friendship_id, { status: 'accepted' });
+              Alert.alert('Thành công', 'Đã chấp nhận lời mời kết bạn');
+              setFriendshipStatus('friends');
+            } catch (error) {
+              Alert.alert('Lỗi', 'Không thể chấp nhận lời mời');
+            }
+          }
+        },
       ]
     );
   };
@@ -51,57 +118,116 @@ const ProfileScreen = () => {
         <View style={styles.avatarContainer}>
           <Avatar.Text
             size={120}
-            label={user?.username?.[0]?.toUpperCase() || 'U'}
+            label={profileUser?.username?.[0]?.toUpperCase() || 'U'}
             style={styles.avatar}
           />
         </View>
         
         <View style={styles.profileInfo}>
-          <Text style={styles.name}>{user?.full_name || user?.username}</Text>
-          <Text style={styles.username}>@{user?.username}</Text>
-          {user?.bio && <Text style={styles.bio}>{user.bio}</Text>}
+          <Text style={styles.name}>{profileUser?.full_name || profileUser?.username}</Text>
+          <Text style={styles.username}>@{profileUser?.username}</Text>
+          {profileUser?.bio && <Text style={styles.bio}>{profileUser.bio}</Text>}
         </View>
 
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>{posts.length}</Text>
-            <Text style={styles.statLabel}>Posts</Text>
+            <Text style={styles.statLabel}>Bài viết</Text>
           </View>
           <Divider style={styles.statDivider} />
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>0</Text>
-            <Text style={styles.statLabel}>Friends</Text>
+            <Text style={styles.statLabel}>Bạn bè</Text>
           </View>
           <Divider style={styles.statDivider} />
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>0</Text>
-            <Text style={styles.statLabel}>Photos</Text>
+            <Text style={styles.statLabel}>Ảnh</Text>
           </View>
         </View>
 
         <View style={styles.actionButtons}>
-          <Button 
-            mode="contained" 
-            style={styles.editButton}
-            buttonColor="#e4e6eb"
-            textColor="#050505"
-            icon="pencil"
-          >
-            Edit Profile
-          </Button>
-          <Button 
-            mode="outlined" 
-            onPress={handleLogout} 
-            style={styles.logoutButton}
-            textColor="#65676b"
-          >
-            Logout
-          </Button>
+          {isOwnProfile ? (
+            <>
+              <Button 
+                mode="contained" 
+                style={styles.editButton}
+                buttonColor="#e4e6eb"
+                textColor="#050505"
+                icon="pencil"
+              >
+                Chỉnh sửa
+              </Button>
+              <Button 
+                mode="outlined" 
+                onPress={handleLogout} 
+                style={styles.logoutButton}
+                textColor="#65676b"
+              >
+                Đăng xuất
+              </Button>
+            </>
+          ) : (
+            <>
+              {friendshipStatus === 'friends' ? (
+                <Button 
+                  mode="contained" 
+                  style={styles.friendButton}
+                  buttonColor="#e4e6eb"
+                  textColor="#050505"
+                  icon="check"
+                >
+                  Bạn bè
+                </Button>
+              ) : friendshipStatus === 'request_sent' ? (
+                <Button 
+                  mode="contained" 
+                  style={styles.requestSentButton}
+                  buttonColor="#e4e6eb"
+                  textColor="#050505"
+                  icon="clock-outline"
+                >
+                  Đã gửi lời mời
+                </Button>
+              ) : friendshipStatus === 'request_received' ? (
+                <Button 
+                  mode="contained" 
+                  onPress={handleRespondRequest}
+                  style={styles.respondButton}
+                  buttonColor="#1877f2"
+                  textColor="#fff"
+                  icon="account-check"
+                >
+                  Phản hồi
+                </Button>
+              ) : (
+                <Button 
+                  mode="contained" 
+                  onPress={handleAddFriend}
+                  style={styles.addFriendButton}
+                  buttonColor="#1877f2"
+                  textColor="#fff"
+                  icon="account-plus"
+                >
+                  Thêm bạn bè
+                </Button>
+              )}
+              <Button 
+                mode="outlined" 
+                onPress={handleMessage}
+                style={styles.messageButton}
+                textColor="#050505"
+                icon="message"
+              >
+                Nhắn tin
+              </Button>
+            </>
+          )}
         </View>
       </View>
 
       <View style={styles.postsHeader}>
-        <Text style={styles.postsTitle}>Posts</Text>
+        <Text style={styles.postsTitle}>Bài viết</Text>
       </View>
     </View>
   );
@@ -112,11 +238,11 @@ const ProfileScreen = () => {
         <View style={styles.postHeaderLeft}>
           <Avatar.Text 
             size={40} 
-            label={user?.username?.[0]?.toUpperCase() || 'U'}
+            label={profileUser?.username?.[0]?.toUpperCase() || 'U'}
             style={styles.postAvatar}
           />
           <View style={styles.postHeaderInfo}>
-            <Text style={styles.postAuthorName}>{user?.full_name || user?.username}</Text>
+            <Text style={styles.postAuthorName}>{profileUser?.full_name || profileUser?.username}</Text>
             <Text style={styles.postTime}>{new Date(item.created_at).toLocaleDateString()}</Text>
           </View>
         </View>
@@ -132,8 +258,8 @@ const ProfileScreen = () => {
       )}
       
       <View style={styles.postStats}>
-        <Text style={styles.statText}>{item.reaction_count || 0} reactions</Text>
-        <Text style={styles.statText}>{item.comment_count || 0} comments</Text>
+        <Text style={styles.statText}>{item.reaction_count || 0} lượt thích</Text>
+        <Text style={styles.statText}>{item.comment_count || 0} bình luận</Text>
       </View>
     </Card>
   );
@@ -146,7 +272,7 @@ const ProfileScreen = () => {
       ListHeaderComponent={renderHeader}
       ListEmptyComponent={
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No posts yet</Text>
+          <Text style={styles.emptyText}>Chưa có bài viết</Text>
         </View>
       }
       contentContainerStyle={styles.container}
@@ -247,6 +373,27 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   logoutButton: {
+    flex: 1,
+    borderRadius: 8,
+    borderColor: '#ccd0d5',
+  },
+  addFriendButton: {
+    flex: 1,
+    borderRadius: 8,
+  },
+  friendButton: {
+    flex: 1,
+    borderRadius: 8,
+  },
+  requestSentButton: {
+    flex: 1,
+    borderRadius: 8,
+  },
+  respondButton: {
+    flex: 1,
+    borderRadius: 8,
+  },
+  messageButton: {
     flex: 1,
     borderRadius: 8,
     borderColor: '#ccd0d5',
