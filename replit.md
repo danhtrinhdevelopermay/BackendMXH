@@ -38,9 +38,19 @@ Preferred communication style: Simple, everyday language.
 
 **State Management Approach:**
 - AuthContext provides centralized authentication state and methods
+- AlertContext provides custom alert/dialog system with modern UI (success, error, warning, info types)
 - Local component state for UI-specific data
 - API calls trigger re-fetching to update views
 - Polling intervals for real-time-like updates (messages every 3s, conversations every 5s)
+
+**Custom Alert System:**
+- Custom alert component replaces native Alert.alert() across all screens
+- AlertContext + AlertProvider manage alert state globally
+- CustomAlert component with beautiful UI: Modal-based, animated, with type-specific icons
+- Alert types: 'success' (green checkmark), 'error' (red X), 'warning' (orange), 'info' (blue info icon)
+- Supports single and multi-button configurations with cancel/destructive styles
+- Smooth spring animations on show/hide
+- Used consistently across Login, Register, Home, Profile, Friends, Messages, Notifications, Comments, CreatePost screens
 
 ### Backend Architecture (Node.js + Express)
 

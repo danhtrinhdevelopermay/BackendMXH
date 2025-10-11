@@ -30,10 +30,10 @@ export const AlertProvider = ({ children }) => {
   };
 
   const hideAlert = () => {
-    setAlert({
-      ...alert,
+    setAlert(prev => ({
+      ...prev,
       visible: false,
-    });
+    }));
   };
 
   const value = {
