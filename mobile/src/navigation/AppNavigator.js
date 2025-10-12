@@ -118,16 +118,12 @@ const HomeTabs = () => {
   );
 };
 
-const AppNavigator = () => {
-  const { user, loading } = useContext(AuthContext);
+const NavigationWrapper = () => {
+  const { user } = useContext(AuthContext);
   const { incomingCall, acceptCall, rejectCall } = useIncomingCall();
 
-  if (loading) {
-    return null;
-  }
-
   return (
-    <NavigationContainer>
+    <>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
           <>
@@ -155,6 +151,20 @@ const AppNavigator = () => {
         onAccept={acceptCall}
         onReject={rejectCall}
       />
+    </>
+  );
+};
+
+const AppNavigator = () => {
+  const { loading } = useContext(AuthContext);
+
+  if (loading) {
+    return null;
+  }
+
+  return (
+    <NavigationContainer>
+      <NavigationWrapper />
     </NavigationContainer>
   );
 };
