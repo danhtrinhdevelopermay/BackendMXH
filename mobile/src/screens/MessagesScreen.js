@@ -37,8 +37,7 @@ const MessagesScreen = ({ navigation }) => {
       const userThought = response.data.find(t => t.user_id === user.id);
       setCurrentUserThought(userThought || null);
     } catch (error) {
-      console.error('Failed to fetch thoughts');
-      showAlert('Lỗi', 'Không thể tải suy nghĩ', 'error');
+      console.error('Failed to fetch thoughts:', error);
     }
   };
 
