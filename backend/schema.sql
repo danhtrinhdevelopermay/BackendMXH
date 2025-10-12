@@ -79,6 +79,17 @@ CREATE TABLE IF NOT EXISTS notifications (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tạo bảng user_thoughts (chia sẻ suy nghĩ)
+CREATE TABLE IF NOT EXISTS user_thoughts (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  content VARCHAR(100) NOT NULL,
+  emoji VARCHAR(10),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id)
+);
+
 -- Tạo indexes để tăng performance
 -- Basic indexes
 CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
@@ -91,6 +102,8 @@ CREATE INDEX IF NOT EXISTS idx_friendships_addressee ON friendships(addressee_id
 CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id);
 CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages(receiver_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_thoughts_user_id ON user_thoughts(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_thoughts_updated_at ON user_thoughts(updated_at DESC);
 
 -- Compound indexes để tối ưu queries phức tạp
 CREATE INDEX IF NOT EXISTS idx_posts_user_created ON posts(user_id, created_at DESC);
