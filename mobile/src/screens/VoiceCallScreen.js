@@ -14,6 +14,7 @@ const VoiceCallScreen = ({ route, navigation }) => {
   const [isSpeakerOn, setIsSpeakerOn] = useState(false);
   const [callStatus, setCallStatus] = useState(callType === 'outgoing' ? 'Calling...' : 'Incoming call');
   const [pulseAnim] = useState(new Animated.Value(1));
+  const timerRef = React.useRef(null);
 
   useEffect(() => {
     const pulseAnimation = Animated.loop(
@@ -55,6 +56,9 @@ const VoiceCallScreen = ({ route, navigation }) => {
     }
 
     return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
       if (socket) {
         socket.off('call_accepted');
         socket.off('call_rejected');
@@ -65,11 +69,12 @@ const VoiceCallScreen = ({ route, navigation }) => {
   }, [socket]);
 
   const startCallTimer = () => {
-    const interval = setInterval(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    timerRef.current = setInterval(() => {
       setCallDuration(prev => prev + 1);
     }, 1000);
-
-    return () => clearInterval(interval);
   };
 
   const formatDuration = (seconds) => {

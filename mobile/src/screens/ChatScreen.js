@@ -26,10 +26,7 @@ const ChatScreen = ({ route, navigation }) => {
       headerShown: false
     });
 
-    const socket = SocketService.connect(user.id);
-    return () => {
-      SocketService.disconnect();
-    };
+    SocketService.connect(user.id);
   }, [user.id]);
 
   const fetchMessages = async () => {

@@ -17,10 +17,22 @@ export const useIncomingCall = () => {
       setIncomingCall(callData);
     };
 
+    const handleCallEnded = () => {
+      setIncomingCall(null);
+    };
+
+    const handleCallRejected = () => {
+      setIncomingCall(null);
+    };
+
     socket.on('incoming_call', handleIncomingCall);
+    socket.on('call_ended', handleCallEnded);
+    socket.on('call_rejected', handleCallRejected);
 
     return () => {
       socket.off('incoming_call', handleIncomingCall);
+      socket.off('call_ended', handleCallEnded);
+      socket.off('call_rejected', handleCallRejected);
     };
   }, [user]);
 

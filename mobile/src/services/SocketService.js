@@ -8,6 +8,10 @@ class SocketService {
   }
 
   connect(userId) {
+    if (this.socket && this.socket.connected) {
+      return this.socket;
+    }
+
     if (!this.socket) {
       this.socket = io(this.API_URL, {
         transports: ['websocket'],
