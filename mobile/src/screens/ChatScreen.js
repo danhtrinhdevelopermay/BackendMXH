@@ -14,6 +14,12 @@ const ChatScreen = ({ route, navigation }) => {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const otherUser = React.useMemo(() => ({
+    id: userId,
+    avatar_url: userAvatar,
+    username: userName
+  }), [userId, userAvatar, userName]);
+
   useEffect(() => {
     navigation.setOptions({ 
       headerShown: false
@@ -67,8 +73,7 @@ const ChatScreen = ({ route, navigation }) => {
           <View style={styles.theirMessageContainer}>
             <View style={styles.messageRow}>
               <UserAvatar 
-                user={item}
-                userId={item.sender_id}
+                user={otherUser}
                 size={36} 
                 style={styles.messageAvatar}
               />
@@ -109,7 +114,7 @@ const ChatScreen = ({ route, navigation }) => {
         )}
       </View>
     );
-  }, [user.id, messages]);
+  }, [user.id, messages, otherUser]);
 
   return (
     <View style={styles.container}>
@@ -123,7 +128,7 @@ const ChatScreen = ({ route, navigation }) => {
         
         <View style={styles.headerCenter}>
           <UserAvatar 
-            user={{ id: userId, avatar_url: userAvatar, username: userName }} 
+            user={otherUser} 
             size={42}
           />
           <View style={styles.headerText}>
