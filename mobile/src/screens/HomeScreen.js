@@ -264,7 +264,7 @@ const HomeScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id.toString()}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         ListHeaderComponent={renderHeader}
-        ListEmptyComponent={<Text style={styles.empty}>No posts yet</Text>}
+        ListEmptyComponent={<Text style={styles.empty}>Không có bài đăng</Text>}
         contentContainerStyle={styles.listContent}
       />
     </View>
