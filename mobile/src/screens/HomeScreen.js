@@ -122,14 +122,14 @@ const HomeScreen = ({ navigation }) => {
     return date.toLocaleDateString('vi-VN');
   };
 
-  const onViewableItemsChanged = useRef(({ viewableItems }) => {
+  const onViewableItemsChanged = useCallback(({ viewableItems }) => {
     const visiblePostIds = viewableItems.map(item => item.item.id);
     setVisibleItems(visiblePostIds);
-  }).current;
+  }, []);
 
-  const viewabilityConfig = useRef({
+  const viewabilityConfig = {
     itemVisiblePercentThreshold: 50,
-  }).current;
+  };
 
   const renderHeader = () => (
     <View style={styles.headerContainer}>

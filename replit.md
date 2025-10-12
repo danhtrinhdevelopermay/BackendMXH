@@ -32,9 +32,10 @@ Preferred communication style: Simple, everyday language.
 **Navigation Structure:**
 - Unauthenticated flow: Login/Register screens via Stack Navigator
 - Authenticated flow: Bottom Tab Navigator with 5 main tabs (Home, Friends, Messages, Notifications, Profile)
-- Modal screens: CreatePost, Chat, Comments, EditProfile accessed via Stack Navigator
+- Modal screens: CreatePost, Chat, Comments, EditProfile, PostDetail accessed via Stack Navigator
 - User Profile: Clicking on a user in search results opens their profile with posts, friendship status, and action buttons (add friend/message)
 - Profile Editing: Users can edit their full name, bio, avatar, and cover photo via EditProfileScreen
+- Post Detail: PostDetailScreen displays individual posts with full video controls when tapped from feed
 
 **State Management Approach:**
 - AuthContext provides centralized authentication state and methods
@@ -65,6 +66,14 @@ Preferred communication style: Simple, everyday language.
   - For production voice calling, consider third-party solutions (Agora, Twilio, Daily.co) or custom development build with react-native-webrtc
 - Performance optimizations: React.memo, useMemo, useCallback prevent unnecessary re-renders
 - Proper cleanup: Timer intervals cleared on unmount, socket listeners properly managed
+
+**Video Playback Features (Oct 2025):**
+- Feed videos autoplay when scrolled into view (50% visibility threshold)
+- Videos in feed display without controls and loop continuously
+- Tapping a video navigates to PostDetailScreen with full controls
+- PostDetailScreen displays videos with native controls, autoplay, and looping
+- Viewability tracking using FlatList callbacks for optimal performance
+- Video refs managed for potential future play/pause control
 
 ### Backend Architecture (Node.js + Express)
 
