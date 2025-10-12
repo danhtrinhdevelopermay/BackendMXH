@@ -20,6 +20,7 @@ import ChatScreen from '../screens/ChatScreen';
 import CommentsScreen from '../screens/CommentsScreen';
 import SearchScreen from '../screens/SearchScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
+import VoiceCallScreen from '../screens/VoiceCallScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -134,6 +135,7 @@ const AppNavigator = () => {
             <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: true }} />
             <Stack.Screen name="Comments" component={CommentsScreen} options={{ headerShown: true, title: 'Comments' }} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: true, title: 'Chỉnh sửa hồ sơ' }} />
+            <Stack.Screen name="VoiceCall" component={VoiceCallScreen} options={{ headerShown: false }} />
           </>
         ) : (
           <>
