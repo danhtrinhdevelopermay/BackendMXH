@@ -74,6 +74,11 @@ Preferred communication style: Simple, everyday language.
 - PostDetailScreen displays videos with native controls, autoplay, and looping
 - Viewability tracking using FlatList callbacks for optimal performance
 - Video refs managed for potential future play/pause control
+- **Video Playback Continuity (Oct 12, 2025):** Videos remember playback position when navigating from feed to post detail
+  - HomeScreen captures video position (positionMillis) before navigation
+  - Position passed to PostDetailScreen via navigation params
+  - PostDetailScreen resumes video from saved position using setPositionAsync on video load
+  - Provides seamless viewing experience across screen transitions
 
 ### Backend Architecture (Node.js + Express)
 
