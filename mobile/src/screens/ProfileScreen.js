@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, FlatList, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { Card, Avatar, Button, Text, Divider, IconButton } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useFocusEffect } from '@react-navigation/native';
 import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
 import { postAPI, userAPI, friendshipAPI, messageAPI } from '../api/api';
@@ -44,11 +45,13 @@ const ProfileScreen = ({ route, navigation }) => {
     }
   };
 
-  useEffect(() => {
-    if (currentUser) {
-      fetchUserData();
-    }
-  }, [userId, currentUser]);
+  useFocusEffect(
+    React.useCallback(() => {
+      if (currentUser) {
+        fetchUserData();
+      }
+    }, [userId, currentUser])
+  );
 
   const handleLogout = () => {
     showAlert(

@@ -8,7 +8,7 @@ import { authAPI } from '../api/api';
 import Constants from 'expo-constants';
 
 const EditProfileScreen = ({ navigation }) => {
-  const { user } = useContext(AuthContext);
+  const { user, refreshUser } = useContext(AuthContext);
   const { showAlert } = useAlert();
   const [fullName, setFullName] = useState(user?.full_name || '');
   const [bio, setBio] = useState(user?.bio || '');
@@ -57,6 +57,8 @@ const EditProfileScreen = ({ navigation }) => {
         full_name: fullName,
         bio: bio,
       });
+
+      await refreshUser();
 
       showAlert('Thành công', 'Đã cập nhật thông tin cá nhân', 'success', [
         {
