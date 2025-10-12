@@ -57,7 +57,7 @@ const ChatScreen = ({ route, navigation }) => {
     return `${hours}:${minutes}`;
   };
 
-  const renderMessage = ({ item, index }) => {
+  const renderMessage = React.useCallback(({ item, index }) => {
     const isMyMessage = item.sender_id === user.id;
     const showTime = index === 0 || messages[index - 1]?.sender_id !== item.sender_id;
     
@@ -67,7 +67,8 @@ const ChatScreen = ({ route, navigation }) => {
           <View style={styles.theirMessageContainer}>
             <View style={styles.messageRow}>
               <UserAvatar 
-                user={{ ...item, id: item.sender_id, avatar_url: userAvatar }} 
+                user={item}
+                userId={item.sender_id}
                 size={36} 
                 style={styles.messageAvatar}
               />
@@ -108,7 +109,7 @@ const ChatScreen = ({ route, navigation }) => {
         )}
       </View>
     );
-  };
+  }, [user.id, messages]);
 
   return (
     <View style={styles.container}>

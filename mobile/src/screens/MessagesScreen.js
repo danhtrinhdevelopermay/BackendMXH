@@ -27,7 +27,7 @@ const MessagesScreen = ({ navigation }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const renderConversation = ({ item }) => {
+  const renderConversation = React.useCallback(({ item }) => {
     const isUnread = !item.is_read && item.sender_id !== item.other_user_id;
     
     return (
@@ -42,7 +42,8 @@ const MessagesScreen = ({ navigation }) => {
           <View style={styles.conversationContainer}>
             <View style={styles.avatarContainer}>
               <UserAvatar 
-                user={{ ...item, id: item.other_user_id }}
+                user={item}
+                userId={item.other_user_id}
                 size={56}
                 style={styles.avatar}
               />
@@ -63,7 +64,7 @@ const MessagesScreen = ({ navigation }) => {
         </Card>
       </TouchableOpacity>
     );
-  };
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
