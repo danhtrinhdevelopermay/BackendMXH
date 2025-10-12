@@ -6,6 +6,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext';
+import { useIncomingCall } from '../hooks/useIncomingCall';
+import IncomingCallModal from '../components/IncomingCallModal';
 
 import WelcomeScreen from '../screens/WelcomeScreen';
 import LoginScreen from '../screens/LoginScreen';
@@ -118,6 +120,7 @@ const HomeTabs = () => {
 
 const AppNavigator = () => {
   const { user, loading } = useContext(AuthContext);
+  const { incomingCall, acceptCall, rejectCall } = useIncomingCall();
 
   if (loading) {
     return null;
@@ -145,6 +148,13 @@ const AppNavigator = () => {
           </>
         )}
       </Stack.Navigator>
+      
+      <IncomingCallModal
+        visible={!!incomingCall}
+        caller={incomingCall}
+        onAccept={acceptCall}
+        onReject={rejectCall}
+      />
     </NavigationContainer>
   );
 };

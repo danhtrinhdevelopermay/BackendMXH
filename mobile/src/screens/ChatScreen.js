@@ -6,6 +6,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { messageAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
 import UserAvatar from '../components/UserAvatar';
+import SocketService from '../services/SocketService';
 
 const ChatScreen = ({ route, navigation }) => {
   const { userId, userName, userAvatar } = route.params;
@@ -24,7 +25,12 @@ const ChatScreen = ({ route, navigation }) => {
     navigation.setOptions({ 
       headerShown: false
     });
-  }, []);
+
+    const socket = SocketService.connect(user.id);
+    return () => {
+      SocketService.disconnect();
+    };
+  }, [user.id]);
 
   const fetchMessages = async () => {
     try {
@@ -53,6 +59,23 @@ const ChatScreen = ({ route, navigation }) => {
       console.error('Failed to send message');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleVoiceCall = () => {
+    const socket = SocketService.getSocket();
+    if (socket) {
+      socket.emit('call_user', {
+        callerId: user.id,
+        callerName: user.full_name || user.username,
+        receiverId: userId
+      });
+
+      navigation.navigate('VoiceCall', {
+        callType: 'outgoing',
+        otherUser,
+        socket
+      });
     }
   };
 
@@ -138,10 +161,7 @@ const ChatScreen = ({ route, navigation }) => {
         </View>
 
         <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.headerButton}>
-            <Ionicons name="videocam-outline" size={24} color="#6B7280" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.headerButton}>
+          <TouchableOpacity style={styles.headerButton} onPress={handleVoiceCall}>
             <Ionicons name="call-outline" size={24} color="#6B7280" />
           </TouchableOpacity>
         </View>
