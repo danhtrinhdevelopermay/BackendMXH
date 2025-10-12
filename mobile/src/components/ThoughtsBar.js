@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     marginBottom: 12,
     minHeight: 60,
-    paddingTop: 28,
+    paddingTop: 40,
   },
   avatar: {
     borderWidth: 3,
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   },
   thoughtBubble: {
     position: 'absolute',
-    top: -20,
+    top: 0,
     left: -4,
     right: -4,
     backgroundColor: '#fff',
