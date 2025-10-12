@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS posts (
   id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
   content TEXT,
-  media_data BYTEA,
+  media_url TEXT,
   media_type VARCHAR(50),
   privacy VARCHAR(20) DEFAULT 'public',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
