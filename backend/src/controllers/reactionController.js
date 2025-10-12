@@ -1,5 +1,6 @@
 const pool = require('../config/database');
 const cacheService = require('../services/cache');
+const { sendPushNotification } = require('./pushTokenController');
 
 const addReaction = async (req, res) => {
   const { postId } = req.params;
@@ -37,6 +38,26 @@ const addReaction = async (req, res) => {
         `INSERT INTO notifications (user_id, type, content, related_user_id, related_post_id) 
          VALUES ($1, $2, $3, $4, $5)`,
         [postOwner.rows[0].user_id, 'reaction', `reacted ${reaction_type} to your post`, user_id, postId]
+      );
+
+      const reactor = await pool.query('SELECT full_name, username FROM users WHERE id = $1', [user_id]);
+      const reactorName = reactor.rows[0]?.full_name || reactor.rows[0]?.username || 'Someone';
+      
+      const reactionEmojis = {
+        'like': '👍',
+        'love': '❤️',
+        'haha': '😂',
+        'wow': '😮',
+        'sad': '😢',
+        'angry': '😡'
+      };
+      const emoji = reactionEmojis[reaction_type] || '👍';
+      
+      await sendPushNotification(
+        postOwner.rows[0].user_id,
+        'Cảm xúc mới',
+        `${reactorName} đã bày tỏ cảm xúc ${emoji} về bài viết của bạn`,
+        { screen: 'PostDetail', postId: parseInt(postId) }
       );
     }
 
