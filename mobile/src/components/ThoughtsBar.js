@@ -79,7 +79,8 @@ const styles = StyleSheet.create({
   },
   thoughtContainer: {
     position: 'relative',
-    marginBottom: 4,
+    marginBottom: 8,
+    minHeight: 60,
   },
   avatar: {
     borderWidth: 3,
