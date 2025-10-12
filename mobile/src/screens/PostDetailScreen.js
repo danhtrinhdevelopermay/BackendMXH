@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Card, Text, Divider, Menu } from 'react-native-paper';
 import { Video } from 'expo-av';
@@ -11,13 +11,14 @@ import UserAvatar from '../components/UserAvatar';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const PostDetailScreen = ({ route, navigation }) => {
-  const { postId } = route.params;
+  const { postId, videoPosition } = route.params;
   const { user } = useContext(AuthContext);
   const { showAlert } = useAlert();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [menuVisible, setMenuVisible] = useState(false);
   const [reactionMenuVisible, setReactionMenuVisible] = useState(false);
+  const videoRef = useRef(null);
 
   useEffect(() => {
     fetchPost();
@@ -111,6 +112,16 @@ const PostDetailScreen = ({ route, navigation }) => {
     return date.toLocaleDateString('vi-VN');
   };
 
+  const handleVideoLoad = async (status) => {
+    if (videoPosition && videoRef.current && status.isLoaded) {
+      try {
+        await videoRef.current.setPositionAsync(videoPosition);
+      } catch (error) {
+        console.log('Error setting video position:', error);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -176,12 +187,14 @@ const PostDetailScreen = ({ route, navigation }) => {
           <View style={styles.mediaContainer}>
             {isVideo ? (
               <Video
+                ref={videoRef}
                 source={{ uri: mediaUrl }}
                 style={styles.postMedia}
                 useNativeControls
                 resizeMode="contain"
                 isLooping
                 shouldPlay={true}
+                onLoad={handleVideoLoad}
                 onError={(error) => console.log('Video error:', error)}
               />
             ) : (
