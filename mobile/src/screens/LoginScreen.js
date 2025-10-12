@@ -36,22 +36,28 @@ const LoginScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#E8D5F2', '#F5C5D8']}
+        colors={['#667eea', '#764ba2']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
         style={styles.gradientTop}
       >
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="chevron-back" size={24} color="#000" />
-          <Text style={styles.backText}>Back</Text>
+          <Ionicons name="chevron-back" size={26} color="#FFFFFF" />
+          <Text style={styles.backText}>Quay lại</Text>
         </TouchableOpacity>
+        <View style={styles.headerContent}>
+          <Text style={styles.headerTitle}>Đăng nhập</Text>
+          <Text style={styles.headerSubtitle}>Chào mừng trở lại!</Text>
+        </View>
       </LinearGradient>
 
       <View style={styles.card}>
         <Text style={styles.title}>Chào mừng trở lại</Text>
         <Text style={styles.subtitle}>
-          Bạn đã sẵn sàng tiếp tục hành trình học tập của mình chưa?{'\n'}Đường đi của bạn ở ngay đây.
+          Đăng nhập để tiếp tục kết nối với bạn bè của bạn
         </Text>
 
         <TextInput
@@ -109,22 +115,22 @@ const LoginScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <LinearGradient
-          colors={['#F5C5D8', '#B8A4E8']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.gradientButton}
+        <TouchableOpacity
+          onPress={handleLogin}
+          disabled={loading}
+          activeOpacity={0.9}
         >
-          <TouchableOpacity
-            onPress={handleLogin}
-            disabled={loading}
-            style={styles.buttonTouchable}
+          <LinearGradient
+            colors={['#667eea', '#764ba2']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.gradientButton}
           >
             <Text style={styles.buttonText}>
               {loading ? 'Đang tải...' : 'Đăng nhập'}
             </Text>
-          </TouchableOpacity>
-        </LinearGradient>
+          </LinearGradient>
+        </TouchableOpacity>
 
         <View style={styles.signupContainer}>
           <Text style={styles.signupText}>Bạn chưa có tài khoản? </Text>
@@ -140,54 +146,78 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F7F8FA',
   },
   gradientTop: {
-    height: height * 0.25,
+    height: height * 0.32,
     paddingTop: 50,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
+    justifyContent: 'space-between',
+    paddingBottom: 40,
   },
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   backText: {
-    fontSize: 16,
-    color: '#000',
-    marginLeft: 4,
+    fontSize: 17,
+    color: '#FFFFFF',
+    marginLeft: 6,
+    fontWeight: '600',
+  },
+  headerContent: {
+    marginTop: 20,
+  },
+  headerTitle: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 8,
+    letterSpacing: 0.5,
+  },
+  headerSubtitle: {
+    fontSize: 18,
+    color: 'rgba(255, 255, 255, 0.95)',
+    letterSpacing: 0.3,
   },
   card: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    marginTop: -20,
-    paddingHorizontal: 32,
-    paddingTop: 32,
+    borderTopLeftRadius: 35,
+    borderTopRightRadius: 35,
+    marginTop: -30,
+    paddingHorizontal: 28,
+    paddingTop: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#1A1A1A',
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
+    letterSpacing: 0.3,
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 15,
+    color: '#6B7280',
     textAlign: 'center',
-    marginBottom: 32,
-    lineHeight: 20,
+    marginBottom: 36,
+    lineHeight: 22,
   },
   input: {
-    marginBottom: 16,
-    backgroundColor: '#F5F5F5',
+    marginBottom: 18,
+    backgroundColor: '#F9FAFB',
   },
   optionsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 28,
   },
   rememberContainer: {
     flexDirection: 'row',
@@ -195,41 +225,45 @@ const styles = StyleSheet.create({
   },
   rememberText: {
     fontSize: 14,
-    color: '#666',
+    color: '#6B7280',
     marginLeft: -8,
   },
   forgotText: {
     fontSize: 14,
-    color: '#9C7BB0',
-    fontWeight: '500',
+    color: '#667eea',
+    fontWeight: '600',
   },
   gradientButton: {
-    borderRadius: 25,
-    overflow: 'hidden',
-    marginBottom: 24,
-  },
-  buttonTouchable: {
-    paddingVertical: 16,
+    borderRadius: 30,
+    paddingVertical: 18,
     alignItems: 'center',
+    marginBottom: 28,
+    shadowColor: '#667eea',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
   signupContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingBottom: 20,
   },
   signupText: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 15,
+    color: '#6B7280',
   },
   signupLink: {
-    fontSize: 14,
-    color: '#9C7BB0',
-    fontWeight: '600',
+    fontSize: 15,
+    color: '#667eea',
+    fontWeight: '700',
   },
 });
 

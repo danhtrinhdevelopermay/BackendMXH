@@ -37,16 +37,22 @@ const RegisterScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#E8D5F2', '#F5C5D8']}
+        colors={['#667eea', '#764ba2']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
         style={styles.gradientTop}
       >
         <TouchableOpacity 
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="chevron-back" size={24} color="#000" />
-          <Text style={styles.backText}>Back</Text>
+          <Ionicons name="chevron-back" size={26} color="#FFFFFF" />
+          <Text style={styles.backText}>Quay lại</Text>
         </TouchableOpacity>
+        <View style={styles.headerContent}>
+          <Text style={styles.headerTitle}>Đăng ký</Text>
+          <Text style={styles.headerSubtitle}>Tạo tài khoản mới!</Text>
+        </View>
       </LinearGradient>
 
       <ScrollView 
@@ -56,7 +62,7 @@ const RegisterScreen = ({ navigation }) => {
       >
         <Text style={styles.title}>Tạo tài khoản</Text>
         <Text style={styles.subtitle}>
-          Chúng tôi ở đây để giúp bạn đạt đến đỉnh cao{'\n'}của việc học. Bạn đã sẵn sàng chưa?
+          Tham gia cộng đồng và kết nối với bạn bè của bạn
         </Text>
 
         <TextInput
@@ -117,26 +123,22 @@ const RegisterScreen = ({ navigation }) => {
           }
         />
 
-        <TouchableOpacity style={styles.forgotContainer}>
-          <Text style={styles.forgotText}>Quên mật khẩu?</Text>
-        </TouchableOpacity>
-
-        <LinearGradient
-          colors={['#F5C5D8', '#B8A4E8']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.gradientButton}
+        <TouchableOpacity
+          onPress={handleRegister}
+          disabled={loading}
+          activeOpacity={0.9}
         >
-          <TouchableOpacity
-            onPress={handleRegister}
-            disabled={loading}
-            style={styles.buttonTouchable}
+          <LinearGradient
+            colors={['#667eea', '#764ba2']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.gradientButton}
           >
             <Text style={styles.buttonText}>
-              {loading ? 'Đang tải...' : 'Bắt đầu'}
+              {loading ? 'Đang tải...' : 'Tạo tài khoản'}
             </Text>
-          </TouchableOpacity>
-        </LinearGradient>
+          </LinearGradient>
+        </TouchableOpacity>
 
         <View style={styles.loginContainer}>
           <Text style={styles.loginText}>Bạn đã có tài khoản? </Text>
@@ -152,88 +154,108 @@ const RegisterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#F7F8FA',
   },
   gradientTop: {
-    height: height * 0.25,
+    height: height * 0.32,
     paddingTop: 50,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
+    justifyContent: 'space-between',
+    paddingBottom: 40,
   },
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   backText: {
-    fontSize: 16,
-    color: '#000',
-    marginLeft: 4,
+    fontSize: 17,
+    color: '#FFFFFF',
+    marginLeft: 6,
+    fontWeight: '600',
+  },
+  headerContent: {
+    marginTop: 20,
+  },
+  headerTitle: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 8,
+    letterSpacing: 0.5,
+  },
+  headerSubtitle: {
+    fontSize: 18,
+    color: 'rgba(255, 255, 255, 0.95)',
+    letterSpacing: 0.3,
   },
   card: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    marginTop: -20,
+    borderTopLeftRadius: 35,
+    borderTopRightRadius: 35,
+    marginTop: -30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
   },
   cardContent: {
-    paddingHorizontal: 32,
-    paddingTop: 32,
+    paddingHorizontal: 28,
+    paddingTop: 40,
     paddingBottom: 40,
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
-    color: '#000',
+    color: '#1A1A1A',
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
+    letterSpacing: 0.3,
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 15,
+    color: '#6B7280',
     textAlign: 'center',
-    marginBottom: 32,
-    lineHeight: 20,
+    marginBottom: 36,
+    lineHeight: 22,
   },
   input: {
-    marginBottom: 16,
-    backgroundColor: '#F5F5F5',
-  },
-  forgotContainer: {
-    alignItems: 'flex-end',
-    marginBottom: 24,
-  },
-  forgotText: {
-    fontSize: 14,
-    color: '#9C7BB0',
-    fontWeight: '500',
+    marginBottom: 18,
+    backgroundColor: '#F9FAFB',
   },
   gradientButton: {
-    borderRadius: 25,
-    overflow: 'hidden',
-    marginBottom: 24,
-  },
-  buttonTouchable: {
-    paddingVertical: 16,
+    borderRadius: 30,
+    paddingVertical: 18,
     alignItems: 'center',
+    marginBottom: 28,
+    marginTop: 12,
+    shadowColor: '#667eea',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
   },
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
   loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingBottom: 20,
   },
   loginText: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 15,
+    color: '#6B7280',
   },
   loginLink: {
-    fontSize: 14,
-    color: '#9C7BB0',
-    fontWeight: '600',
+    fontSize: 15,
+    color: '#667eea',
+    fontWeight: '700',
   },
 });
 

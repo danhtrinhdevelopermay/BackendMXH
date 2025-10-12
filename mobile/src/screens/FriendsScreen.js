@@ -299,7 +299,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginHorizontal: 12,
     marginTop: 12,
-    borderRadius: 8,
+    borderRadius: 16,
+    shadowColor: '#667eea',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   friendContainer: {
     flexDirection: 'row',
@@ -336,7 +341,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginHorizontal: 12,
     marginTop: 12,
-    borderRadius: 8,
+    borderRadius: 16,
+    shadowColor: '#667eea',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   requestContainer: {
     padding: 12,
@@ -369,7 +379,7 @@ const styles = StyleSheet.create({
   },
   acceptButton: {
     flex: 1,
-    borderRadius: 6,
+    borderRadius: 10,
   },
   rejectButton: {
     flex: 1,
@@ -380,7 +390,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginHorizontal: 12,
     marginTop: 12,
-    borderRadius: 8,
+    borderRadius: 16,
+    shadowColor: '#667eea',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -411,7 +426,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   addButton: {
-    borderRadius: 6,
+    borderRadius: 10,
   },
   emptyContainer: {
     padding: 32,

@@ -1,53 +1,103 @@
-import React from 'react';
-import { View, StyleSheet, Image, Dimensions } from 'react-native';
-import { Button, Text } from 'react-native-paper';
+import React, { useEffect, useRef } from 'react';
+import { View, StyleSheet, Image, Dimensions, Animated, TouchableOpacity } from 'react-native';
+import { Text } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const WelcomeScreen = ({ navigation }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+  const logoScale = useRef(new Animated.Value(0.8)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.spring(logoScale, {
+        toValue: 1,
+        tension: 50,
+        friction: 7,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
   return (
     <LinearGradient
-      colors={['#E8D5F2', '#F5C5D8', '#E8D5F2']}
+      colors={['#667eea', '#764ba2', '#f093fb']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
       style={styles.container}
     >
       <View style={styles.content}>
-        <Text style={styles.title}>Chào mừng</Text>
-        <Text style={styles.greeting}>Xin chào</Text>
-        <Text style={styles.subtitle}>
-          Hãy tham mạng xã hội này {'\n'}
-          Trước tiên hãy đăng nhập hoặc đăng ký 
-        </Text>
+        <Animated.View 
+          style={[
+            styles.titleContainer,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }]
+            }
+          ]}
+        >
+          <Text style={styles.title}>Chào mừng đến với</Text>
+          <Text style={styles.appName}>Social Connect</Text>
+          <Text style={styles.subtitle}>
+            Kết nối với bạn bè và chia sẻ những khoảnh khắc đáng nhớ
+          </Text>
+        </Animated.View>
 
-        <Image
-          source={require('../../assets/logo.png')}
-          style={styles.illustration}
-          resizeMode="contain"
-        />
+        <Animated.View 
+          style={[
+            styles.logoContainer,
+            {
+              transform: [{ scale: logoScale }]
+            }
+          ]}
+        >
+          <Image
+            source={require('../../assets/logo.png')}
+            style={styles.illustration}
+            resizeMode="contain"
+          />
+        </Animated.View>
 
-        <View style={styles.buttonContainer}>
-          <Button
-            mode="contained"
+        <Animated.View 
+          style={[
+            styles.buttonContainer,
+            {
+              opacity: fadeAnim,
+            }
+          ]}
+        >
+          <TouchableOpacity
             onPress={() => navigation.navigate('Register')}
-            style={styles.createButton}
-            buttonColor="#FFFFFF"
-            textColor="#000000"
-            labelStyle={styles.buttonLabel}
+            activeOpacity={0.9}
           >
-            Tạo tài khoản mới
-          </Button>
+            <LinearGradient
+              colors={['#FFFFFF', '#F0F0F0']}
+              style={styles.createButton}
+            >
+              <Text style={styles.createButtonText}>Tạo tài khoản mới</Text>
+            </LinearGradient>
+          </TouchableOpacity>
 
-          <Button
-            mode="outlined"
+          <TouchableOpacity
             onPress={() => navigation.navigate('Login')}
             style={styles.loginButton}
-            textColor="#FFFFFF"
-            theme={{ colors: { outline: '#FFFFFF' }}}
-            labelStyle={styles.buttonLabel}
+            activeOpacity={0.8}
           >
-            Đăng nhập
-          </Button>
-        </View>
+            <Text style={styles.loginButtonText}>Đăng nhập</Text>
+          </TouchableOpacity>
+        </Animated.View>
       </View>
     </LinearGradient>
   );
@@ -59,51 +109,84 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
     alignItems: 'center',
     paddingHorizontal: 32,
+    paddingVertical: 60,
+  },
+  titleContainer: {
+    alignItems: 'center',
   },
   title: {
-    fontSize: 42,
-    fontWeight: 'bold',
-    color: '#000000',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  greeting: {
-    fontSize: 18,
-    color: '#000000',
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#FFFFFF',
     marginBottom: 8,
     textAlign: 'center',
+    letterSpacing: 0.5,
+  },
+  appName: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 16,
+    textAlign: 'center',
+    letterSpacing: 1,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 10,
   },
   subtitle: {
-    fontSize: 15,
-    color: '#000000',
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.95)',
     textAlign: 'center',
-    marginBottom: 40,
-    lineHeight: 22,
+    lineHeight: 24,
+    paddingHorizontal: 20,
+  },
+  logoContainer: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
   },
   illustration: {
-    width: width * 0.6,
-    height: width * 0.6,
-    marginBottom: 60,
+    width: width * 0.5,
+    height: width * 0.5,
   },
   buttonContainer: {
     width: '100%',
     gap: 16,
   },
   createButton: {
-    borderRadius: 25,
-    paddingVertical: 4,
+    borderRadius: 30,
+    paddingVertical: 18,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  createButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#667eea',
+    letterSpacing: 0.5,
   },
   loginButton: {
-    borderRadius: 25,
-    borderWidth: 2,
-    paddingVertical: 4,
+    borderRadius: 30,
+    paddingVertical: 18,
+    alignItems: 'center',
+    borderWidth: 2.5,
+    borderColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
   },
-  buttonLabel: {
-    fontSize: 16,
-    fontWeight: '600',
+  loginButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
 });
 

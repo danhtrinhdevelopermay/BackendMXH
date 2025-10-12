@@ -131,7 +131,7 @@ const ProfileScreen = ({ route, navigation }) => {
           onError={() => console.log('Cover photo load error')}
         />
         <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.3)']}
+          colors={['transparent', 'rgba(102, 126, 234, 0.2)', 'rgba(118, 75, 162, 0.3)']}
           style={styles.coverGradient}
         />
       </View>
@@ -207,7 +207,7 @@ const ProfileScreen = ({ route, navigation }) => {
                 onPress={() => navigation.navigate('EditProfile')}
               >
                 <LinearGradient
-                  colors={['#1877f2', '#0c63d4']}
+                  colors={['#667eea', '#764ba2']}
                   start={{x: 0, y: 0}}
                   end={{x: 1, y: 0}}
                   style={styles.gradientButton}

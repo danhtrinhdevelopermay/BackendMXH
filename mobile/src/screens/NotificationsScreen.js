@@ -141,15 +141,24 @@ const styles = StyleSheet.create({
   },
   listContent: {
     flexGrow: 1,
+    paddingTop: 12,
+    paddingBottom: 16,
   },
   notificationCard: {
     backgroundColor: '#fff',
-    marginHorizontal: 0,
-    marginBottom: 1,
-    borderRadius: 0,
+    marginHorizontal: 12,
+    marginBottom: 10,
+    borderRadius: 16,
+    shadowColor: '#667eea',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 2,
   },
   unreadCard: {
     backgroundColor: '#f0f8ff',
+    borderLeftWidth: 4,
+    borderLeftColor: '#667eea',
   },
   notificationContainer: {
     flexDirection: 'row',
