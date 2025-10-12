@@ -1,4 +1,5 @@
 const pool = require('../config/database');
+const { sendPushNotification } = require('./pushTokenController');
 
 const sendMessage = async (req, res) => {
   const { receiver_id, content } = req.body;
@@ -13,7 +14,17 @@ const sendMessage = async (req, res) => {
     await pool.query(
       `INSERT INTO notifications (user_id, type, content, related_user_id) 
        VALUES ($1, $2, $3, $4)`,
-      [receiver_id, 'message', 'gửi một yêu cầu kết bạn đến bạn', sender_id]
+      [receiver_id, 'message', 'sent you a message', sender_id]
+    );
+
+    const sender = await pool.query('SELECT full_name, username FROM users WHERE id = $1', [sender_id]);
+    const senderName = sender.rows[0]?.full_name || sender.rows[0]?.username || 'Someone';
+    
+    await sendPushNotification(
+      receiver_id,
+      'Tin nhắn mới',
+      `${senderName}: ${content}`,
+      { screen: 'Chat', userId: sender_id, userName: senderName }
     );
 
     res.status(201).json(result.rows[0]);

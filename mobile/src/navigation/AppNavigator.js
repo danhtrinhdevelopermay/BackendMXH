@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext';
 import { useIncomingCall } from '../hooks/useIncomingCall';
 import IncomingCallModal from '../components/IncomingCallModal';
+import { registerForPushNotificationsAsync, setupNotificationListeners, unregisterPushToken } from '../services/notificationService';
 
 import WelcomeScreen from '../screens/WelcomeScreen';
 import LoginScreen from '../screens/LoginScreen';
@@ -122,10 +123,40 @@ const HomeTabs = () => {
 const NavigationWrapper = () => {
   const { user } = useContext(AuthContext);
   const { incomingCall, acceptCall, rejectCall } = useIncomingCall();
+  const navigationRef = useRef(null);
+  const pushTokenRef = useRef(null);
+
+  useEffect(() => {
+    if (user) {
+      registerForPushNotificationsAsync().then(token => {
+        pushTokenRef.current = token;
+      });
+
+      const subscription = setupNotificationListeners({
+        navigate: (screen, params) => {
+          if (navigationRef.current) {
+            navigationRef.current.navigate(screen, params);
+          }
+        }
+      });
+
+      return () => {
+        subscription.remove();
+      };
+    } else {
+      if (pushTokenRef.current) {
+        unregisterPushToken(pushTokenRef.current);
+        pushTokenRef.current = null;
+      }
+    }
+  }, [user]);
 
   return (
     <>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator 
+        ref={navigationRef}
+        screenOptions={{ headerShown: false }}
+      >
         {user ? (
           <>
             <Stack.Screen name="MainTabs" component={HomeTabs} />

@@ -12,6 +12,7 @@ const friendshipRoutes = require('./src/routes/friendships');
 const messageRoutes = require('./src/routes/messages');
 const notificationRoutes = require('./src/routes/notifications');
 const userRoutes = require('./src/routes/users');
+const pushTokenRoutes = require('./src/routes/pushTokens');
 const { authenticateToken } = require('./src/middleware/auth');
 const pool = require('./src/config/database');
 const cloudinary = require('./src/config/cloudinary');
@@ -45,6 +46,7 @@ app.use('/api/friendships', friendshipRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/push-tokens', pushTokenRoutes);
 
 app.post('/api/upload', authenticateToken, upload.single('media'), async (req, res) => {
   try {

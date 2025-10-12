@@ -1,4 +1,5 @@
 const pool = require('../config/database');
+const { sendPushNotification } = require('./pushTokenController');
 
 const sendFriendRequest = async (req, res) => {
   const { addressee_id } = req.body;
@@ -27,6 +28,16 @@ const sendFriendRequest = async (req, res) => {
       `INSERT INTO notifications (user_id, type, content, related_user_id) 
        VALUES ($1, $2, $3, $4)`,
       [addressee_id, 'friend_request', 'gửi một yêu cầu kết bạn đến bạn', requester_id]
+    );
+
+    const requester = await pool.query('SELECT full_name, username FROM users WHERE id = $1', [requester_id]);
+    const requesterName = requester.rows[0]?.full_name || requester.rows[0]?.username || 'Someone';
+    
+    await sendPushNotification(
+      addressee_id,
+      'Lời mời kết bạn mới',
+      `${requesterName} đã gửi lời mời kết bạn đến bạn`,
+      { screen: 'Notifications' }
     );
 
     res.status(201).json(result.rows[0]);
@@ -60,6 +71,16 @@ const respondToFriendRequest = async (req, res) => {
         `INSERT INTO notifications (user_id, type, content, related_user_id) 
          VALUES ($1, $2, $3, $4)`,
         [result.rows[0].requester_id, 'friend_accept', 'accepted your friend request', user_id]
+      );
+
+      const accepter = await pool.query('SELECT full_name, username FROM users WHERE id = $1', [user_id]);
+      const accepterName = accepter.rows[0]?.full_name || accepter.rows[0]?.username || 'Someone';
+      
+      await sendPushNotification(
+        result.rows[0].requester_id,
+        'Lời mời kết bạn được chấp nhận',
+        `${accepterName} đã chấp nhận lời mời kết bạn của bạn`,
+        { screen: 'Notifications' }
       );
     }
 

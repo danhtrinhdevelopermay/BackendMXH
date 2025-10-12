@@ -1,5 +1,6 @@
 const pool = require('../config/database');
 const cacheService = require('../services/cache');
+const { sendPushNotification } = require('./pushTokenController');
 
 const addComment = async (req, res) => {
   const { postId } = req.params;
@@ -33,6 +34,16 @@ const addComment = async (req, res) => {
         `INSERT INTO notifications (user_id, type, content, related_user_id, related_post_id) 
          VALUES ($1, $2, $3, $4, $5)`,
         [postOwner.rows[0].user_id, 'comment', 'commented on your post', user_id, postId]
+      );
+
+      const commenter = await pool.query('SELECT full_name, username FROM users WHERE id = $1', [user_id]);
+      const commenterName = commenter.rows[0]?.full_name || commenter.rows[0]?.username || 'Someone';
+      
+      await sendPushNotification(
+        postOwner.rows[0].user_id,
+        'Bình luận mới',
+        `${commenterName} đã bình luận về bài viết của bạn`,
+        { screen: 'PostDetail', postId: parseInt(postId) }
       );
     }
 
