@@ -149,14 +149,19 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handleVideoPress = async (postId) => {
+    let videoPosition = 0;
     if (videoRefs.current[postId]) {
       try {
+        const status = await videoRefs.current[postId].getStatusAsync();
+        if (status.isLoaded) {
+          videoPosition = status.positionMillis;
+        }
         await videoRefs.current[postId].pauseAsync();
       } catch (error) {
         console.log('Error pausing video:', error);
       }
     }
-    navigation.navigate('PostDetail', { postId });
+    navigation.navigate('PostDetail', { postId, videoPosition });
   };
 
   const renderHeader = () => (
