@@ -41,7 +41,7 @@ const MessagesScreen = ({ navigation }) => {
           <View style={styles.conversationContainer}>
             <View style={styles.avatarContainer}>
               <UserAvatar 
-                user={item}
+                user={{ ...item, id: item.other_user_id }}
                 size={56}
                 style={styles.avatar}
               />

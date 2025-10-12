@@ -8,7 +8,7 @@ const UserAvatar = ({ user, size = 40, style }) => {
   
   const userId = user?.user_id || user?.id;
   const hasAvatar = user?.avatar_url && user.avatar_url.trim() !== '';
-  const avatarUrl = hasAvatar ? `${API_URL}/api/avatar/${userId}` : null;
+  const avatarUrl = hasAvatar && userId ? `${API_URL}/api/avatar/${userId}?t=${Date.now()}` : null;
 
   const initials = (user?.full_name || user?.username || 'U')[0].toUpperCase();
 
@@ -22,7 +22,7 @@ const UserAvatar = ({ user, size = 40, style }) => {
           style
         ]}
         onError={(e) => {
-          console.log('Avatar load error:', e.nativeEvent.error);
+          console.log('Avatar load error:', e.nativeEvent.error, 'URL:', avatarUrl);
         }}
       />
     );
