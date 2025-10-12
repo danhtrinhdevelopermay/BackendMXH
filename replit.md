@@ -52,6 +52,20 @@ Preferred communication style: Simple, everyday language.
 - Smooth spring animations on show/hide
 - Used consistently across Login, Register, Home, Profile, Friends, Messages, Notifications, Comments, CreatePost screens
 
+**Voice Calling Infrastructure (Signaling Layer - Oct 2025):**
+- Socket.IO-based real-time signaling for call initiation and management
+- VoiceCallScreen component handles call UI (outgoing/incoming states, timer, mute/speaker controls)
+- IncomingCallModal displays incoming call notifications with accept/reject actions
+- useIncomingCall hook manages global incoming call state and navigation
+- SocketService provides centralized socket connection management (idempotent, single shared instance)
+- Call flow: User clicks call button → Socket emits call_user → Receiver sees IncomingCallModal → Accept/Reject
+- Socket events: call_user, incoming_call, accept_call, reject_call, call_ended, call_accepted, call_rejected
+- **Important Limitation:** Current implementation provides UI and signaling only - no actual audio transmission
+  - WebRTC is NOT implemented (react-native-webrtc requires custom development build, incompatible with Expo Go)
+  - For production voice calling, consider third-party solutions (Agora, Twilio, Daily.co) or custom development build with react-native-webrtc
+- Performance optimizations: React.memo, useMemo, useCallback prevent unnecessary re-renders
+- Proper cleanup: Timer intervals cleared on unmount, socket listeners properly managed
+
 ### Backend Architecture (Node.js + Express)
 
 **API Design Pattern:**
