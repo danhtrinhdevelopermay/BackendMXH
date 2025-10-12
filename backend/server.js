@@ -97,17 +97,15 @@ app.get('/api/media/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const result = await pool.query(
-      'SELECT media_data, media_type FROM posts WHERE id = $1',
+      'SELECT media_url FROM posts WHERE id = $1',
       [id]
     );
 
-    if (result.rows.length === 0 || !result.rows[0].media_data) {
+    if (result.rows.length === 0 || !result.rows[0].media_url) {
       return res.status(404).json({ error: 'Media not found' });
     }
 
-    const { media_data, media_type } = result.rows[0];
-    res.set('Content-Type', media_type);
-    res.send(media_data);
+    res.redirect(result.rows[0].media_url);
   } catch (error) {
     console.error('Get media error:', error);
     res.status(500).json({ error: 'Failed to get media' });
@@ -123,17 +121,15 @@ app.get('/api/avatar/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     const result = await pool.query(
-      'SELECT avatar_data, avatar_type FROM users WHERE id = $1',
+      'SELECT avatar_url FROM users WHERE id = $1',
       [userId]
     );
 
-    if (result.rows.length === 0 || !result.rows[0].avatar_data) {
+    if (result.rows.length === 0 || !result.rows[0].avatar_url) {
       return res.status(404).json({ error: 'Avatar not found' });
     }
 
-    const { avatar_data, avatar_type } = result.rows[0];
-    res.set('Content-Type', avatar_type);
-    res.send(avatar_data);
+    res.redirect(result.rows[0].avatar_url);
   } catch (error) {
     console.error('Get avatar error:', error);
     res.status(500).json({ error: 'Failed to get avatar' });
@@ -149,17 +145,15 @@ app.get('/api/cover/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     const result = await pool.query(
-      'SELECT cover_data, cover_type FROM users WHERE id = $1',
+      'SELECT cover_url FROM users WHERE id = $1',
       [userId]
     );
 
-    if (result.rows.length === 0 || !result.rows[0].cover_data) {
+    if (result.rows.length === 0 || !result.rows[0].cover_url) {
       return res.status(404).json({ error: 'Cover not found' });
     }
 
-    const { cover_data, cover_type } = result.rows[0];
-    res.set('Content-Type', cover_type);
-    res.send(cover_data);
+    res.redirect(result.rows[0].cover_url);
   } catch (error) {
     console.error('Get cover error:', error);
     res.status(500).json({ error: 'Failed to get cover' });
