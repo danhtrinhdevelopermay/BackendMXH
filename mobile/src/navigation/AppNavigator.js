@@ -23,6 +23,7 @@ import CommentsScreen from '../screens/CommentsScreen';
 import SearchScreen from '../screens/SearchScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import VoiceCallScreen from '../screens/VoiceCallScreen';
+import PostDetailScreen from '../screens/PostDetailScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -131,6 +132,7 @@ const NavigationWrapper = () => {
             <Stack.Screen name="Search" component={SearchScreen} options={{ headerShown: true, title: 'Tìm kiếm' }} />
             <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: true, title: 'Hồ sơ' }} />
             <Stack.Screen name="CreatePost" component={CreatePostScreen} options={{ headerShown: true, title: 'Tạo bài viết' }} />
+            <Stack.Screen name="PostDetail" component={PostDetailScreen} options={{ headerShown: true, title: 'Bài viết' }} />
             <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: true }} />
             <Stack.Screen name="Comments" component={CommentsScreen} options={{ headerShown: true, title: 'Comments' }} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: true, title: 'Chỉnh sửa hồ sơ' }} />

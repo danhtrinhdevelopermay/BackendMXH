@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, { useState, useEffect, useCallback, useContext, useRef } from 'react';
 import { View, FlatList, StyleSheet, RefreshControl, TouchableOpacity, Pressable, Animated, Dimensions } from 'react-native';
 import { Card, Avatar, IconButton, Text, Menu, Divider } from 'react-native-paper';
 import { Video } from 'expo-av';
@@ -20,6 +20,8 @@ const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [menuVisible, setMenuVisible] = useState({});
   const [reactionMenuVisible, setReactionMenuVisible] = useState({});
+  const [visibleItems, setVisibleItems] = useState([]);
+  const videoRefs = useRef({});
 
   const fetchPosts = async () => {
     try {
@@ -120,6 +122,15 @@ const HomeScreen = ({ navigation }) => {
     return date.toLocaleDateString('vi-VN');
   };
 
+  const onViewableItemsChanged = useRef(({ viewableItems }) => {
+    const visiblePostIds = viewableItems.map(item => item.item.id);
+    setVisibleItems(visiblePostIds);
+  }).current;
+
+  const viewabilityConfig = useRef({
+    itemVisiblePercentThreshold: 50,
+  }).current;
+
   const renderHeader = () => (
     <View style={styles.headerContainer}>
       <LinearGradient
@@ -198,18 +209,30 @@ const HomeScreen = ({ navigation }) => {
           const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
           const mediaUrl = item.media_url || `${API_URL}/api/media/${item.id}`;
           const isVideo = item.media_type?.startsWith('video/');
+          const isVisible = visibleItems.includes(item.id);
           
           return (
             <View style={styles.mediaContainer}>
               {isVideo ? (
-                <Video
-                  source={{ uri: mediaUrl }}
-                  style={styles.postMedia}
-                  useNativeControls
-                  resizeMode="cover"
-                  shouldPlay={false}
-                  onError={(error) => console.log('Video error:', error)}
-                />
+                <TouchableOpacity 
+                  activeOpacity={1}
+                  onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
+                >
+                  <Video
+                    ref={(ref) => {
+                      if (ref) {
+                        videoRefs.current[item.id] = ref;
+                      }
+                    }}
+                    source={{ uri: mediaUrl }}
+                    style={styles.postMedia}
+                    resizeMode="cover"
+                    shouldPlay={isVisible}
+                    isLooping
+                    isMuted={false}
+                    onError={(error) => console.log('Video error:', error)}
+                  />
+                </TouchableOpacity>
               ) : (
                 <Card.Cover 
                   source={{ uri: mediaUrl }} 
@@ -328,6 +351,8 @@ const HomeScreen = ({ navigation }) => {
         }
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
       />
     </View>
   );
