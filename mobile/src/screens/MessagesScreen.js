@@ -34,7 +34,8 @@ const MessagesScreen = ({ navigation }) => {
       <TouchableOpacity 
         onPress={() => navigation.navigate('Chat', { 
           userId: item.other_user_id, 
-          userName: item.full_name || item.username 
+          userName: item.full_name || item.username,
+          userAvatar: item.avatar_url
         })}
       >
         <Card style={[styles.conversationCard, isUnread && styles.unreadCard]} elevation={0}>

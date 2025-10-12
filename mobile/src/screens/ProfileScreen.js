@@ -78,7 +78,8 @@ const ProfileScreen = ({ route, navigation }) => {
   const handleMessage = () => {
     navigation.navigate('Chat', { 
       userId: userId, 
-      userName: profileUser?.full_name || profileUser?.username 
+      userName: profileUser?.full_name || profileUser?.username,
+      userAvatar: profileUser?.avatar_url
     });
   };
 
