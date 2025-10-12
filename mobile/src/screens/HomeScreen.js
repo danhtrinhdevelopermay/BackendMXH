@@ -166,7 +166,7 @@ const HomeScreen = ({ navigation }) => {
       
       {item.media_type && (() => {
         const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
-        const mediaUrl = `${API_URL}/api/media/${item.id}`;
+        const mediaUrl = item.media_url || `${API_URL}/api/media/${item.id}`;
         const isVideo = item.media_type?.startsWith('video/');
         
         return (
