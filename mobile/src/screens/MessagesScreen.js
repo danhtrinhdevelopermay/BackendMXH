@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { Avatar, Text, Card } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { messageAPI, thoughtAPI } from '../api/api';
 import { useAlert } from '../context/AlertContext';
 import { AuthContext } from '../context/AuthContext';
@@ -24,7 +26,7 @@ const MessagesScreen = ({ navigation }) => {
       const response = await messageAPI.getConversations();
       setConversations(response.data);
     } catch (error) {
-      showAlert('Error', 'Failed to fetch conversations', 'error');
+      console.error('Failed to fetch messages');
     } finally {
       setLoading(false);
     }
@@ -75,6 +77,22 @@ const MessagesScreen = ({ navigation }) => {
     }
   };
 
+  const formatTime = (timestamp) => {
+    if (!timestamp) return '';
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diff = now - date;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return 'Vừa xong';
+    if (minutes < 60) return `${minutes} phút`;
+    if (hours < 24) return `${hours} giờ`;
+    if (days < 7) return `${days} ngày`;
+    return date.toLocaleDateString('vi-VN');
+  };
+
   const renderConversation = React.useCallback(({ item }) => {
     const isUnread = !item.is_read && item.sender_id !== item.other_user_id;
     
@@ -85,31 +103,47 @@ const MessagesScreen = ({ navigation }) => {
           userName: item.full_name || item.username,
           userAvatar: item.avatar_url
         })}
+        activeOpacity={0.7}
       >
-        <Card style={[styles.conversationCard, isUnread && styles.unreadCard]} elevation={0}>
+        <View style={[styles.conversationCard, isUnread && styles.unreadCard]}>
           <View style={styles.conversationContainer}>
             <View style={styles.avatarContainer}>
               <UserAvatar 
                 user={item}
                 userId={item.other_user_id}
-                size={56}
+                size={60}
                 style={styles.avatar}
               />
-              {isUnread && <View style={styles.unreadBadge} />}
+              {isUnread && (
+                <LinearGradient
+                  colors={['#667eea', '#764ba2']}
+                  style={styles.unreadBadge}
+                />
+              )}
             </View>
             <View style={styles.conversationInfo}>
-              <Text style={[styles.userName, isUnread && styles.unreadText]}>
-                {item.full_name || item.username}
-              </Text>
-              <Text 
-                style={[styles.lastMessage, isUnread && styles.unreadText]} 
-                numberOfLines={1}
-              >
-                {item.last_message || 'No messages yet'}
-              </Text>
+              <View style={styles.headerRow}>
+                <Text style={[styles.userName, isUnread && styles.unreadText]} numberOfLines={1}>
+                  {item.full_name || item.username}
+                </Text>
+                <Text style={styles.timeText}>{formatTime(item.created_at)}</Text>
+              </View>
+              <View style={styles.messageRow}>
+                <Text 
+                  style={[styles.lastMessage, isUnread && styles.unreadMessageText]} 
+                  numberOfLines={1}
+                >
+                  {item.last_message || 'Bắt đầu cuộc trò chuyện'}
+                </Text>
+                {isUnread && (
+                  <View style={styles.unreadCount}>
+                    <Text style={styles.unreadCountText}>•</Text>
+                  </View>
+                )}
+              </View>
             </View>
           </View>
-        </Card>
+        </View>
       </TouchableOpacity>
     );
   }, [navigation]);
@@ -119,7 +153,19 @@ const MessagesScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={styles.container}>
+      <LinearGradient
+        colors={['#667eea', '#764ba2']}
+        style={[styles.header, { paddingTop: insets.top + 12 }]}
+      >
+        <View style={styles.headerContent}>
+          <Text style={styles.headerTitle}>Tin nhắn</Text>
+          <TouchableOpacity style={styles.searchButton}>
+            <Ionicons name="search" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
+
       <FlatList
         data={conversations}
         renderItem={renderConversation}
@@ -133,11 +179,19 @@ const MessagesScreen = ({ navigation }) => {
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No conversations yet</Text>
+            <View style={styles.emptyIconContainer}>
+              <Ionicons name="chatbubbles-outline" size={80} color="#e4e6eb" />
+            </View>
+            <Text style={styles.emptyTitle}>Chưa có tin nhắn</Text>
+            <Text style={styles.emptyText}>
+              Bắt đầu cuộc trò chuyện với bạn bè của bạn
+            </Text>
           </View>
         }
         contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
       />
+      
       <CreateThoughtModal
         visible={modalVisible}
         onDismiss={() => setModalVisible(false)}
@@ -151,69 +205,161 @@ const MessagesScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f2f5',
+    backgroundColor: '#f8f9fa',
+  },
+  header: {
+    paddingBottom: 16,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: '#667eea',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+    letterSpacing: 0.5,
+  },
+  searchButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   listContent: {
     flexGrow: 1,
+    paddingTop: 8,
   },
   conversationCard: {
     backgroundColor: '#fff',
-    marginHorizontal: 0,
-    marginBottom: 1,
-    borderRadius: 0,
+    marginHorizontal: 12,
+    marginVertical: 6,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   unreadCard: {
-    backgroundColor: '#f0f8ff',
+    backgroundColor: '#fff',
+    borderWidth: 1.5,
+    borderColor: '#667eea',
+    shadowColor: '#667eea',
+    shadowOpacity: 0.15,
   },
   conversationContainer: {
     flexDirection: 'row',
-    padding: 12,
+    padding: 14,
     alignItems: 'center',
   },
   avatarContainer: {
     position: 'relative',
   },
   avatar: {
-    backgroundColor: '#1877f2',
+    backgroundColor: '#667eea',
   },
   unreadBadge: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#1877f2',
-    borderWidth: 2,
+    bottom: 2,
+    right: 2,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 3,
     borderColor: '#fff',
   },
   conversationInfo: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: 14,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
   },
   userName: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#050505',
-    marginBottom: 4,
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    flex: 1,
+    marginRight: 8,
   },
   unreadText: {
-    fontWeight: '600',
+    fontWeight: '700',
+    color: '#050505',
+  },
+  timeText: {
+    fontSize: 13,
+    color: '#8e8e93',
+    fontWeight: '500',
+  },
+  messageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   lastMessage: {
-    fontSize: 14,
-    color: '#65676b',
+    fontSize: 15,
+    color: '#8e8e93',
+    flex: 1,
+    lineHeight: 20,
+  },
+  unreadMessageText: {
+    color: '#1a1a1a',
+    fontWeight: '500',
+  },
+  unreadCount: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#667eea',
+    marginLeft: 8,
+  },
+  unreadCountText: {
+    fontSize: 10,
+    color: '#667eea',
+    textAlign: 'center',
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 32,
+    paddingVertical: 80,
+    paddingHorizontal: 32,
+  },
+  emptyIconContainer: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: '#f0f2f5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  emptyTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#1a1a1a',
+    marginBottom: 8,
   },
   emptyText: {
     fontSize: 16,
-    color: '#65676b',
+    color: '#8e8e93',
     textAlign: 'center',
+    lineHeight: 24,
   },
 });
 
