@@ -129,6 +129,7 @@ const AppNavigator = () => {
           <>
             <Stack.Screen name="MainTabs" component={HomeTabs} />
             <Stack.Screen name="Search" component={SearchScreen} options={{ headerShown: true, title: 'Tìm kiếm' }} />
+            <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: true, title: 'Hồ sơ' }} />
             <Stack.Screen name="CreatePost" component={CreatePostScreen} options={{ headerShown: true, title: 'Tạo bài viết' }} />
             <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: true }} />
             <Stack.Screen name="Comments" component={CommentsScreen} options={{ headerShown: true, title: 'Comments' }} />
