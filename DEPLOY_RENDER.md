@@ -44,7 +44,14 @@
    JWT_SECRET = [tạo một chuỗi ngẫu nhiên dài, ví dụ: my-super-secret-jwt-key-2024]
    NODE_ENV = production
    PORT = 5000
+   CLOUDINARY_CLOUD_NAME = [your cloudinary cloud name]
+   CLOUDINARY_API_KEY = [your cloudinary api key]
+   CLOUDINARY_API_SECRET = [your cloudinary api secret]
    ```
+   
+   **Lưu ý về Cloudinary**: Nếu chưa có tài khoản Cloudinary:
+   - Đăng ký tại: https://cloudinary.com/users/register/free
+   - Sau khi đăng ký, vào Dashboard để lấy Cloud Name, API Key, và API Secret
 
 6. Click "Create Web Service"
 7. Đợi deploy hoàn tất (5-10 phút)
