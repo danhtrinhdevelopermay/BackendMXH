@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Avatar, Text, Card } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { messageAPI, thoughtAPI } from '../api/api';
 import { useAlert } from '../context/AlertContext';
 import { AuthContext } from '../context/AuthContext';
@@ -11,6 +12,7 @@ import CreateThoughtModal from '../components/CreateThoughtModal';
 const MessagesScreen = ({ navigation }) => {
   const { showAlert } = useAlert();
   const { user } = useContext(AuthContext);
+  const insets = useSafeAreaInsets();
   const [conversations, setConversations] = useState([]);
   const [thoughts, setThoughts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -117,7 +119,7 @@ const MessagesScreen = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <FlatList
         data={conversations}
         renderItem={renderConversation}
