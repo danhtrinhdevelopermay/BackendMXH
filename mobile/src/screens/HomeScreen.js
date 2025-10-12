@@ -5,6 +5,7 @@ import { Video } from 'expo-av';
 import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { postAPI, reactionAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
@@ -38,6 +39,22 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     fetchPosts();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        Object.values(videoRefs.current).forEach(async (video) => {
+          if (video) {
+            try {
+              await video.pauseAsync();
+            } catch (error) {
+              console.log('Error pausing video:', error);
+            }
+          }
+        });
+      };
+    }, [])
+  );
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -131,6 +148,17 @@ const HomeScreen = ({ navigation }) => {
     itemVisiblePercentThreshold: 50,
   };
 
+  const handleVideoPress = async (postId) => {
+    if (videoRefs.current[postId]) {
+      try {
+        await videoRefs.current[postId].pauseAsync();
+      } catch (error) {
+        console.log('Error pausing video:', error);
+      }
+    }
+    navigation.navigate('PostDetail', { postId });
+  };
+
   const renderHeader = () => (
     <View style={styles.headerContainer}>
       <LinearGradient
@@ -216,7 +244,7 @@ const HomeScreen = ({ navigation }) => {
               {isVideo ? (
                 <TouchableOpacity 
                   activeOpacity={1}
-                  onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
+                  onPress={() => handleVideoPress(item.id)}
                 >
                   <Video
                     ref={(ref) => {
