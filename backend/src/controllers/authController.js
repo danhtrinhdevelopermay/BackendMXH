@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const pool = require('../config/database');
 const { JWT_SECRET } = require('../middleware/auth');
+const cloudinary = require('../config/cloudinary');
 
 const register = async (req, res) => {
   const errors = validationResult(req);
@@ -121,22 +122,34 @@ const updateAvatar = async (req, res) => {
   }
 
   try {
-    const avatarData = req.file.buffer;
-    const avatarType = req.file.mimetype;
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'avatars',
+          public_id: `avatar_${userId}`,
+          overwrite: true,
+          resource_type: 'auto'
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      uploadStream.end(req.file.buffer);
+    });
 
     const result = await pool.query(
-      'UPDATE users SET avatar_data = $1, avatar_type = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id',
-      [avatarData, avatarType, userId]
+      'UPDATE users SET avatar_url = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id',
+      [uploadResult.secure_url, userId]
     );
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
     res.json({ 
-      avatar_url: `${baseUrl}/api/avatar/${userId}`,
-      type: avatarType
+      avatar_url: uploadResult.secure_url,
+      type: req.file.mimetype
     });
   } catch (error) {
     console.error('Update avatar error:', error);
@@ -152,22 +165,34 @@ const updateCover = async (req, res) => {
   }
 
   try {
-    const coverData = req.file.buffer;
-    const coverType = req.file.mimetype;
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'covers',
+          public_id: `cover_${userId}`,
+          overwrite: true,
+          resource_type: 'auto'
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      uploadStream.end(req.file.buffer);
+    });
 
     const result = await pool.query(
-      'UPDATE users SET cover_data = $1, cover_type = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id',
-      [coverData, coverType, userId]
+      'UPDATE users SET cover_url = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id',
+      [uploadResult.secure_url, userId]
     );
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
     res.json({ 
-      cover_url: `${baseUrl}/api/cover/${userId}`,
-      type: coverType
+      cover_url: uploadResult.secure_url,
+      type: req.file.mimetype
     });
   } catch (error) {
     console.error('Update cover error:', error);

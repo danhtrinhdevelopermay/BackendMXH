@@ -14,6 +14,7 @@ const notificationRoutes = require('./src/routes/notifications');
 const userRoutes = require('./src/routes/users');
 const { authenticateToken } = require('./src/middleware/auth');
 const pool = require('./src/config/database');
+const cloudinary = require('./src/config/cloudinary');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -49,24 +50,36 @@ app.post('/api/upload', authenticateToken, upload.single('media'), async (req, r
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    const mediaData = req.file.buffer;
     const mediaType = req.file.mimetype;
     const fileSize = req.file.size;
     
     console.log(`Uploading media - Type: ${mediaType}, Size: ${fileSize} bytes`);
     
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'posts',
+          resource_type: 'auto'
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      uploadStream.end(req.file.buffer);
+    });
+
     const result = await pool.query(
-      'INSERT INTO posts (user_id, media_data, media_type) VALUES ($1, $2, $3) RETURNING id',
-      [req.user.id, mediaData, mediaType]
+      'INSERT INTO posts (user_id, media_url, media_type) VALUES ($1, $2, $3) RETURNING id',
+      [req.user.id, uploadResult.secure_url, mediaType]
     );
 
     const mediaId = result.rows[0].id;
-    console.log(`Media uploaded successfully with ID: ${mediaId}`);
+    console.log(`Media uploaded successfully to Cloudinary with post ID: ${mediaId}`);
     
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
     res.json({ 
       id: mediaId,
-      url: `${baseUrl}/api/media/${mediaId}`,
+      url: uploadResult.secure_url,
       type: mediaType
     });
   } catch (error) {
