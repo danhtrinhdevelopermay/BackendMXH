@@ -1,4 +1,5 @@
 const pool = require('../config/database');
+const cacheService = require('../services/cache');
 
 const addReaction = async (req, res) => {
   const { postId } = req.params;
@@ -16,6 +17,8 @@ const addReaction = async (req, res) => {
         'UPDATE reactions SET reaction_type = $1 WHERE post_id = $2 AND user_id = $3 RETURNING *',
         [reaction_type, postId, user_id]
       );
+      cacheService.delPattern('newsfeed:');
+      cacheService.delPattern('userposts:');
       return res.json(result.rows[0]);
     }
 
@@ -37,6 +40,9 @@ const addReaction = async (req, res) => {
       );
     }
 
+    cacheService.delPattern('newsfeed:');
+    cacheService.delPattern('userposts:');
+    
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Add reaction error:', error);
@@ -57,6 +63,9 @@ const removeReaction = async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Reaction not found' });
     }
+
+    cacheService.delPattern('newsfeed:');
+    cacheService.delPattern('userposts:');
 
     res.json({ message: 'Reaction removed successfully' });
   } catch (error) {

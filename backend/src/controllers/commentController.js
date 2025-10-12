@@ -1,4 +1,5 @@
 const pool = require('../config/database');
+const cacheService = require('../services/cache');
 
 const addComment = async (req, res) => {
   const { postId } = req.params;
@@ -35,6 +36,9 @@ const addComment = async (req, res) => {
       );
     }
 
+    cacheService.delPattern('newsfeed:');
+    cacheService.delPattern('userposts:');
+    
     res.status(201).json(commentWithUser.rows[0]);
   } catch (error) {
     console.error('Add comment error:', error);
@@ -75,6 +79,9 @@ const deleteComment = async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Comment not found or unauthorized' });
     }
+
+    cacheService.delPattern('newsfeed:');
+    cacheService.delPattern('userposts:');
 
     res.json({ message: 'Comment deleted successfully' });
   } catch (error) {
