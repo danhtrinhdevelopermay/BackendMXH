@@ -165,6 +165,82 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+const http = require('http');
+const { Server } = require('socket.io');
+
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
+
+const activeUsers = new Map();
+const activeCalls = new Map();
+
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+
+  socket.on('user_online', (userId) => {
+    activeUsers.set(userId, socket.id);
+    console.log(`User ${userId} is online with socket ${socket.id}`);
+  });
+
+  socket.on('call_user', ({ callerId, callerName, receiverId }) => {
+    const receiverSocketId = activeUsers.get(receiverId);
+    if (receiverSocketId) {
+      activeCalls.set(callerId, receiverId);
+      io.to(receiverSocketId).emit('incoming_call', {
+        callerId,
+        callerName,
+        callId: `${callerId}-${receiverId}-${Date.now()}`
+      });
+      console.log(`Call from ${callerId} to ${receiverId}`);
+    } else {
+      socket.emit('user_offline');
+    }
+  });
+
+  socket.on('accept_call', ({ callerId, receiverId }) => {
+    const callerSocketId = activeUsers.get(callerId);
+    if (callerSocketId) {
+      io.to(callerSocketId).emit('call_accepted', { receiverId });
+      console.log(`Call accepted by ${receiverId}`);
+    }
+  });
+
+  socket.on('reject_call', ({ callerId }) => {
+    const callerSocketId = activeUsers.get(callerId);
+    if (callerSocketId) {
+      io.to(callerSocketId).emit('call_rejected');
+      console.log(`Call rejected`);
+    }
+    activeCalls.delete(callerId);
+  });
+
+  socket.on('end_call', ({ userId, otherUserId }) => {
+    const otherSocketId = activeUsers.get(otherUserId);
+    if (otherSocketId) {
+      io.to(otherSocketId).emit('call_ended');
+    }
+    activeCalls.delete(userId);
+    activeCalls.delete(otherUserId);
+    console.log(`Call ended between ${userId} and ${otherUserId}`);
+  });
+
+  socket.on('disconnect', () => {
+    for (const [userId, socketId] of activeUsers.entries()) {
+      if (socketId === socket.id) {
+        activeUsers.delete(userId);
+        activeCalls.delete(userId);
+        console.log(`User ${userId} disconnected`);
+        break;
+      }
+    }
+  });
+});
+
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
 });
