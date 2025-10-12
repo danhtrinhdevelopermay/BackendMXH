@@ -106,6 +106,13 @@ export const userAPI = {
   getUserById: (userId) => api.get(`/users/${userId}`),
 };
 
+export const thoughtAPI = {
+  createOrUpdateThought: (data) => api.post('/thoughts', data),
+  getAllThoughts: () => api.get('/thoughts'),
+  getUserThought: (userId) => api.get(`/thoughts/${userId}`),
+  deleteThought: () => api.delete('/thoughts'),
+};
+
 export const uploadAPI = {
   uploadMedia: async (uri, type) => {
     const formData = new FormData();

@@ -1,14 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Avatar, Text, Card } from 'react-native-paper';
-import { messageAPI } from '../api/api';
+import { messageAPI, thoughtAPI } from '../api/api';
 import { useAlert } from '../context/AlertContext';
+import { AuthContext } from '../context/AuthContext';
 import UserAvatar from '../components/UserAvatar';
+import ThoughtsBar from '../components/ThoughtsBar';
+import CreateThoughtModal from '../components/CreateThoughtModal';
 
 const MessagesScreen = ({ navigation }) => {
   const { showAlert } = useAlert();
+  const { user } = useContext(AuthContext);
   const [conversations, setConversations] = useState([]);
+  const [thoughts, setThoughts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentUserThought, setCurrentUserThought] = useState(null);
 
   const fetchConversations = async () => {
     try {
@@ -21,11 +28,51 @@ const MessagesScreen = ({ navigation }) => {
     }
   };
 
+  const fetchThoughts = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await thoughtAPI.getAllThoughts();
+      setThoughts(response.data);
+      const userThought = response.data.find(t => t.user_id === user.id);
+      setCurrentUserThought(userThought || null);
+    } catch (error) {
+      console.error('Failed to fetch thoughts');
+      showAlert('Lỗi', 'Không thể tải suy nghĩ', 'error');
+    }
+  };
+
   useEffect(() => {
+    if (!user) return;
+    
     fetchConversations();
-    const interval = setInterval(fetchConversations, 5000);
+    fetchThoughts();
+    const interval = setInterval(() => {
+      fetchConversations();
+      fetchThoughts();
+    }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [user]);
+
+  const handleCreateThought = () => {
+    setModalVisible(true);
+  };
+
+  const handleSaveThought = async (thoughtData) => {
+    try {
+      if (thoughtData === null) {
+        await thoughtAPI.deleteThought();
+        showAlert('Thành công', 'Đã xóa suy nghĩ', 'success');
+      } else {
+        await thoughtAPI.createOrUpdateThought(thoughtData);
+        showAlert('Thành công', 'Đã lưu suy nghĩ', 'success');
+      }
+      fetchThoughts();
+      setModalVisible(false);
+    } catch (error) {
+      showAlert('Lỗi', 'Không thể lưu suy nghĩ', 'error');
+    }
+  };
 
   const renderConversation = React.useCallback(({ item }) => {
     const isUnread = !item.is_read && item.sender_id !== item.other_user_id;
@@ -66,18 +113,35 @@ const MessagesScreen = ({ navigation }) => {
     );
   }, [navigation]);
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
         data={conversations}
         renderItem={renderConversation}
         keyExtractor={(item) => item.other_user_id.toString()}
+        ListHeaderComponent={
+          <ThoughtsBar
+            thoughts={thoughts}
+            currentUserId={user.id}
+            onCreateThought={handleCreateThought}
+          />
+        }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>No conversations yet</Text>
           </View>
         }
         contentContainerStyle={styles.listContent}
+      />
+      <CreateThoughtModal
+        visible={modalVisible}
+        onDismiss={() => setModalVisible(false)}
+        onSave={handleSaveThought}
+        initialThought={currentUserThought}
       />
     </View>
   );
