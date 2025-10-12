@@ -8,7 +8,7 @@ const UserAvatar = ({ user, size = 40, style }) => {
   
   const userId = user?.user_id || user?.id;
   const hasAvatar = user?.avatar_url && user.avatar_url.trim() !== '';
-  const avatarUrl = hasAvatar && userId ? `${API_URL}/api/avatar/${userId}?t=${Date.now()}` : null;
+  const avatarUrl = hasAvatar && userId ? `${API_URL}/api/avatar/${userId}` : null;
 
   const initials = (user?.full_name || user?.username || 'U')[0].toUpperCase();
 
