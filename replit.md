@@ -82,6 +82,18 @@ Preferred communication style: Simple, everyday language.
   - PostDetailScreen resumes video from saved position using setPositionAsync on video load
   - Provides seamless viewing experience across screen transitions
 
+**User Thoughts/Notes Sharing Feature (Oct 12, 2025):**
+- Messenger-like thoughts/notes feature displayed at the top of MessagesScreen
+- ThoughtsBar component: Horizontal scrollable list of user thoughts with avatars
+- Users can create/update/delete their own thought (max 100 characters)
+- Optional emoji selection (10 options: 😊, 😂, ❤️, 🎉, 🔥, 👍, 🤔, 😎, 🌟, 💪)
+- Thoughts displayed as bubbles above user avatars
+- Shows current user's thought first, followed by friends' thoughts
+- CreateThoughtModal: Full-featured modal for thought creation/editing with emoji picker
+- Real-time updates: Thoughts refresh every 5 seconds along with conversations
+- User guard: Component safely handles AuthContext initialization to prevent crashes
+- Visual design: Blue gradient "+" button for creating, bordered bubbles for displaying thoughts
+
 ### Backend Architecture (Node.js + Express)
 
 **API Design Pattern:**
@@ -106,6 +118,7 @@ Preferred communication style: Simple, everyday language.
 - `/api/friendships` - Friend requests, acceptance/rejection, search
 - `/api/messages` - Direct messaging, conversations list
 - `/api/notifications` - Notification feed, read status management
+- `/api/thoughts` - User thoughts/notes (create/update, get all, get by user, delete)
 - `/api/upload` - Media upload (images/videos) stored directly in database
 - `/api/media/:id` - Retrieve media from database by post ID
 - `/api/avatar` - Upload/retrieve user avatar (POST with image, GET /api/avatar/:userId)
@@ -149,8 +162,9 @@ Preferred communication style: Simple, everyday language.
 ### Database
 - **PostgreSQL** - Primary relational database (hosted on Neon)
 - Direct pool connection using `pg` driver
-- Schema includes: users, posts, comments, reactions, friendships, messages, notifications tables
+- Schema includes: users, posts, comments, reactions, friendships, messages, notifications, user_thoughts tables
 - Database URL configured via environment variable `DATABASE_URL`
+- **user_thoughts table:** Stores user thoughts/notes with unique constraint per user, includes content (max 100 chars), emoji, and timestamps
 
 ### Third-Party Services & APIs
 - **Expo Services:**
