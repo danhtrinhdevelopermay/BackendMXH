@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { TextInput, IconButton, Avatar, Text, Card } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { commentAPI } from '../api/api';
 import { useAlert } from '../context/AlertContext';
 import { AuthContext } from '../context/AuthContext';
@@ -9,6 +10,7 @@ import UserAvatar from '../components/UserAvatar';
 const CommentsScreen = ({ route }) => {
   const { showAlert } = useAlert();
   const { user } = useContext(AuthContext);
+  const insets = useSafeAreaInsets();
   const { postId } = route.params;
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
@@ -80,7 +82,7 @@ const CommentsScreen = ({ route }) => {
         }
         contentContainerStyle={styles.commentsList}
       />
-      <View style={styles.inputContainer}>
+      <View style={[styles.inputContainer, { paddingBottom: Math.max(insets.bottom, 12) }]}>
         <UserAvatar 
           user={user}
           size={32}

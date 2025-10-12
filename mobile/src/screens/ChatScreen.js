@@ -3,6 +3,7 @@ import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform, TouchableOp
 import { TextInput, IconButton, Text } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { messageAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
 import UserAvatar from '../components/UserAvatar';
@@ -11,6 +12,7 @@ import SocketService from '../services/SocketService';
 const ChatScreen = ({ route, navigation }) => {
   const { userId, userName, userAvatar } = route.params;
   const { user } = useContext(AuthContext);
+  const insets = useSafeAreaInsets();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -179,7 +181,7 @@ const ChatScreen = ({ route, navigation }) => {
         />
         
         {/* Input Area */}
-        <View style={styles.inputWrapper}>
+        <View style={[styles.inputWrapper, { paddingBottom: Math.max(insets.bottom, 12) }]}>
           <View style={styles.inputContainer}>
             <TextInput
               value={newMessage}

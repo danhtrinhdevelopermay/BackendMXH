@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { View, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Avatar, Text, Divider, Menu } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { Video } from 'expo-av';
 import { postAPI, uploadAPI } from '../api/api';
@@ -12,6 +13,7 @@ import UserAvatar from '../components/UserAvatar';
 const CreatePostScreen = ({ navigation }) => {
   const { user } = useContext(AuthContext);
   const { showAlert } = useAlert();
+  const insets = useSafeAreaInsets();
   const [content, setContent] = useState('');
   const [mediaUri, setMediaUri] = useState(null);
   const [mediaType, setMediaType] = useState(null);
@@ -157,7 +159,7 @@ const CreatePostScreen = ({ navigation }) => {
         )}
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 16) }]}>
         <View style={styles.mediaButtons}>
           <TouchableOpacity 
             style={[styles.addPhotoButton, { flex: 1, marginRight: 8 }]}
