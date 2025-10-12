@@ -7,9 +7,11 @@ Layedia is a full-stack social media application similar to Facebook, built with
 ## App Branding
 
 - **App Name:** Layedia
-- **Logo:** Custom gradient checkmark logo (located at `mobile/assets/logo.png`)
-- **Branding Colors:** Blue gradient theme (#1877f2)
+- **Logo:** Custom gradient checkmark logo with blue-purple gradient (located at `mobile/assets/logo.png`)
+- **App Icon:** Logo used as launcher icon for APK builds (`mobile/assets/icon.png`, `mobile/assets/adaptive-icon.png`)
+- **Branding Colors:** Blue-purple gradient theme (#667eea to #764ba2)
 - **Logo Display:** Login screen shows logo image (120x120) with app name "Layedia" below
+- **Adaptive Icon Background:** Gradient blue (#667eea) matches logo theme
 
 ## User Preferences
 

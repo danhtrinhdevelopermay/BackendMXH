@@ -24,7 +24,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#667eea"
       },
       "package": "com.socialmedia.app"
     },
@@ -32,7 +32,7 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "apiUrl": "https://cead3c03-5986-4586-924b-117ef5cc1bb0-00-rzeeg32yxa2g.pike.replit.dev",
+      "apiUrl": "https://backendmxh-1.onrender.com",
       "eas": {
         "projectId": "1fb0f3d8-c5ef-4e8e-bf79-2cfe01921c03"
       }
