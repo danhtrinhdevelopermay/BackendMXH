@@ -81,15 +81,16 @@ Preferred communication style: Simple, everyday language.
 - `/api/avatar` - Upload/retrieve user avatar (POST with image, GET /api/avatar/:userId)
 - `/api/cover` - Upload/retrieve user cover photo (POST with image, GET /api/cover/:userId)
 
-**Media Storage (Updated):**
-- Media (images/videos) stored directly in database as BYTEA
-- Posts table includes: `media_data` (bytea), `media_type` (varchar)
-- Users table includes: `avatar_data` (bytea), `avatar_type` (varchar), `cover_data` (bytea), `cover_type` (varchar)
-- Upload endpoint stores media in memory, then saves to database
-- Media retrieval endpoint serves binary data with appropriate Content-Type
+**Media Storage (Cloudinary Integration - Updated Oct 2025):**
+- Media (images/videos) uploaded to Cloudinary cloud storage
+- Posts table includes: `media_url` (text), `media_type` (varchar) 
+- Users table includes: `avatar_url` (text), `cover_url` (text)
+- Upload endpoint uses Cloudinary SDK to upload files, stores returned URLs in database
+- Cloudinary handles image/video optimization, transformations, and CDN delivery
 - Supports both images (JPEG, PNG) and videos (MP4) up to 50MB
-- Mobile app uses expo-av for video playback
-- Avatar and cover photos uploaded separately via dedicated endpoints
+- Mobile app displays media directly from Cloudinary URLs
+- Avatar and cover photos uploaded separately to Cloudinary via dedicated endpoints
+- Legacy database columns (media_data, avatar_data, cover_data) retained for backward compatibility
 
 **Privacy & Visibility:**
 - Posts support privacy settings: `public` (visible to everyone) or `friends` (visible only to friends)
@@ -101,10 +102,10 @@ Preferred communication style: Simple, everyday language.
 - Default privacy is 'public' for backward compatibility
 
 **Data Flow Pattern:**
-- Media upload creates post with media_data, returns media ID
+- Media upload sends file to Cloudinary, creates post with media_url, returns Cloudinary URL and post ID
 - CreatePost updates that post with content and privacy setting
-- News feed returns post metadata with media_type and privacy (not media_data for efficiency)
-- Frontend constructs media URL from post ID: /api/media/{post.id}
+- News feed returns post metadata with media_url, media_type and privacy
+- Frontend displays media directly from Cloudinary URL (fallback to /api/media/{post.id} for legacy posts)
 - Notification creation triggered automatically on social actions (comments, reactions, friend requests, messages)
 - Conversations view shows latest message per unique user pair
 - User reactions stored with ability to update reaction type
@@ -132,6 +133,7 @@ Preferred communication style: Simple, everyday language.
   - Multer - File upload middleware (memory storage, 50MB limit)
   - JWT (jsonwebtoken) - Token generation and verification
   - Bcrypt - Password hashing
+  - Cloudinary - Cloud-based media storage and delivery (images & videos)
   
 - **Deployment:**
   - Backend currently using Replit URL: `https://25381eed-bb44-406f-9912-690d32f22c41-00-3gr8xaickanud.pike.replit.dev`
@@ -143,3 +145,6 @@ Preferred communication style: Simple, everyday language.
 - `DATABASE_URL` - PostgreSQL connection string
 - `JWT_SECRET` - Secret key for JWT signing (defaults to placeholder if not set)
 - `PORT` - Server port (defaults to 5000)
+- `CLOUDINARY_CLOUD_NAME` - Cloudinary account cloud name
+- `CLOUDINARY_API_KEY` - Cloudinary API key
+- `CLOUDINARY_API_SECRET` - Cloudinary API secret
