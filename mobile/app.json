@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Shatter",
-    "slug": "shatter-social",
+    "name": "Layedia",
+    "slug": "social-media-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -9,14 +9,14 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#ffffff"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.shatter.app",
+      "bundleIdentifier": "com.socialmedia.app",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -24,15 +24,15 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#667eea"
       },
-      "package": "com.shatter.app"
+      "package": "com.socialmedia.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "apiUrl": "https://e7077766-987f-4369-8d53-bf56781bc254-00-1392r7pmkgxp9.sisko.replit.dev",
+      "apiUrl": "https://backendmxh-1.onrender.com",
       "eas": {
         "projectId": "1fb0f3d8-c5ef-4e8e-bf79-2cfe01921c03"
       }
