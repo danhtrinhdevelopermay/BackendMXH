@@ -54,6 +54,8 @@ const HomeScreen = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
+      fetchStories();
+      
       return () => {
         Object.values(videoRefs.current).forEach(async (video) => {
           if (video) {
@@ -71,6 +73,7 @@ const HomeScreen = ({ navigation }) => {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchPosts();
+    fetchStories();
   }, []);
 
   const handleReaction = async (postId, reactionType) => {
