@@ -219,6 +219,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 16,
     backgroundColor: 'rgba(0,0,0,0.3)',
+    zIndex: 10,
   },
   progressContainer: {
     flexDirection: 'row',
@@ -266,6 +267,7 @@ const styles = StyleSheet.create({
     bottom: 40,
     left: 20,
     right: 20,
+    zIndex: 10,
   },
   caption: {
     fontSize: 16,
@@ -279,6 +281,7 @@ const styles = StyleSheet.create({
   touchAreas: {
     ...StyleSheet.absoluteFillObject,
     flexDirection: 'row',
+    zIndex: 1,
   },
   touchLeft: {
     flex: 1,
