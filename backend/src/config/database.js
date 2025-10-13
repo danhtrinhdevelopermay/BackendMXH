@@ -45,8 +45,12 @@ pool.on('error', (err) => {
   process.exit(-1);
 });
 
-pool.on('connect', (client) => {
-  client.query('SET search_path TO public');
+pool.on('connect', async (client) => {
+  try {
+    await client.query('SET search_path TO public');
+  } catch (err) {
+    console.error('Error setting search_path:', err);
+  }
 });
 
 module.exports = pool;
