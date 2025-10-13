@@ -1,8 +1,8 @@
-# 📱 Layedia - Kết Nối Mọi Khoảnh Khắc
+# 📱 Shatter - Kết Nối Mọi Khoảnh Khắc
 
 ## 🌟 Giới Thiệu
 
-**Layedia** là ứng dụng mạng xã hội hiện đại, được thiết kế để kết nối mọi người một cách dễ dàng và thú vị. Với giao diện thân thiện và đầy đủ tính năng, Layedia mang đến trải nghiệm mạng xã hội hoàn hảo ngay trên điện thoại của bạn.
+**Shatter** là ứng dụng mạng xã hội hiện đại, được thiết kế để kết nối mọi người một cách dễ dàng và thú vị. Với giao diện thân thiện và đầy đủ tính năng, Shatter mang đến trải nghiệm mạng xã hội hoàn hảo ngay trên điện thoại của bạn.
 
 ## ✨ Tính Năng Nổi Bật
 
@@ -28,7 +28,7 @@
 
 ## 🎨 Thiết Kế Hiện Đại
 
-Layedia sở hữu giao diện Material Design với màu gradient xanh-tím đặc trưng, mang đến trải nghiệm người dùng mượt mà và thu hút. Logo checkmark gradient độc đáo thể hiện sự hoàn thiện và kết nối.
+Shatter sở hữu giao diện Material Design với màu gradient xanh-tím đặc trưng, mang đến trải nghiệm người dùng mượt mà và thu hút. Logo checkmark gradient độc đáo thể hiện sự hoàn thiện và kết nối.
 
 ## 🚀 Công Nghệ Tiên Tiến
 
@@ -46,8 +46,8 @@ Layedia sở hữu giao diện Material Design với màu gradient xanh-tím đ�
 
 ## 📲 Tải Ngay Hôm Nay!
 
-Tham gia Layedia để bắt đầu kết nối với bạn bè, chia sẻ khoảnh khắc đáng nhớ và trải nghiệm mạng xã hội theo cách của bạn!
+Tham gia Shatter để bắt đầu kết nối với bạn bè, chia sẻ khoảnh khắc đáng nhớ và trải nghiệm mạng xã hội theo cách của bạn!
 
 ---
 
-*Layedia - Nơi mọi kết nối đều có ý nghĩa* ✨
+*Shatter - Nơi mọi kết nối đều có ý nghĩa* ✨

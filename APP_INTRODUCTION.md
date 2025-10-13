@@ -1,8 +1,8 @@
-# 📱 Layedia - Connect Every Moment
+# 📱 Shatter - Connect Every Moment
 
 ## 🌟 Introduction
 
-**Layedia** is a modern social media application designed to connect people easily and enjoyably. With a user-friendly interface and comprehensive features, Layedia delivers the perfect social networking experience right on your phone.
+**Shatter** is a modern social media application designed to connect people easily and enjoyably. With a user-friendly interface and comprehensive features, Shatter delivers the perfect social networking experience right on your phone.
 
 ## ✨ Key Features
 
@@ -28,7 +28,7 @@
 
 ## 🎨 Modern Design
 
-Layedia features a Material Design interface with distinctive blue-purple gradients, providing a smooth and attractive user experience. The unique gradient checkmark logo represents completeness and connection.
+Shatter features a Material Design interface with distinctive blue-purple gradients, providing a smooth and attractive user experience. The unique gradient checkmark logo represents completeness and connection.
 
 ## 🚀 Advanced Technology
 
@@ -46,8 +46,8 @@ Layedia features a Material Design interface with distinctive blue-purple gradie
 
 ## 📲 Download Today!
 
-Join Layedia to start connecting with friends, sharing memorable moments, and experiencing social media your way!
+Join Shatter to start connecting with friends, sharing memorable moments, and experiencing social media your way!
 
 ---
 
-*Layedia - Where every connection matters* ✨
+*Shatter - Where every connection matters* ✨
