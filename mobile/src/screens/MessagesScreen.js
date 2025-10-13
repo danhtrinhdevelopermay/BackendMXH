@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text } from 'react-native-paper';
+import { View, FlatList, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { Text, Searchbar } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,6 +20,7 @@ const MessagesScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [currentUserThought, setCurrentUserThought] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchConversations = async () => {
     try {
@@ -87,11 +88,16 @@ const MessagesScreen = ({ navigation }) => {
     const days = Math.floor(diff / 86400000);
 
     if (minutes < 1) return 'Vừa xong';
-    if (minutes < 60) return `${minutes} phút`;
-    if (hours < 24) return `${hours} giờ`;
-    if (days < 7) return `${days} ngày`;
-    return date.toLocaleDateString('vi-VN');
+    if (minutes < 60) return `${minutes}p`;
+    if (hours < 24) return `${hours}h`;
+    if (days < 7) return `${days}d`;
+    return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
   };
+
+  const filteredConversations = conversations.filter(item => {
+    const name = (item.full_name || item.username || '').toLowerCase();
+    return name.includes(searchQuery.toLowerCase());
+  });
 
   const renderConversation = React.useCallback(({ item }) => {
     const isUnread = !item.is_read && item.sender_id !== item.other_user_id;
@@ -105,43 +111,29 @@ const MessagesScreen = ({ navigation }) => {
         })}
         activeOpacity={0.7}
       >
-        <View style={[styles.conversationCard, isUnread && styles.unreadCard]}>
-          <View style={styles.conversationContainer}>
-            <View style={styles.avatarContainer}>
-              <UserAvatar 
-                user={item}
-                userId={item.other_user_id}
-                size={60}
-                style={styles.avatar}
-              />
-              {isUnread && (
-                <LinearGradient
-                  colors={['#667eea', '#764ba2']}
-                  style={styles.unreadBadge}
-                />
-              )}
+        <View style={styles.conversationItem}>
+          <View style={styles.avatarWrapper}>
+            <UserAvatar 
+              user={item}
+              userId={item.other_user_id}
+              size={56}
+            />
+            {isUnread && <View style={styles.unreadDot} />}
+          </View>
+          
+          <View style={styles.conversationContent}>
+            <View style={styles.nameRow}>
+              <Text style={[styles.userName, isUnread && styles.unreadName]} numberOfLines={1}>
+                {item.full_name || item.username}
+              </Text>
+              <Text style={styles.timeText}>{formatTime(item.last_message_time)}</Text>
             </View>
-            <View style={styles.conversationInfo}>
-              <View style={styles.headerRow}>
-                <Text style={[styles.userName, isUnread && styles.unreadText]} numberOfLines={1}>
-                  {item.full_name || item.username}
-                </Text>
-                <Text style={styles.timeText}>{formatTime(item.created_at)}</Text>
-              </View>
-              <View style={styles.messageRow}>
-                <Text 
-                  style={[styles.lastMessage, isUnread && styles.unreadMessageText]} 
-                  numberOfLines={1}
-                >
-                  {item.last_message || 'Bắt đầu cuộc trò chuyện'}
-                </Text>
-                {isUnread && (
-                  <View style={styles.unreadCount}>
-                    <Text style={styles.unreadCountText}>•</Text>
-                  </View>
-                )}
-              </View>
-            </View>
+            <Text 
+              style={[styles.lastMessage, isUnread && styles.unreadMessage]} 
+              numberOfLines={2}
+            >
+              {item.last_message || 'Bắt đầu trò chuyện'}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -154,20 +146,36 @@ const MessagesScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        style={[styles.header, { paddingTop: insets.top + 12 }]}
-      >
-        <View style={styles.headerContent}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
+        <View style={styles.headerTop}>
           <Text style={styles.headerTitle}>Tin nhắn</Text>
-          <TouchableOpacity style={styles.searchButton}>
-            <Ionicons name="search" size={24} color="#fff" />
+          <TouchableOpacity style={styles.composeButton}>
+            <LinearGradient
+              colors={['#667eea', '#764ba2']}
+              style={styles.composeGradient}
+            >
+              <Ionicons name="create-outline" size={20} color="#fff" />
+            </LinearGradient>
           </TouchableOpacity>
         </View>
-      </LinearGradient>
+        
+        <View style={styles.searchContainer}>
+          <View style={styles.searchWrapper}>
+            <Ionicons name="search" size={20} color="#9CA3AF" style={styles.searchIcon} />
+            <Searchbar
+              placeholder="Tìm kiếm"
+              onChangeText={setSearchQuery}
+              value={searchQuery}
+              style={styles.searchBar}
+              inputStyle={styles.searchInput}
+              iconColor="transparent"
+            />
+          </View>
+        </View>
+      </View>
 
       <FlatList
-        data={conversations}
+        data={filteredConversations}
         renderItem={renderConversation}
         keyExtractor={(item) => item.other_user_id.toString()}
         ListHeaderComponent={
@@ -179,12 +187,15 @@ const MessagesScreen = ({ navigation }) => {
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <View style={styles.emptyIconContainer}>
-              <Ionicons name="chatbubbles-outline" size={80} color="#e4e6eb" />
-            </View>
+            <LinearGradient
+              colors={['#F3F4F6', '#E5E7EB']}
+              style={styles.emptyIconContainer}
+            >
+              <Ionicons name="chatbubbles-outline" size={60} color="#9CA3AF" />
+            </LinearGradient>
             <Text style={styles.emptyTitle}>Chưa có tin nhắn</Text>
             <Text style={styles.emptyText}>
-              Bắt đầu cuộc trò chuyện với bạn bè của bạn
+              Bắt đầu cuộc trò chuyện{'\n'}với bạn bè của bạn
             </Text>
           </View>
         }
@@ -205,161 +216,153 @@ const MessagesScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#fff',
   },
   header: {
-    paddingBottom: 16,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    shadowColor: '#667eea',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.05)',
   },
-  headerContent: {
+  headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    marginBottom: 16,
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
-    letterSpacing: 0.5,
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#1a1a1a',
+    letterSpacing: -0.5,
   },
-  searchButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  composeButton: {
+    shadowColor: '#667eea',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  composeGradient: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  listContent: {
-    flexGrow: 1,
-    paddingTop: 8,
+  searchContainer: {
+    marginBottom: 4,
   },
-  conversationCard: {
-    backgroundColor: '#fff',
-    marginHorizontal: 12,
-    marginVertical: 6,
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  unreadCard: {
-    backgroundColor: '#fff',
-    borderWidth: 1.5,
-    borderColor: '#667eea',
-    shadowColor: '#667eea',
-    shadowOpacity: 0.15,
-  },
-  conversationContainer: {
-    flexDirection: 'row',
-    padding: 14,
-    alignItems: 'center',
-  },
-  avatarContainer: {
+  searchWrapper: {
     position: 'relative',
   },
-  avatar: {
-    backgroundColor: '#667eea',
-  },
-  unreadBadge: {
+  searchIcon: {
     position: 'absolute',
-    bottom: 2,
-    right: 2,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 3,
+    left: 16,
+    top: '50%',
+    transform: [{ translateY: -10 }],
+    zIndex: 1,
+  },
+  searchBar: {
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+    elevation: 0,
+    shadowOpacity: 0,
+    paddingLeft: 40,
+    height: 44,
+  },
+  searchInput: {
+    fontSize: 15,
+    color: '#1a1a1a',
+    paddingLeft: 8,
+  },
+  listContent: {
+    flexGrow: 1,
+  },
+  conversationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.04)',
+  },
+  avatarWrapper: {
+    position: 'relative',
+    marginRight: 12,
+  },
+  unreadDot: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#667eea',
+    borderWidth: 2,
     borderColor: '#fff',
   },
-  conversationInfo: {
+  conversationContent: {
     flex: 1,
-    marginLeft: 14,
   },
-  headerRow: {
+  nameRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   userName: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '600',
     color: '#1a1a1a',
     flex: 1,
     marginRight: 8,
   },
-  unreadText: {
+  unreadName: {
     fontWeight: '700',
-    color: '#050505',
   },
   timeText: {
     fontSize: 13,
-    color: '#8e8e93',
-    fontWeight: '500',
-  },
-  messageRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    color: '#9CA3AF',
+    fontWeight: '400',
   },
   lastMessage: {
-    fontSize: 15,
-    color: '#8e8e93',
-    flex: 1,
+    fontSize: 14,
+    color: '#9CA3AF',
     lineHeight: 20,
   },
-  unreadMessageText: {
-    color: '#1a1a1a',
+  unreadMessage: {
+    color: '#4B5563',
     fontWeight: '500',
-  },
-  unreadCount: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#667eea',
-    marginLeft: 8,
-  },
-  unreadCountText: {
-    fontSize: 10,
-    color: '#667eea',
-    textAlign: 'center',
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 80,
+    paddingVertical: 100,
     paddingHorizontal: 32,
   },
   emptyIconContainer: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: '#f0f2f5',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
   },
   emptyTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '700',
     color: '#1a1a1a',
     marginBottom: 8,
   },
   emptyText: {
-    fontSize: 16,
-    color: '#8e8e93',
+    fontSize: 15,
+    color: '#9CA3AF',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 22,
   },
 });
 
