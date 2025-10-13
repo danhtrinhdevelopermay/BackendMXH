@@ -99,7 +99,7 @@ const HomeTabs = () => {
         name="Tin nhắn" 
         component={MessagesScreen}
         options={{
-          headerShown: true,
+          headerShown: false,
         }}
       />
       <Tab.Screen 
