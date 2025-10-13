@@ -187,7 +187,7 @@ const HomeScreen = ({ navigation }) => {
         end={{ x: 1, y: 0 }}
         style={styles.gradientHeader}
       >
-        <Text style={styles.headerTitle}>Layedia</Text>
+        <Text style={styles.headerTitle}>Shatter</Text>
         <Text style={styles.headerSubtitle}>Chia sẻ khoảnh khắc của bạn</Text>
       </LinearGradient>
       
