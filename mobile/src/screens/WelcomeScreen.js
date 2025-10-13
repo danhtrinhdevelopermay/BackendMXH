@@ -49,7 +49,7 @@ const WelcomeScreen = ({ navigation }) => {
           ]}
         >
           <Text style={styles.title}>Chào mừng đến với</Text>
-          <Text style={styles.appName}>Social Connect</Text>
+          <Text style={styles.appName}>Shatter</Text>
           <Text style={styles.subtitle}>
             Kết nối với bạn bè và chia sẻ những khoảnh khắc đáng nhớ
           </Text>
