@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const { createStory, getAllStories, getUserStories, deleteStory } = require('../controllers/storyController');
-const { auth } = require('../middleware/auth');
+const { authenticateToken } = require('../middleware/auth');
 
 const storage = multer.memoryStorage();
 const upload = multer({ 
@@ -10,9 +10,9 @@ const upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 }
 });
 
-router.post('/', auth, upload.single('media'), createStory);
-router.get('/', auth, getAllStories);
-router.get('/user/:userId', auth, getUserStories);
-router.delete('/:storyId', auth, deleteStory);
+router.post('/', authenticateToken, upload.single('media'), createStory);
+router.get('/', authenticateToken, getAllStories);
+router.get('/user/:userId', authenticateToken, getUserStories);
+router.delete('/:storyId', authenticateToken, deleteStory);
 
 module.exports = router;
