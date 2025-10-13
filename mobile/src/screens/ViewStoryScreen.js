@@ -86,6 +86,10 @@ const ViewStoryScreen = ({ route, navigation }) => {
 
   const handleDelete = async () => {
     try {
+      console.log('Deleting story:', stories[currentIndex].id);
+      console.log('Current user ID:', user?.id);
+      console.log('Story user ID:', stories[currentIndex].user_id);
+      
       await storyAPI.deleteStory(stories[currentIndex].id);
       const newStories = stories.filter((_, i) => i !== currentIndex);
       if (newStories.length === 0) {
@@ -99,7 +103,9 @@ const ViewStoryScreen = ({ route, navigation }) => {
       }
       showAlert('Thành công', 'Đã xóa story', 'success');
     } catch (error) {
-      showAlert('Lỗi', 'Không thể xóa story', 'error');
+      console.error('Delete story error:', error);
+      console.error('Error response:', error.response?.data);
+      showAlert('Lỗi', error.response?.data?.error || 'Không thể xóa story', 'error');
     }
   };
 
@@ -117,7 +123,7 @@ const ViewStoryScreen = ({ route, navigation }) => {
   }
 
   const currentStory = stories[currentIndex];
-  const isOwnStory = currentStory.user_id === user?.id;
+  const isOwnStory = parseInt(currentStory.user_id) === parseInt(user?.id);
 
   return (
     <View style={styles.container}>
