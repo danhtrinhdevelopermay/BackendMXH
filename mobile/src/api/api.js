@@ -113,6 +113,33 @@ export const thoughtAPI = {
   deleteThought: () => api.delete('/thoughts'),
 };
 
+export const storyAPI = {
+  createStory: async (uri, mediaType, caption) => {
+    const formData = new FormData();
+    formData.append('media', {
+      uri,
+      type: mediaType.startsWith('video') ? 'video/mp4' : 'image/jpeg',
+      name: mediaType.startsWith('video') ? 'story.mp4' : 'story.jpg',
+    });
+    formData.append('media_type', mediaType.startsWith('video') ? 'video' : 'image');
+    if (caption) {
+      formData.append('caption', caption);
+    }
+
+    const token = await SecureStore.getItemAsync('token');
+    const response = await axios.post(`${API_URL}/api/stories`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
+  getAllStories: () => api.get('/stories'),
+  getUserStories: (userId) => api.get(`/stories/user/${userId}`),
+  deleteStory: (storyId) => api.delete(`/stories/${storyId}`),
+};
+
 export const uploadAPI = {
   uploadMedia: async (uri, type) => {
     const formData = new FormData();

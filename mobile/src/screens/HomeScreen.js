@@ -6,10 +6,11 @@ import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { postAPI, reactionAPI } from '../api/api';
+import { postAPI, reactionAPI, storyAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
 import UserAvatar from '../components/UserAvatar';
+import StoriesBar from '../components/StoriesBar';
 
 const { width } = Dimensions.get('window');
 
@@ -17,6 +18,7 @@ const HomeScreen = ({ navigation }) => {
   const { user } = useContext(AuthContext);
   const { showAlert } = useAlert();
   const [posts, setPosts] = useState([]);
+  const [stories, setStories] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [menuVisible, setMenuVisible] = useState({});
@@ -36,8 +38,18 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
+  const fetchStories = async () => {
+    try {
+      const response = await storyAPI.getAllStories();
+      setStories(response.data);
+    } catch (error) {
+      console.error('Failed to fetch stories:', error);
+    }
+  };
+
   useEffect(() => {
     fetchPosts();
+    fetchStories();
   }, []);
 
   useFocusEffect(
@@ -175,6 +187,13 @@ const HomeScreen = ({ navigation }) => {
         <Text style={styles.headerTitle}>Layedia</Text>
         <Text style={styles.headerSubtitle}>Chia sẻ khoảnh khắc của bạn</Text>
       </LinearGradient>
+      
+      <StoriesBar
+        stories={stories}
+        currentUserId={user?.id}
+        onCreateStory={() => navigation.navigate('CreateStory')}
+        onViewStory={(userId) => navigation.navigate('ViewStory', { userId })}
+      />
 
       <Pressable 
         style={styles.postInputContainer}

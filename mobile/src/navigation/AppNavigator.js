@@ -25,6 +25,8 @@ import SearchScreen from '../screens/SearchScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
 import VoiceCallScreen from '../screens/VoiceCallScreen';
 import PostDetailScreen from '../screens/PostDetailScreen';
+import CreateStoryScreen from '../screens/CreateStoryScreen';
+import ViewStoryScreen from '../screens/ViewStoryScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -168,6 +170,8 @@ const NavigationWrapper = () => {
             <Stack.Screen name="Comments" component={CommentsScreen} options={{ headerShown: true, title: 'Comments' }} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: true, title: 'Chỉnh sửa hồ sơ' }} />
             <Stack.Screen name="VoiceCall" component={VoiceCallScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="CreateStory" component={CreateStoryScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="ViewStory" component={ViewStoryScreen} options={{ headerShown: false }} />
           </>
         ) : (
           <>
