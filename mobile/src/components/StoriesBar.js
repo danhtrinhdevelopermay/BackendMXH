@@ -6,6 +6,8 @@ import UserAvatar from './UserAvatar';
 
 const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
   const hasOwnStory = stories.some(s => s.user_id === currentUserId);
+  const ownStories = stories.filter(s => s.user_id === currentUserId);
+  const otherStories = stories.filter(s => s.user_id !== currentUserId);
 
   return (
     <ScrollView 
@@ -20,62 +22,74 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
         activeOpacity={0.7}
       >
         <View style={styles.createStoryContainer}>
-          {hasOwnStory ? (
-            <LinearGradient
-              colors={['#667eea', '#764ba2']}
-              style={styles.storyRing}
-            >
-              <View style={styles.avatarContainer}>
-                <UserAvatar userId={currentUserId} size={56} />
-              </View>
-            </LinearGradient>
-          ) : (
-            <View style={styles.createAvatarContainer}>
-              <View style={styles.avatarPlaceholder}>
-                <Ionicons name="person" size={28} color="#9CA3AF" />
-              </View>
-              <View style={styles.addButton}>
-                <LinearGradient
-                  colors={['#667eea', '#764ba2']}
-                  style={styles.addButtonGradient}
-                >
-                  <Ionicons name="add" size={16} color="#fff" />
-                </LinearGradient>
-              </View>
+          <View style={styles.createAvatarContainer}>
+            <View style={styles.avatarPlaceholder}>
+              <Ionicons name="person" size={28} color="#9CA3AF" />
             </View>
-          )}
+            <View style={styles.addButton}>
+              <LinearGradient
+                colors={['#667eea', '#764ba2']}
+                style={styles.addButtonGradient}
+              >
+                <Ionicons name="add" size={16} color="#fff" />
+              </LinearGradient>
+            </View>
+          </View>
         </View>
         <Text style={styles.storyName} numberOfLines={1}>
-          {hasOwnStory ? 'Story của bạn' : 'Tạo story'}
+          Tạo story
         </Text>
       </TouchableOpacity>
 
-      {stories
-        .filter(story => story.user_id !== currentUserId)
-        .map((story) => (
-          <TouchableOpacity
-            key={story.user_id}
-            style={styles.storyItem}
-            onPress={() => onViewStory(story.user_id)}
-            activeOpacity={0.7}
+      {hasOwnStory && ownStories.map((story) => (
+        <TouchableOpacity
+          key={`own-${story.user_id}`}
+          style={styles.storyItem}
+          onPress={() => onViewStory(story.user_id)}
+          activeOpacity={0.7}
+        >
+          <LinearGradient
+            colors={['#667eea', '#764ba2']}
+            style={styles.storyRing}
           >
-            <LinearGradient
-              colors={['#667eea', '#764ba2']}
-              style={styles.storyRing}
-            >
-              <View style={styles.avatarContainer}>
-                <UserAvatar 
-                  user={story}
-                  userId={story.user_id}
-                  size={56}
-                />
-              </View>
-            </LinearGradient>
-            <Text style={styles.storyName} numberOfLines={1}>
-              {story.full_name || story.username}
-            </Text>
-          </TouchableOpacity>
-        ))}
+            <View style={styles.avatarContainer}>
+              <UserAvatar 
+                user={story}
+                userId={story.user_id}
+                size={56}
+              />
+            </View>
+          </LinearGradient>
+          <Text style={styles.storyName} numberOfLines={1}>
+            Story của bạn
+          </Text>
+        </TouchableOpacity>
+      ))}
+
+      {otherStories.map((story) => (
+        <TouchableOpacity
+          key={story.user_id}
+          style={styles.storyItem}
+          onPress={() => onViewStory(story.user_id)}
+          activeOpacity={0.7}
+        >
+          <LinearGradient
+            colors={['#667eea', '#764ba2']}
+            style={styles.storyRing}
+          >
+            <View style={styles.avatarContainer}>
+              <UserAvatar 
+                user={story}
+                userId={story.user_id}
+                size={56}
+              />
+            </View>
+          </LinearGradient>
+          <Text style={styles.storyName} numberOfLines={1}>
+            {story.full_name || story.username}
+          </Text>
+        </TouchableOpacity>
+      ))}
     </ScrollView>
   );
 };
