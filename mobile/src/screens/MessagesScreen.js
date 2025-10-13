@@ -160,17 +160,15 @@ const MessagesScreen = ({ navigation }) => {
         </View>
         
         <View style={styles.searchContainer}>
-          <View style={styles.searchWrapper}>
-            <Ionicons name="search" size={20} color="#9CA3AF" style={styles.searchIcon} />
-            <Searchbar
-              placeholder="Tìm kiếm"
-              onChangeText={setSearchQuery}
-              value={searchQuery}
-              style={styles.searchBar}
-              inputStyle={styles.searchInput}
-              iconColor="transparent"
-            />
-          </View>
+          <Searchbar
+            placeholder="Tìm kiếm"
+            onChangeText={setSearchQuery}
+            value={searchQuery}
+            style={styles.searchBar}
+            inputStyle={styles.searchInput}
+            icon="magnify"
+            iconColor="#9CA3AF"
+          />
         </View>
       </View>
 
@@ -254,28 +252,17 @@ const styles = StyleSheet.create({
   searchContainer: {
     marginBottom: 4,
   },
-  searchWrapper: {
-    position: 'relative',
-  },
-  searchIcon: {
-    position: 'absolute',
-    left: 16,
-    top: '50%',
-    transform: [{ translateY: -10 }],
-    zIndex: 1,
-  },
   searchBar: {
     backgroundColor: '#F3F4F6',
     borderRadius: 12,
     elevation: 0,
     shadowOpacity: 0,
-    paddingLeft: 40,
     height: 44,
   },
   searchInput: {
     fontSize: 15,
     color: '#1a1a1a',
-    paddingLeft: 8,
+    minHeight: 0,
   },
   listContent: {
     flexGrow: 1,
