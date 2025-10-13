@@ -34,7 +34,7 @@
     "extra": {
       "apiUrl": "https://backendmxh-1.onrender.com",
       "eas": {
-        "projectId": "1fb0f3d8-c5ef-4e8e-bf79-2cfe01921c03"
+        "projectId": ""
       }
     },
     "plugins": [
