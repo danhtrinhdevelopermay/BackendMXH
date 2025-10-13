@@ -14,10 +14,11 @@ class SocketService {
 
     if (!this.socket) {
       this.socket = io(this.API_URL, {
-        transports: ['websocket'],
+        transports: ['websocket', 'polling'],
         reconnection: true,
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
+        timeout: 10000,
       });
 
       this.socket.on('connect', () => {
@@ -28,7 +29,9 @@ class SocketService {
       });
 
       this.socket.on('connect_error', (error) => {
-        console.error('Socket connection error:', error);
+        if (error.message !== 'websocket error') {
+          console.error('Socket connection error:', error);
+        }
       });
 
       this.socket.on('disconnect', () => {

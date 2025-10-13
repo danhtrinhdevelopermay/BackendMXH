@@ -121,15 +121,20 @@ const ProfileScreen = ({ route, navigation }) => {
   const renderHeader = () => (
     <View style={styles.headerContainer}>
       <View style={styles.coverContainer}>
-        <Image
-          source={{ 
-            uri: profileUser?.id ? `${API_URL}/api/cover/${profileUser.id}?${Date.now()}` : null
-          }}
-          style={styles.coverPhoto}
-          resizeMode="cover"
-          defaultSource={require('../../assets/icon.png')}
-          onError={() => console.log('Cover photo load error')}
-        />
+        {profileUser?.cover_url ? (
+          <Image
+            source={{ uri: `${API_URL}/api/cover/${profileUser.id}?${Date.now()}` }}
+            style={styles.coverPhoto}
+            resizeMode="cover"
+          />
+        ) : (
+          <LinearGradient
+            colors={['#667eea', '#764ba2']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.coverPhoto}
+          />
+        )}
         <LinearGradient
           colors={['transparent', 'rgba(102, 126, 234, 0.2)', 'rgba(118, 75, 162, 0.3)']}
           style={styles.coverGradient}
