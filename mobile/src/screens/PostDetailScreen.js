@@ -142,7 +142,10 @@ const PostDetailScreen = ({ route, navigation }) => {
     <ScrollView style={styles.container}>
       <Card style={styles.card} elevation={2}>
         <View style={styles.postHeader}>
-          <View style={styles.postHeaderLeft}>
+          <TouchableOpacity 
+            style={styles.postHeaderLeft}
+            onPress={() => navigation.navigate('Profile', { userId: post.user_id })}
+          >
             <UserAvatar 
               user={post}
               size={48}
@@ -155,7 +158,7 @@ const PostDetailScreen = ({ route, navigation }) => {
                 <Text style={styles.postTime}>{formatTimeAgo(post.created_at)}</Text>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
           {user?.id === post.user_id && (
             <Menu
               visible={menuVisible}

@@ -70,7 +70,10 @@ const SearchScreen = ({ navigation }) => {
         onPress={() => navigation.navigate('Home')}
       >
         <View style={styles.postHeader}>
-          <View style={styles.postAuthorInfo}>
+          <TouchableOpacity 
+            style={styles.postAuthorInfo}
+            onPress={() => navigation.navigate('Profile', { userId: item.user_id })}
+          >
             {item.avatar_url ? (
               <Image source={{ uri: item.avatar_url }} style={styles.postAvatar} />
             ) : (
@@ -82,7 +85,7 @@ const SearchScreen = ({ navigation }) => {
               <Text style={styles.postAuthorName}>{item.author_name}</Text>
               <Text style={styles.postTime}>{new Date(item.created_at).toLocaleDateString()}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
         {item.content && <Text style={styles.postContent} numberOfLines={3}>{item.content}</Text>}
         {mediaUrl && item.media_type?.startsWith('image/') && (

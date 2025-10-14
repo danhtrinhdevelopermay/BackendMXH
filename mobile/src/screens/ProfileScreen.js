@@ -295,7 +295,10 @@ const ProfileScreen = ({ route, navigation }) => {
   const renderPost = ({ item }) => (
     <Card style={styles.postCard} elevation={0}>
       <View style={styles.postHeader}>
-        <View style={styles.postHeaderLeft}>
+        <TouchableOpacity 
+          style={styles.postHeaderLeft}
+          onPress={() => navigation.navigate('Profile', { userId: item.user_id })}
+        >
           <UserAvatar 
             user={profileUser}
             size={40}
@@ -305,7 +308,7 @@ const ProfileScreen = ({ route, navigation }) => {
             <Text style={styles.postAuthorName}>{profileUser?.full_name || profileUser?.username}</Text>
             <Text style={styles.postTime}>{new Date(item.created_at).toLocaleDateString()}</Text>
           </View>
-        </View>
+        </TouchableOpacity>
       </View>
       
       {item.content && <Text style={styles.postContent}>{item.content}</Text>}

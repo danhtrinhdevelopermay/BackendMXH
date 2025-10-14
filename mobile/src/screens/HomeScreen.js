@@ -219,7 +219,10 @@ const HomeScreen = ({ navigation }) => {
     <View style={styles.cardWrapper}>
       <Card style={styles.card} elevation={2}>
         <View style={styles.postHeader}>
-          <View style={styles.postHeaderLeft}>
+          <TouchableOpacity 
+            style={styles.postHeaderLeft}
+            onPress={() => navigation.navigate('Profile', { userId: item.user_id })}
+          >
             <UserAvatar 
               user={item}
               size={48}
@@ -232,7 +235,7 @@ const HomeScreen = ({ navigation }) => {
                 <Text style={styles.postTime}>{formatTimeAgo(item.created_at)}</Text>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
           {user?.id === item.user_id && (
             <Menu
               visible={menuVisible[item.id] || false}
