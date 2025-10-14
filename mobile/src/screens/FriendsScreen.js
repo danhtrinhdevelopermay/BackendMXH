@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { List, Avatar, Button, Searchbar, Text, Divider, Card } from 'react-native-paper';
+import { List, Avatar, Button, Text, Divider, Card } from 'react-native-paper';
 import { friendshipAPI } from '../api/api';
 import { useAlert } from '../context/AlertContext';
 import UserAvatar from '../components/UserAvatar';
@@ -10,8 +10,6 @@ const FriendsScreen = () => {
   const { showAlert } = useAlert();
   const [friends, setFriends] = useState([]);
   const [requests, setRequests] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('friends');
 
   const fetchFriends = async () => {
@@ -36,29 +34,6 @@ const FriendsScreen = () => {
     fetchFriends();
     fetchRequests();
   }, []);
-
-  const handleSearch = async (query) => {
-    setSearchQuery(query);
-    if (query.length > 2) {
-      try {
-        const response = await friendshipAPI.searchUsers(query);
-        setSearchResults(response.data);
-      } catch (error) {
-        showAlert('Error', 'Search failed', 'error');
-      }
-    } else {
-      setSearchResults([]);
-    }
-  };
-
-  const handleSendRequest = async (userId) => {
-    try {
-      await friendshipAPI.sendFriendRequest({ addressee_id: userId });
-      showAlert('Success', 'Friend request sent', 'success');
-    } catch (error) {
-      showAlert('Error', 'Failed to send request', 'error');
-    }
-  };
 
   const handleRespondRequest = async (requestId, status) => {
     try {
@@ -140,36 +115,6 @@ const FriendsScreen = () => {
     </Card>
   );
 
-  const renderSearchResult = ({ item }) => (
-    <Card style={styles.searchCard} elevation={0}>
-      <View style={styles.searchContainer}>
-        <View style={styles.searchLeft}>
-          <Avatar.Text 
-            size={60} 
-            label={item.username[0].toUpperCase()}
-            style={styles.searchAvatar}
-          />
-          <View style={styles.searchInfo}>
-            <View style={styles.nameContainer}>
-              <Text style={styles.searchName}>{item.full_name || item.username}</Text>
-              <VerifiedBadge isVerified={item.is_verified} size={16} />
-            </View>
-            <Text style={styles.searchUsername}>@{item.username}</Text>
-          </View>
-        </View>
-        <Button 
-          mode="contained" 
-          onPress={() => handleSendRequest(item.id)}
-          style={styles.addButton}
-          buttonColor="#1877f2"
-          compact
-        >
-          Add Friend
-        </Button>
-      </View>
-    </Card>
-  );
-
   return (
     <View style={styles.container}>
       <View style={styles.tabsContainer}>
@@ -200,47 +145,18 @@ const FriendsScreen = () => {
             </View>
           )}
         </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'search' && styles.activeTab]}
-          onPress={() => setActiveTab('search')}
-        >
-          <Text style={[styles.tabText, activeTab === 'search' && styles.activeTabText]}>
-            Tìm kiếm
-          </Text>
-        </TouchableOpacity>
       </View>
       
       <Divider style={styles.headerDivider} />
-      
-      {activeTab === 'search' && (
-        <Searchbar
-          placeholder="Search users"
-          onChangeText={handleSearch}
-          value={searchQuery}
-          style={styles.searchbar}
-          elevation={0}
-        />
-      )}
 
       <FlatList
-        data={
-          activeTab === 'friends' ? friends :
-          activeTab === 'requests' ? requests :
-          searchResults
-        }
-        renderItem={
-          activeTab === 'friends' ? renderFriend :
-          activeTab === 'requests' ? renderRequest :
-          renderSearchResult
-        }
+        data={activeTab === 'friends' ? friends : requests}
+        renderItem={activeTab === 'friends' ? renderFriend : renderRequest}
         keyExtractor={(item) => item.id?.toString() || item.user_id?.toString()}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>
-              {activeTab === 'friends' ? 'No friends yet' :
-               activeTab === 'requests' ? 'Không có yêu cầu nào' :
-               searchQuery.length > 2 ? 'No users found' : 'Search for users to add as friends'}
+              {activeTab === 'friends' ? 'No friends yet' : 'Không có yêu cầu nào'}
             </Text>
           </View>
         }
@@ -296,10 +212,6 @@ const styles = StyleSheet.create({
   headerDivider: {
     height: 1,
     backgroundColor: '#e4e6eb',
-  },
-  searchbar: {
-    margin: 12,
-    backgroundColor: '#f0f2f5',
   },
   listContent: {
     flexGrow: 1,
@@ -399,48 +311,6 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 6,
     borderColor: '#ccd0d5',
-  },
-  searchCard: {
-    backgroundColor: '#fff',
-    marginHorizontal: 12,
-    marginTop: 12,
-    borderRadius: 16,
-    shadowColor: '#667eea',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 12,
-  },
-  searchLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  searchAvatar: {
-    backgroundColor: '#1877f2',
-  },
-  searchInfo: {
-    marginLeft: 12,
-    flex: 1,
-  },
-  searchName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#050505',
-  },
-  searchUsername: {
-    fontSize: 14,
-    color: '#65676b',
-    marginTop: 2,
-  },
-  addButton: {
-    borderRadius: 10,
   },
   emptyContainer: {
     padding: 32,
