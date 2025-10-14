@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, Animated } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -10,6 +10,7 @@ import { useIncomingCall } from '../hooks/useIncomingCall';
 import IncomingCallModal from '../components/IncomingCallModal';
 import { registerForPushNotificationsAsync, setupNotificationListeners, unregisterPushToken } from '../services/notificationService';
 
+import { useIsFocused } from '@react-navigation/native';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
@@ -31,6 +32,69 @@ import ViewStoryScreen from '../screens/ViewStoryScreen';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
+const TabBarIcon = ({ focused, iconName, color, size }) => {
+  const scale = useRef(new Animated.Value(focused ? 1 : 0.9)).current;
+
+  useEffect(() => {
+    Animated.spring(scale, {
+      toValue: focused ? 1 : 0.9,
+      friction: 5,
+      tension: 100,
+      useNativeDriver: true,
+    }).start();
+  }, [focused]);
+
+  return (
+    <Animated.View style={{ transform: [{ scale }] }}>
+      <Ionicons name={iconName} size={size} color={color} />
+    </Animated.View>
+  );
+};
+
+const withTabAnimation = (Component) => {
+  return (props) => {
+    const isFocused = useIsFocused();
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const translateX = useRef(new Animated.Value(30)).current;
+
+    useEffect(() => {
+      if (isFocused) {
+        Animated.parallel([
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+          Animated.spring(translateX, {
+            toValue: 0,
+            friction: 8,
+            tension: 40,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      }
+    }, [isFocused]);
+
+    return (
+      <Animated.View 
+        style={{ 
+          flex: 1, 
+          opacity: fadeAnim,
+          transform: [{ translateX }]
+        }}
+      >
+        <Component {...props} />
+      </Animated.View>
+    );
+  };
+};
+
+const AnimatedHome = withTabAnimation(HomeScreen);
+const AnimatedFriends = withTabAnimation(FriendsScreen);
+const AnimatedMessages = withTabAnimation(MessagesScreen);
+const AnimatedNotifications = withTabAnimation(NotificationsScreen);
+const AnimatedProfile = withTabAnimation(ProfileScreen);
+
 const HomeTabs = () => {
   const insets = useSafeAreaInsets();
   
@@ -44,7 +108,7 @@ const HomeTabs = () => {
           else if (route.name === 'Tin nhắn') iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
           else if (route.name === 'Thông báo') iconName = focused ? 'notifications' : 'notifications-outline';
           else if (route.name === 'Hồ sơ') iconName = focused ? 'person' : 'person-outline';
-          return <Ionicons name={iconName} size={size} color={color} />;
+          return <TabBarIcon focused={focused} iconName={iconName} color={color} size={size} />;
         },
         tabBarActiveTintColor: '#1877f2',
         tabBarInactiveTintColor: '#65676b',
@@ -60,6 +124,14 @@ const HomeTabs = () => {
           fontSize: 12,
           fontWeight: '500',
         },
+        tabBarHideOnKeyboard: true,
+        tabBarButton: (props) => (
+          <TouchableOpacity
+            {...props}
+            activeOpacity={0.7}
+            style={[props.style, { flex: 1 }]}
+          />
+        ),
         headerStyle: {
           backgroundColor: '#fff',
           elevation: 0,
@@ -72,11 +144,16 @@ const HomeTabs = () => {
           fontWeight: 'bold',
           color: '#1877f2',
         },
+        lazy: true,
+        unmountOnBlur: false,
       })}
+      sceneContainerStyle={{
+        backgroundColor: 'transparent',
+      }}
     >
       <Tab.Screen 
         name="Home" 
-        component={HomeScreen}
+        component={AnimatedHome}
         options={({ navigation }) => ({
           headerShown: true,
           title: 'Trang chủ',
@@ -92,28 +169,28 @@ const HomeTabs = () => {
       />
       <Tab.Screen 
         name="Bạn bè" 
-        component={FriendsScreen}
+        component={AnimatedFriends}
         options={{
           headerShown: true,
         }}
       />
       <Tab.Screen 
         name="Tin nhắn" 
-        component={MessagesScreen}
+        component={AnimatedMessages}
         options={{
           headerShown: false,
         }}
       />
       <Tab.Screen 
         name="Thông báo" 
-        component={NotificationsScreen}
+        component={AnimatedNotifications}
         options={{
           headerShown: true,
         }}
       />
       <Tab.Screen 
         name="Hồ sơ" 
-        component={ProfileScreen}
+        component={AnimatedProfile}
         options={{
           headerShown: true,
         }}
