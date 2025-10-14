@@ -3,6 +3,7 @@ import { View, FlatList, StyleSheet, Image, TouchableOpacity, ScrollView } from 
 import { Card, Avatar, Button, Text, Divider, IconButton } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from '@react-navigation/native';
+import { Video } from 'expo-av';
 import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
 import { postAPI, userAPI, friendshipAPI, messageAPI } from '../api/api';
@@ -308,13 +309,41 @@ const ProfileScreen = ({ route, navigation }) => {
       </View>
       
       {item.content && <Text style={styles.postContent}>{item.content}</Text>}
-      {item.media_url && (
-        <Image 
-          source={{ uri: item.media_url }} 
-          style={styles.postImage}
-          resizeMode="cover"
-        />
-      )}
+      {item.media_type && (() => {
+        const mediaUrl = item.media_url || `${API_URL}/api/media/${item.id}`;
+        const isVideo = item.media_type?.startsWith('video/');
+        
+        return (
+          <View style={styles.mediaContainer}>
+            {isVideo ? (
+              <TouchableOpacity 
+                activeOpacity={1}
+                onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
+              >
+                <Video
+                  source={{ uri: mediaUrl }}
+                  style={styles.postImage}
+                  resizeMode="cover"
+                  shouldPlay={false}
+                  isLooping
+                  isMuted={true}
+                  onError={(error) => console.log('Video error:', error)}
+                />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity 
+                activeOpacity={1}
+                onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
+              >
+                <Card.Cover 
+                  source={{ uri: mediaUrl }} 
+                  style={styles.postImage}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+        );
+      })()}
       
       <View style={styles.postStats}>
         <View style={styles.postStatItem}>
@@ -599,6 +628,9 @@ const styles = StyleSheet.create({
     color: '#050505',
     paddingHorizontal: 16,
     paddingBottom: 12,
+  },
+  mediaContainer: {
+    width: '100%',
   },
   postImage: {
     width: '100%',
