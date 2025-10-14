@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Modal, Animated } from 'react-nativ
 import { Text } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import UserAvatar from './UserAvatar';
 
 const IncomingCallModal = ({ visible, caller, onAccept, onReject }) => {
@@ -39,11 +40,12 @@ const IncomingCallModal = ({ visible, caller, onAccept, onReject }) => {
       animationType="fade"
       statusBarTranslucent
     >
-      <LinearGradient
-        colors={['rgba(102, 126, 234, 0.95)', 'rgba(118, 75, 162, 0.95)']}
-        style={styles.container}
-      >
-        <View style={styles.content}>
+      <BlurView intensity={100} tint="dark" style={styles.container}>
+        <LinearGradient
+          colors={['rgba(102, 126, 234, 0.7)', 'rgba(118, 75, 162, 0.7)']}
+          style={styles.gradientOverlay}
+        >
+          <View style={styles.content}>
           <Text style={styles.incomingText}>Cuộc gọi thoại đến</Text>
           
           <Animated.View style={[styles.avatarContainer, { transform: [{ scale: pulseAnim }] }]}>
@@ -75,14 +77,18 @@ const IncomingCallModal = ({ visible, caller, onAccept, onReject }) => {
               <Text style={styles.actionText}>Chấp nhận</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </LinearGradient>
+          </View>
+        </LinearGradient>
+      </BlurView>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  gradientOverlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
