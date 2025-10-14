@@ -115,6 +115,13 @@ Preferred communication style: Simple, everyday language.
 - Better visual hierarchy separating modal content from background
 - Consistent user experience across all modal interactions
 
+**Verified Badge on Friends Screen (Oct 14, 2025):**
+- Fixed bug: Verified badges now display correctly on Friends screen
+- VerifiedBadge component added to all three sections: Friends list, Friend requests, Search results
+- Backend already returns is_verified status from friendships endpoints (getFriends, getFriendRequests, searchUsers)
+- Blue checkmark icon displays next to verified users' names with consistent 16px size
+- Clicking badge shows popup explaining verification status
+
 ### Backend Architecture (Node.js + Express)
 
 **API Design Pattern:**
