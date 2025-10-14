@@ -4,6 +4,7 @@ import { List, Avatar, Button, Searchbar, Text, Divider, Card } from 'react-nati
 import { friendshipAPI } from '../api/api';
 import { useAlert } from '../context/AlertContext';
 import UserAvatar from '../components/UserAvatar';
+import VerifiedBadge from '../components/VerifiedBadge';
 
 const FriendsScreen = () => {
   const { showAlert } = useAlert();
@@ -80,7 +81,10 @@ const FriendsScreen = () => {
             style={styles.friendAvatar}
           />
           <View style={styles.friendInfo}>
-            <Text style={styles.friendName}>{item.full_name || item.username}</Text>
+            <View style={styles.nameContainer}>
+              <Text style={styles.friendName}>{item.full_name || item.username}</Text>
+              <VerifiedBadge isVerified={item.is_verified} size={16} />
+            </View>
             <Text style={styles.friendUsername}>@{item.username}</Text>
           </View>
         </View>
@@ -105,7 +109,10 @@ const FriendsScreen = () => {
             style={styles.requestAvatar}
           />
           <View style={styles.requestInfo}>
-            <Text style={styles.requestName}>{item.full_name || item.username}</Text>
+            <View style={styles.nameContainer}>
+              <Text style={styles.requestName}>{item.full_name || item.username}</Text>
+              <VerifiedBadge isVerified={item.is_verified} size={16} />
+            </View>
             <Text style={styles.requestUsername}>@{item.username}</Text>
           </View>
         </View>
@@ -143,7 +150,10 @@ const FriendsScreen = () => {
             style={styles.searchAvatar}
           />
           <View style={styles.searchInfo}>
-            <Text style={styles.searchName}>{item.full_name || item.username}</Text>
+            <View style={styles.nameContainer}>
+              <Text style={styles.searchName}>{item.full_name || item.username}</Text>
+              <VerifiedBadge isVerified={item.is_verified} size={16} />
+            </View>
             <Text style={styles.searchUsername}>@{item.username}</Text>
           </View>
         </View>
@@ -323,6 +333,10 @@ const styles = StyleSheet.create({
   friendInfo: {
     marginLeft: 12,
     flex: 1,
+  },
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   friendName: {
     fontSize: 16,
