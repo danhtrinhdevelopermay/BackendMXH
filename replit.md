@@ -94,6 +94,15 @@ Preferred communication style: Simple, everyday language.
 - User guard: Component safely handles AuthContext initialization to prevent crashes
 - Visual design: Blue gradient "+" button for creating, bordered bubbles for displaying thoughts
 
+**Post Reactions - Like/Unlike Toggle (Oct 14, 2025):**
+- Simple like/unlike toggle functionality on posts in HomeScreen and PostDetailScreen
+- Single tap behavior: If not liked → likes the post; If already liked → unlikes (removes reaction)
+- If user has a different reaction type, single tap changes it to 'like'
+- Long press opens full reaction menu with 6 options (like, love, haha, wow, sad, angry)
+- Visual feedback: Button shows current reaction icon and colored highlight when user has reacted
+- Server-side updates with automatic UI refresh after each reaction change
+- Consistent behavior across all post viewing contexts (feed, post detail)
+
 ### Backend Architecture (Node.js + Express)
 
 **API Design Pattern:**
