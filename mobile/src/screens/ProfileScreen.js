@@ -168,75 +168,58 @@ const ProfileScreen = ({ route, navigation }) => {
           />
         )}
         <LinearGradient
-          colors={['transparent', 'rgba(102, 126, 234, 0.2)', 'rgba(118, 75, 162, 0.3)']}
+          colors={['transparent', 'rgba(0, 0, 0, 0.1)']}
           style={styles.coverGradient}
         />
       </View>
       
       <View style={styles.profileSection}>
-        <View style={styles.avatarContainer}>
-          {profileUser?.id ? (
-            <View style={styles.avatarWrapper}>
-              <Image
-                source={{ uri: `${API_URL}/api/avatar/${profileUser.id}?${Date.now()}` }}
-                style={styles.avatarImage}
-                onError={() => console.log('Avatar load error')}
-              />
-              <View style={styles.avatarBorder} />
+        <View style={styles.topSection}>
+          <View style={styles.avatarContainer}>
+            {profileUser?.id ? (
+              <View style={styles.avatarWrapper}>
+                <Image
+                  source={{ uri: `${API_URL}/api/avatar/${profileUser.id}?${Date.now()}` }}
+                  style={styles.avatarImage}
+                  onError={() => console.log('Avatar load error')}
+                />
+              </View>
+            ) : (
+              <View style={styles.avatarWrapper}>
+                <Avatar.Text
+                  size={90}
+                  label={profileUser?.username?.[0]?.toUpperCase() || 'U'}
+                  style={styles.avatar}
+                />
+              </View>
+            )}
+          </View>
+          
+          <View style={styles.statsCompact}>
+            <View style={styles.statItemCompact}>
+              <Text style={styles.statNumberCompact}>{stats.posts_count}</Text>
+              <Text style={styles.statLabelCompact}>Bài viết</Text>
             </View>
-          ) : (
-            <View style={styles.avatarWrapper}>
-              <Avatar.Text
-                size={130}
-                label={profileUser?.username?.[0]?.toUpperCase() || 'U'}
-                style={styles.avatar}
-              />
-              <View style={styles.avatarBorder} />
+            <View style={styles.statItemCompact}>
+              <Text style={styles.statNumberCompact}>{stats.friends_count}</Text>
+              <Text style={styles.statLabelCompact}>Bạn bè</Text>
             </View>
-          )}
+            <View style={styles.statItemCompact}>
+              <Text style={styles.statNumberCompact}>{stats.photos_count}</Text>
+              <Text style={styles.statLabelCompact}>Ảnh</Text>
+            </View>
+          </View>
         </View>
         
         <View style={styles.profileInfo}>
           <View style={styles.nameContainer}>
             <Text style={styles.name}>{profileUser?.full_name || profileUser?.username}</Text>
-            <VerifiedBadge isVerified={profileUser?.is_verified} size={20} />
+            <VerifiedBadge isVerified={profileUser?.is_verified} size={18} />
           </View>
           <Text style={styles.username}>@{profileUser?.username}</Text>
           {profileUser?.bio && (
-            <View style={styles.bioContainer}>
-              <Text style={styles.bio}>{profileUser.bio}</Text>
-            </View>
+            <Text style={styles.bio}>{profileUser.bio}</Text>
           )}
-        </View>
-
-        <View style={styles.statsContainer}>
-          <TouchableOpacity style={styles.statItem}>
-            <View style={styles.statIconContainer}>
-              <MaterialCommunityIcons name="post-outline" size={20} color="#1877f2" />
-            </View>
-            <Text style={styles.statNumber}>{stats.posts_count}</Text>
-            <Text style={styles.statLabel}>Bài viết</Text>
-          </TouchableOpacity>
-          
-          <View style={styles.statDivider} />
-          
-          <TouchableOpacity style={styles.statItem}>
-            <View style={styles.statIconContainer}>
-              <MaterialCommunityIcons name="account-group" size={20} color="#1877f2" />
-            </View>
-            <Text style={styles.statNumber}>{stats.friends_count}</Text>
-            <Text style={styles.statLabel}>Bạn bè</Text>
-          </TouchableOpacity>
-          
-          <View style={styles.statDivider} />
-          
-          <TouchableOpacity style={styles.statItem}>
-            <View style={styles.statIconContainer}>
-              <MaterialCommunityIcons name="image-multiple" size={20} color="#1877f2" />
-            </View>
-            <Text style={styles.statNumber}>{stats.photos_count}</Text>
-            <Text style={styles.statLabel}>Ảnh</Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.actionButtons}>
@@ -252,36 +235,34 @@ const ProfileScreen = ({ route, navigation }) => {
                   end={{x: 1, y: 0}}
                   style={styles.gradientButton}
                 >
-                  <MaterialCommunityIcons name="pencil" size={18} color="#fff" />
-                  <Text style={styles.primaryButtonText}>Chỉnh sửa hồ sơ</Text>
+                  <MaterialCommunityIcons name="pencil" size={16} color="#fff" />
+                  <Text style={styles.primaryButtonText}>Chỉnh sửa</Text>
                 </LinearGradient>
               </TouchableOpacity>
               <TouchableOpacity 
-                style={styles.secondaryButton}
+                style={styles.iconButton}
                 onPress={handleTestNotification}
               >
-                <MaterialCommunityIcons name="bell-ring" size={18} color="#1877f2" />
-                <Text style={styles.testNotificationButtonText}>Test Thông báo</Text>
+                <MaterialCommunityIcons name="bell-ring" size={20} color="#1877f2" />
               </TouchableOpacity>
               <TouchableOpacity 
-                style={styles.secondaryButton}
+                style={styles.iconButton}
                 onPress={handleLogout}
               >
-                <MaterialCommunityIcons name="logout" size={18} color="#65676b" />
-                <Text style={styles.secondaryButtonText}>Đăng xuất</Text>
+                <MaterialCommunityIcons name="logout" size={20} color="#65676b" />
               </TouchableOpacity>
             </>
           ) : (
             <>
               {friendshipStatus === 'friends' ? (
                 <TouchableOpacity style={styles.friendButton}>
-                  <MaterialCommunityIcons name="check-circle" size={18} color="#42b72a" />
+                  <MaterialCommunityIcons name="check-circle" size={16} color="#42b72a" />
                   <Text style={styles.friendButtonText}>Bạn bè</Text>
                 </TouchableOpacity>
               ) : friendshipStatus === 'request_sent' ? (
                 <TouchableOpacity style={styles.requestSentButton}>
-                  <MaterialCommunityIcons name="clock-outline" size={18} color="#65676b" />
-                  <Text style={styles.requestSentButtonText}>Đã gửi lời mời</Text>
+                  <MaterialCommunityIcons name="clock-outline" size={16} color="#65676b" />
+                  <Text style={styles.requestSentButtonText}>Đã gửi</Text>
                 </TouchableOpacity>
               ) : friendshipStatus === 'request_received' ? (
                 <TouchableOpacity 
@@ -294,7 +275,7 @@ const ProfileScreen = ({ route, navigation }) => {
                     end={{x: 1, y: 0}}
                     style={styles.gradientButton}
                   >
-                    <MaterialCommunityIcons name="account-check" size={18} color="#fff" />
+                    <MaterialCommunityIcons name="account-check" size={16} color="#fff" />
                     <Text style={styles.primaryButtonText}>Phản hồi</Text>
                   </LinearGradient>
                 </TouchableOpacity>
@@ -309,17 +290,16 @@ const ProfileScreen = ({ route, navigation }) => {
                     end={{x: 1, y: 0}}
                     style={styles.gradientButton}
                   >
-                    <MaterialCommunityIcons name="account-plus" size={18} color="#fff" />
-                    <Text style={styles.primaryButtonText}>Thêm bạn bè</Text>
+                    <MaterialCommunityIcons name="account-plus" size={16} color="#fff" />
+                    <Text style={styles.primaryButtonText}>Thêm bạn</Text>
                   </LinearGradient>
                 </TouchableOpacity>
               )}
               <TouchableOpacity 
-                style={styles.secondaryButton}
+                style={styles.iconButton}
                 onPress={handleMessage}
               >
-                <MaterialCommunityIcons name="message-text" size={18} color="#1877f2" />
-                <Text style={styles.messageButtonText}>Nhắn tin</Text>
+                <MaterialCommunityIcons name="message-text" size={20} color="#1877f2" />
               </TouchableOpacity>
             </>
           )}
@@ -327,7 +307,7 @@ const ProfileScreen = ({ route, navigation }) => {
       </View>
 
       <View style={styles.postsHeader}>
-        <MaterialCommunityIcons name="grid" size={20} color="#050505" />
+        <MaterialCommunityIcons name="grid" size={18} color="#050505" />
         <Text style={styles.postsTitle}>Bài viết</Text>
       </View>
     </View>
@@ -437,7 +417,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   coverContainer: {
-    height: 220,
+    height: 160,
     backgroundColor: '#1877f2',
     position: 'relative',
   },
@@ -450,15 +430,24 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 80,
+    height: 60,
   },
   profileSection: {
     paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingBottom: 16,
+  },
+  topSection: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginTop: -50,
+    gap: 16,
   },
   avatarContainer: {
-    alignItems: 'center',
-    marginTop: -70,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   avatarWrapper: {
     position: 'relative',
@@ -467,153 +456,106 @@ const styles = StyleSheet.create({
     backgroundColor: '#1877f2',
   },
   avatarImage: {
-    width: 130,
-    height: 130,
-    borderRadius: 65,
-    borderWidth: 5,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    borderWidth: 4,
     borderColor: '#fff',
   },
-  avatarBorder: {
-    position: 'absolute',
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    borderWidth: 2,
-    borderColor: '#e4e6eb',
-    top: -5,
-    left: -5,
+  statsCompact: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingBottom: 8,
+  },
+  statItemCompact: {
+    alignItems: 'center',
+  },
+  statNumberCompact: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#050505',
+  },
+  statLabelCompact: {
+    fontSize: 12,
+    color: '#65676b',
+    marginTop: 2,
   },
   profileInfo: {
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 12,
   },
   nameContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
   },
   name: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#050505',
-    letterSpacing: 0.3,
-  },
-  username: {
-    fontSize: 15,
-    color: '#65676b',
-    marginTop: 4,
-    fontWeight: '500',
-  },
-  bioContainer: {
-    marginTop: 12,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    backgroundColor: '#f0f2f5',
-    borderRadius: 12,
-  },
-  bio: {
-    fontSize: 15,
-    color: '#050505',
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 24,
-    marginBottom: 20,
-    paddingVertical: 16,
-    backgroundColor: '#f8f9fa',
-    borderRadius: 16,
-  },
-  statItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  statIconContainer: {
-    marginBottom: 8,
-  },
-  statDivider: {
-    width: 1,
-    height: '80%',
-    backgroundColor: '#e4e6eb',
-    alignSelf: 'center',
-  },
-  statNumber: {
     fontSize: 22,
     fontWeight: 'bold',
     color: '#050505',
-    marginTop: 4,
   },
-  statLabel: {
-    fontSize: 13,
+  username: {
+    fontSize: 14,
     color: '#65676b',
-    marginTop: 4,
-    fontWeight: '500',
+    marginTop: 2,
+  },
+  bio: {
+    fontSize: 14,
+    color: '#050505',
+    textAlign: 'center',
+    marginTop: 8,
+    lineHeight: 20,
+    paddingHorizontal: 20,
   },
   actionButtons: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 8,
+    marginTop: 16,
   },
   primaryButton: {
     flex: 1,
-    borderRadius: 12,
+    borderRadius: 10,
     overflow: 'hidden',
     elevation: 2,
     shadowColor: '#1877f2',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowRadius: 3,
   },
   gradientButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
-    gap: 8,
+    paddingVertical: 10,
+    gap: 6,
   },
   primaryButtonText: {
     color: '#fff',
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
   },
-  secondaryButton: {
-    flex: 1,
-    flexDirection: 'row',
+  iconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: '#f0f2f5',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: '#f0f2f5',
-    gap: 8,
-  },
-  secondaryButtonText: {
-    color: '#65676b',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  testNotificationButtonText: {
-    color: '#1877f2',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  messageButtonText: {
-    color: '#1877f2',
-    fontSize: 15,
-    fontWeight: '600',
   },
   friendButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
     backgroundColor: '#e7f3ff',
-    gap: 8,
+    gap: 6,
   },
   friendButtonText: {
     color: '#42b72a',
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
   },
   requestSentButton: {
@@ -621,27 +563,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
     backgroundColor: '#f0f2f5',
-    gap: 8,
+    gap: 6,
   },
   requestSentButtonText: {
     color: '#65676b',
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
   },
   postsHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 14,
     borderTopWidth: 8,
     borderTopColor: '#f0f2f5',
     gap: 8,
   },
   postsTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#050505',
   },
