@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Modal, Portal, Text, TextInput, Button } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 
 const EMOJI_OPTIONS = ['😊', '😂', '❤️', '🎉', '🔥', '👍', '🤔', '😎', '🌟', '💪'];
 
@@ -38,89 +39,105 @@ const CreateThoughtModal = ({ visible, onDismiss, onSave, initialThought }) => {
       <Modal
         visible={visible}
         onDismiss={onDismiss}
-        contentContainerStyle={styles.modalContainer}
+        style={styles.modalWrapper}
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>Chia sẻ suy nghĩ</Text>
-          <TouchableOpacity onPress={onDismiss}>
-            <Text style={styles.closeButton}>✕</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.content}>
-          <Text style={styles.label}>Chọn emoji</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.emojiScroll}
-          >
-            {EMOJI_OPTIONS.map((emoji) => (
-              <TouchableOpacity
-                key={emoji}
-                style={[
-                  styles.emojiButton,
-                  selectedEmoji === emoji && styles.emojiButtonSelected,
-                ]}
-                onPress={() => setSelectedEmoji(emoji)}
-              >
-                <Text style={styles.emoji}>{emoji}</Text>
+        <BlurView intensity={80} tint="dark" style={styles.blurContainer}>
+          <View style={styles.modalContainer}>
+            <View style={styles.header}>
+              <Text style={styles.title}>Chia sẻ suy nghĩ</Text>
+              <TouchableOpacity onPress={onDismiss}>
+                <Text style={styles.closeButton}>✕</Text>
               </TouchableOpacity>
-            ))}
-          </ScrollView>
+            </View>
 
-          <Text style={styles.label}>Suy nghĩ của bạn</Text>
-          <TextInput
-            mode="outlined"
-            value={content}
-            onChangeText={setContent}
-            placeholder="Bạn đang nghĩ gì?"
-            maxLength={100}
-            multiline
-            numberOfLines={3}
-            style={styles.input}
-            outlineColor="#e4e6eb"
-            activeOutlineColor="#1877f2"
-          />
-          <Text style={styles.characterCount}>{content.length}/100</Text>
+            <View style={styles.content}>
+              <Text style={styles.label}>Chọn emoji</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.emojiScroll}
+              >
+                {EMOJI_OPTIONS.map((emoji) => (
+                  <TouchableOpacity
+                    key={emoji}
+                    style={[
+                      styles.emojiButton,
+                      selectedEmoji === emoji && styles.emojiButtonSelected,
+                    ]}
+                    onPress={() => setSelectedEmoji(emoji)}
+                  >
+                    <Text style={styles.emoji}>{emoji}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
 
-          <View style={styles.buttonContainer}>
-            {initialThought && (
-              <Button
+              <Text style={styles.label}>Suy nghĩ của bạn</Text>
+              <TextInput
                 mode="outlined"
-                onPress={handleDelete}
-                style={styles.deleteButton}
-                textColor="#e41e3f"
-              >
-                Xóa
-              </Button>
-            )}
-            <TouchableOpacity
-              onPress={handleSave}
-              disabled={!content.trim()}
-              style={styles.saveButtonWrapper}
-            >
-              <LinearGradient
-                colors={content.trim() ? ['#667eea', '#764ba2'] : ['#ccc', '#999']}
-                style={styles.saveButton}
-              >
-                <Text style={styles.saveButtonText}>
-                  {initialThought ? 'Cập nhật' : 'Chia sẻ'}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
+                value={content}
+                onChangeText={setContent}
+                placeholder="Bạn đang nghĩ gì?"
+                maxLength={100}
+                multiline
+                numberOfLines={3}
+                style={styles.input}
+                outlineColor="#e4e6eb"
+                activeOutlineColor="#1877f2"
+              />
+              <Text style={styles.characterCount}>{content.length}/100</Text>
+
+              <View style={styles.buttonContainer}>
+                {initialThought && (
+                  <Button
+                    mode="outlined"
+                    onPress={handleDelete}
+                    style={styles.deleteButton}
+                    textColor="#e41e3f"
+                  >
+                    Xóa
+                  </Button>
+                )}
+                <TouchableOpacity
+                  onPress={handleSave}
+                  disabled={!content.trim()}
+                  style={styles.saveButtonWrapper}
+                >
+                  <LinearGradient
+                    colors={content.trim() ? ['#667eea', '#764ba2'] : ['#ccc', '#999']}
+                    style={styles.saveButton}
+                  >
+                    <Text style={styles.saveButtonText}>
+                      {initialThought ? 'Cập nhật' : 'Chia sẻ'}
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
-        </View>
+        </BlurView>
       </Modal>
     </Portal>
   );
 };
 
 const styles = StyleSheet.create({
+  modalWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  blurContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
   modalContainer: {
     backgroundColor: '#fff',
     margin: 20,
     borderRadius: 12,
     padding: 20,
+    width: '90%',
+    maxWidth: 400,
   },
   header: {
     flexDirection: 'row',
