@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Modal, Text, FlatList, TouchableOpacity, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { reactionAPI } from '../api/api';
 import Constants from 'expo-constants';
 import UserAvatar from './UserAvatar';
@@ -104,7 +105,7 @@ const ReactionsModal = ({ visible, onClose, postId }) => {
       transparent={true}
       onRequestClose={onClose}
     >
-      <View style={styles.modalOverlay}>
+      <BlurView intensity={90} tint="dark" style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Reactions ({totalCount})</Text>
@@ -149,7 +150,7 @@ const ReactionsModal = ({ visible, onClose, postId }) => {
             />
           )}
         </View>
-      </View>
+      </BlurView>
     </Modal>
   );
 };
@@ -157,7 +158,6 @@ const ReactionsModal = ({ visible, onClose, postId }) => {
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
   modalContent: {
