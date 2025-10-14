@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Modal, View, StyleSheet, Animated, Dimensions } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { useAlert } from '../context/AlertContext';
 
 const { width } = Dimensions.get('window');
@@ -71,8 +72,9 @@ const CustomAlert = () => {
       animationType="none"
       onRequestClose={hideAlert}
     >
-      <Animated.View style={[styles.overlay, { opacity: opacityAnim }]}>
-        <Animated.View
+      <BlurView intensity={90} tint="dark" style={styles.overlay}>
+        <Animated.View style={{ opacity: opacityAnim }}>
+          <Animated.View
           style={[
             styles.alertContainer,
             {
@@ -119,8 +121,9 @@ const CustomAlert = () => {
               </Button>
             ))}
           </View>
+          </Animated.View>
         </Animated.View>
-      </Animated.View>
+      </BlurView>
     </Modal>
   );
 };
@@ -128,7 +131,6 @@ const CustomAlert = () => {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
