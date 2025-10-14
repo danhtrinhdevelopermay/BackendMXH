@@ -103,6 +103,18 @@ Preferred communication style: Simple, everyday language.
 - Server-side updates with automatic UI refresh after each reaction change
 - Consistent behavior across all post viewing contexts (feed, post detail)
 
+**iOS-Style Gaussian Blur Modals (Oct 14, 2025):**
+- All modals enhanced with Gaussian blur backdrop effect using expo-blur
+- Modal components with blur effect:
+  - ReactionsModal: Blur intensity 90, dark tint for reactions list overlay
+  - CreateThoughtModal: Blur intensity 80, dark tint for thought creation dialog
+  - CustomAlert: Blur intensity 90, dark tint for alert dialogs
+  - IncomingCallModal: Blur intensity 100, dark tint with gradient overlay for incoming calls
+- iOS-like visual aesthetic with smooth, translucent backgrounds
+- Maintains existing animations and interactions while adding depth perception
+- Better visual hierarchy separating modal content from background
+- Consistent user experience across all modal interactions
+
 ### Backend Architecture (Node.js + Express)
 
 **API Design Pattern:**
