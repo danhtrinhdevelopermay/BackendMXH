@@ -9,6 +9,7 @@ import { useAlert } from '../context/AlertContext';
 import { postAPI, userAPI, friendshipAPI, messageAPI } from '../api/api';
 import Constants from 'expo-constants';
 import UserAvatar from '../components/UserAvatar';
+import VerifiedBadge from '../components/VerifiedBadge';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const ProfileScreen = ({ route, navigation }) => {
@@ -166,7 +167,10 @@ const ProfileScreen = ({ route, navigation }) => {
         </View>
         
         <View style={styles.profileInfo}>
-          <Text style={styles.name}>{profileUser?.full_name || profileUser?.username}</Text>
+          <View style={styles.nameContainer}>
+            <Text style={styles.name}>{profileUser?.full_name || profileUser?.username}</Text>
+            <VerifiedBadge isVerified={profileUser?.is_verified} size={20} />
+          </View>
           <Text style={styles.username}>@{profileUser?.username}</Text>
           {profileUser?.bio && (
             <View style={styles.bioContainer}>
@@ -305,7 +309,10 @@ const ProfileScreen = ({ route, navigation }) => {
             style={styles.postAvatar}
           />
           <View style={styles.postHeaderInfo}>
-            <Text style={styles.postAuthorName}>{profileUser?.full_name || profileUser?.username}</Text>
+            <View style={styles.postAuthorNameContainer}>
+              <Text style={styles.postAuthorName}>{profileUser?.full_name || profileUser?.username}</Text>
+              <VerifiedBadge isVerified={profileUser?.is_verified} size={14} />
+            </View>
             <Text style={styles.postTime}>{new Date(item.created_at).toLocaleDateString()}</Text>
           </View>
         </TouchableOpacity>
@@ -442,6 +449,10 @@ const styles = StyleSheet.create({
   profileInfo: {
     alignItems: 'center',
     marginTop: 16,
+  },
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   name: {
     fontSize: 26,
@@ -614,6 +625,10 @@ const styles = StyleSheet.create({
   postHeaderInfo: {
     marginLeft: 10,
     flex: 1,
+  },
+  postAuthorNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   postAuthorName: {
     fontSize: 15,

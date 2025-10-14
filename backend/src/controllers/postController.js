@@ -38,7 +38,7 @@ const createPost = async (req, res) => {
     
     const postWithUser = await pool.query(
       `SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.privacy, p.created_at, p.updated_at,
-       u.username, u.full_name, u.avatar_url 
+       u.username, u.full_name, u.avatar_url, u.is_verified 
        FROM posts p 
        JOIN users u ON p.user_id = u.id 
        WHERE p.id = $1`,
@@ -108,7 +108,7 @@ const getNewsFeed = async (req, res) => {
          WHERE user_id = $1 AND post_id IN (SELECT id FROM visible_posts)
        )
        SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.privacy, p.created_at, p.updated_at,
-         u.username, u.full_name, u.avatar_url,
+         u.username, u.full_name, u.avatar_url, u.is_verified,
          COALESCE(rc.count, 0) as reaction_count,
          COALESCE(cc.count, 0) as comment_count,
          ur.reaction_type as user_reaction
@@ -174,7 +174,7 @@ const getUserPosts = async (req, res) => {
          WHERE user_id = $2 AND post_id IN (SELECT id FROM visible_posts)
        )
        SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.privacy, p.created_at, p.updated_at,
-         u.username, u.full_name, u.avatar_url,
+         u.username, u.full_name, u.avatar_url, u.is_verified,
          COALESCE(rc.count, 0) as reaction_count,
          COALESCE(cc.count, 0) as comment_count,
          ur.reaction_type as user_reaction

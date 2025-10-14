@@ -8,6 +8,7 @@ import { postAPI, reactionAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
 import UserAvatar from '../components/UserAvatar';
+import VerifiedBadge from '../components/VerifiedBadge';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const PostDetailScreen = ({ route, navigation }) => {
@@ -152,7 +153,10 @@ const PostDetailScreen = ({ route, navigation }) => {
               style={styles.avatar}
             />
             <View style={styles.postHeaderInfo}>
-              <Text style={styles.authorName}>{post.full_name || post.username}</Text>
+              <View style={styles.authorNameContainer}>
+                <Text style={styles.authorName}>{post.full_name || post.username}</Text>
+                <VerifiedBadge isVerified={post.is_verified} size={16} />
+              </View>
               <View style={styles.timeContainer}>
                 <Ionicons name="time-outline" size={12} color="#8e8e93" />
                 <Text style={styles.postTime}>{formatTimeAgo(post.created_at)}</Text>
@@ -330,6 +334,10 @@ const styles = StyleSheet.create({
   postHeaderInfo: {
     marginLeft: 12,
     flex: 1,
+  },
+  authorNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   authorName: {
     fontSize: 16,

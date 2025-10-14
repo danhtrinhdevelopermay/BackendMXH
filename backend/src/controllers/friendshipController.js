@@ -96,7 +96,7 @@ const getFriends = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT u.id, u.username, u.full_name, u.avatar_url, u.bio 
+      `SELECT u.id, u.username, u.full_name, u.avatar_url, u.bio, u.is_verified 
        FROM users u 
        JOIN friendships f ON (f.requester_id = u.id OR f.addressee_id = u.id) 
        WHERE f.status = 'accepted' 
@@ -117,7 +117,7 @@ const getFriendRequests = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT f.id as request_id, u.id as user_id, u.username, u.full_name, u.avatar_url, f.created_at 
+      `SELECT f.id as request_id, u.id as user_id, u.username, u.full_name, u.avatar_url, u.is_verified, f.created_at 
        FROM friendships f 
        JOIN users u ON f.requester_id = u.id 
        WHERE f.addressee_id = $1 AND f.status = 'pending' 
@@ -138,7 +138,7 @@ const searchUsers = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT id, username, full_name, avatar_url, bio 
+      `SELECT id, username, full_name, avatar_url, bio, is_verified 
        FROM users 
        WHERE (username ILIKE $1 OR full_name ILIKE $1) AND id != $2 
        LIMIT 20`,

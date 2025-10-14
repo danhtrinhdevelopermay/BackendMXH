@@ -11,6 +11,7 @@ import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
 import UserAvatar from '../components/UserAvatar';
 import StoriesBar from '../components/StoriesBar';
+import VerifiedBadge from '../components/VerifiedBadge';
 
 const { width } = Dimensions.get('window');
 
@@ -229,7 +230,10 @@ const HomeScreen = ({ navigation }) => {
               style={styles.avatar}
             />
             <View style={styles.postHeaderInfo}>
-              <Text style={styles.authorName}>{item.full_name || item.username}</Text>
+              <View style={styles.authorNameContainer}>
+                <Text style={styles.authorName}>{item.full_name || item.username}</Text>
+                <VerifiedBadge isVerified={item.is_verified} size={16} />
+              </View>
               <View style={styles.timeContainer}>
                 <Ionicons name="time-outline" size={12} color="#8e8e93" />
                 <Text style={styles.postTime}>{formatTimeAgo(item.created_at)}</Text>
@@ -500,6 +504,10 @@ const styles = StyleSheet.create({
   postHeaderInfo: {
     marginLeft: 12,
     flex: 1,
+  },
+  authorNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   authorName: {
     fontSize: 16,
