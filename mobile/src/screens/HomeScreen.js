@@ -12,6 +12,7 @@ import { useAlert } from '../context/AlertContext';
 import UserAvatar from '../components/UserAvatar';
 import StoriesBar from '../components/StoriesBar';
 import VerifiedBadge from '../components/VerifiedBadge';
+import ReactionsModal from '../components/ReactionsModal';
 
 const { width } = Dimensions.get('window');
 
@@ -25,6 +26,8 @@ const HomeScreen = ({ navigation }) => {
   const [menuVisible, setMenuVisible] = useState({});
   const [reactionMenuVisible, setReactionMenuVisible] = useState({});
   const [visibleItems, setVisibleItems] = useState([]);
+  const [reactionsModalVisible, setReactionsModalVisible] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState(null);
   const videoRefs = useRef({});
 
   const fetchPosts = async () => {
@@ -308,12 +311,28 @@ const HomeScreen = ({ navigation }) => {
         {(item.reaction_count > 0 || item.comment_count > 0) && (
           <View style={styles.statsContainer}>
             {item.reaction_count > 0 && (
-              <View style={styles.reactionStats}>
-                <View style={styles.reactionBubble}>
-                  <Text style={styles.reactionIcon}>{getReactionIcon(item.user_reaction || 'like')}</Text>
+              <TouchableOpacity 
+                style={styles.reactionStats}
+                onPress={() => {
+                  setSelectedPostId(item.id);
+                  setReactionsModalVisible(true);
+                }}
+                activeOpacity={0.7}
+              >
+                <View style={styles.reactionBubblesContainer}>
+                  {item.user_reaction && (
+                    <View style={[styles.reactionBubble, { zIndex: 3 }]}>
+                      <Text style={styles.reactionIcon}>{getReactionIcon(item.user_reaction)}</Text>
+                    </View>
+                  )}
+                  {!item.user_reaction && (
+                    <View style={[styles.reactionBubble, { zIndex: 3 }]}>
+                      <Text style={styles.reactionIcon}>👍</Text>
+                    </View>
+                  )}
                 </View>
                 <Text style={styles.statsText}>{item.reaction_count}</Text>
-              </View>
+              </TouchableOpacity>
             )}
             <View style={{ flex: 1 }} />
             {item.comment_count > 0 && (
@@ -415,6 +434,12 @@ const HomeScreen = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
+      />
+      
+      <ReactionsModal
+        visible={reactionsModalVisible}
+        onClose={() => setReactionsModalVisible(false)}
+        postId={selectedPostId}
       />
     </View>
   );
@@ -556,6 +581,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  reactionBubblesContainer: {
+    flexDirection: 'row',
+    marginRight: 6,
+  },
   reactionBubble: {
     width: 28,
     height: 28,
@@ -563,7 +592,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f3f4f6',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 6,
+    marginRight: -8,
   },
   reactionIcon: {
     fontSize: 14,

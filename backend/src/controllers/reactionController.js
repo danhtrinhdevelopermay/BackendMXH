@@ -99,15 +99,29 @@ const getReactions = async (req, res) => {
   const { postId } = req.params;
 
   try {
-    const result = await pool.query(
-      `SELECT r.*, u.username, u.full_name, u.avatar_url 
-       FROM reactions r 
-       JOIN users u ON r.user_id = u.id 
-       WHERE r.post_id = $1`,
-      [postId]
-    );
+    const [reactionsResult, summaryResult] = await Promise.all([
+      pool.query(
+        `SELECT r.*, u.username, u.full_name, u.avatar_url, u.is_verified
+         FROM reactions r 
+         JOIN users u ON r.user_id = u.id 
+         WHERE r.post_id = $1
+         ORDER BY r.created_at DESC`,
+        [postId]
+      ),
+      pool.query(
+        `SELECT reaction_type, COUNT(*) as count
+         FROM reactions
+         WHERE post_id = $1
+         GROUP BY reaction_type
+         ORDER BY count DESC`,
+        [postId]
+      )
+    ]);
 
-    res.json(result.rows);
+    res.json({
+      reactions: reactionsResult.rows,
+      summary: summaryResult.rows
+    });
   } catch (error) {
     console.error('Get reactions error:', error);
     res.status(500).json({ error: 'Server error' });
