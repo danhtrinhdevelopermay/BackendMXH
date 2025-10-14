@@ -90,6 +90,17 @@ CREATE TABLE IF NOT EXISTS user_thoughts (
   UNIQUE(user_id)
 );
 
+-- Tạo bảng push_tokens (lưu push notification tokens)
+CREATE TABLE IF NOT EXISTS push_tokens (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  push_token TEXT NOT NULL,
+  device_type VARCHAR(50),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(user_id, push_token)
+);
+
 -- Tạo indexes để tăng performance
 -- Basic indexes
 CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
@@ -113,3 +124,4 @@ CREATE INDEX IF NOT EXISTS idx_friendships_addressee_status ON friendships(addre
 CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(sender_id, receiver_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_messages_reverse_conversation ON messages(receiver_id, sender_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_read ON notifications(user_id, is_read, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_push_tokens_user_id ON push_tokens(user_id);
