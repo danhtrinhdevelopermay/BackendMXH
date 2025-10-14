@@ -45,11 +45,15 @@ const PostDetailScreen = ({ route, navigation }) => {
 
   const handleReaction = async (reactionType) => {
     try {
-      await reactionAPI.addReaction(postId, { reaction_type: reactionType });
+      if (reactionType === 'like' && post.user_reaction === 'like') {
+        await reactionAPI.removeReaction(postId);
+      } else {
+        await reactionAPI.addReaction(postId, { reaction_type: reactionType });
+      }
       setReactionMenuVisible(false);
       fetchPost();
     } catch (error) {
-      showAlert('Error', 'Failed to add reaction', 'error');
+      showAlert('Error', 'Failed to update reaction', 'error');
     }
   };
 
@@ -236,7 +240,7 @@ const PostDetailScreen = ({ route, navigation }) => {
           <TouchableOpacity 
             style={styles.actionButton}
             onLongPress={() => setReactionMenuVisible(!reactionMenuVisible)}
-            onPress={() => handleReaction(post.user_reaction ? post.user_reaction : 'like')}
+            onPress={() => handleReaction('like')}
           >
             <View style={[
               styles.actionIconContainer,

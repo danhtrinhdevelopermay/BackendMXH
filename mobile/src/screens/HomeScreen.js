@@ -80,13 +80,17 @@ const HomeScreen = ({ navigation }) => {
     fetchStories();
   }, []);
 
-  const handleReaction = async (postId, reactionType) => {
+  const handleReaction = async (postId, reactionType, currentReaction) => {
     try {
-      await reactionAPI.addReaction(postId, { reaction_type: reactionType });
+      if (reactionType === 'like' && currentReaction === 'like') {
+        await reactionAPI.removeReaction(postId);
+      } else {
+        await reactionAPI.addReaction(postId, { reaction_type: reactionType });
+      }
       setReactionMenuVisible({});
       fetchPosts();
     } catch (error) {
-      showAlert('Error', 'Failed to add reaction', 'error');
+      showAlert('Error', 'Failed to update reaction', 'error');
     }
   };
 
@@ -347,7 +351,7 @@ const HomeScreen = ({ navigation }) => {
           <TouchableOpacity 
             style={styles.actionButton}
             onLongPress={() => toggleReactionMenu(item.id)}
-            onPress={() => handleReaction(item.id, item.user_reaction ? item.user_reaction : 'like')}
+            onPress={() => handleReaction(item.id, 'like', item.user_reaction)}
           >
             <View style={[
               styles.actionIconContainer,
@@ -377,7 +381,7 @@ const HomeScreen = ({ navigation }) => {
                 {['like', 'love', 'haha', 'wow', 'sad', 'angry'].map((reaction) => (
                   <TouchableOpacity
                     key={reaction}
-                    onPress={() => handleReaction(item.id, reaction)}
+                    onPress={() => handleReaction(item.id, reaction, item.user_reaction)}
                     style={styles.reactionOption}
                   >
                     <Text style={styles.reactionOptionIcon}>{getReactionIcon(reaction)}</Text>
