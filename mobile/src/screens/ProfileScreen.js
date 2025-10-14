@@ -22,6 +22,7 @@ const ProfileScreen = ({ route, navigation }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [friendshipStatus, setFriendshipStatus] = useState(null);
+  const [stats, setStats] = useState({ posts_count: 0, friends_count: 0, photos_count: 0 });
   
   const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
 
@@ -29,16 +30,22 @@ const ProfileScreen = ({ route, navigation }) => {
     try {
       if (isOwnProfile) {
         setProfileUser(currentUser);
-        const response = await postAPI.getUserPosts(currentUser.id);
-        setPosts(response.data);
+        const [postsResponse, statsResponse] = await Promise.all([
+          postAPI.getUserPosts(currentUser.id),
+          userAPI.getUserStats(currentUser.id)
+        ]);
+        setPosts(postsResponse.data);
+        setStats(statsResponse.data);
       } else {
-        const [userResponse, postsResponse] = await Promise.all([
+        const [userResponse, postsResponse, statsResponse] = await Promise.all([
           userAPI.getUserById(userId),
-          postAPI.getUserPosts(userId)
+          postAPI.getUserPosts(userId),
+          userAPI.getUserStats(userId)
         ]);
         setProfileUser(userResponse.data);
         setFriendshipStatus(userResponse.data.friendship_status);
         setPosts(postsResponse.data);
+        setStats(statsResponse.data);
       }
     } catch (error) {
       showAlert('Lỗi', 'Không thể tải thông tin người dùng', 'error');
@@ -184,7 +191,7 @@ const ProfileScreen = ({ route, navigation }) => {
             <View style={styles.statIconContainer}>
               <MaterialCommunityIcons name="post-outline" size={20} color="#1877f2" />
             </View>
-            <Text style={styles.statNumber}>{posts.length}</Text>
+            <Text style={styles.statNumber}>{stats.posts_count}</Text>
             <Text style={styles.statLabel}>Bài viết</Text>
           </TouchableOpacity>
           
@@ -194,7 +201,7 @@ const ProfileScreen = ({ route, navigation }) => {
             <View style={styles.statIconContainer}>
               <MaterialCommunityIcons name="account-group" size={20} color="#1877f2" />
             </View>
-            <Text style={styles.statNumber}>0</Text>
+            <Text style={styles.statNumber}>{stats.friends_count}</Text>
             <Text style={styles.statLabel}>Bạn bè</Text>
           </TouchableOpacity>
           
@@ -204,7 +211,7 @@ const ProfileScreen = ({ route, navigation }) => {
             <View style={styles.statIconContainer}>
               <MaterialCommunityIcons name="image-multiple" size={20} color="#1877f2" />
             </View>
-            <Text style={styles.statNumber}>0</Text>
+            <Text style={styles.statNumber}>{stats.photos_count}</Text>
             <Text style={styles.statLabel}>Ảnh</Text>
           </TouchableOpacity>
         </View>

@@ -53,4 +53,32 @@ const getUserById = async (req, res) => {
   }
 };
 
-module.exports = { getUserById };
+const getUserStats = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const [postsResult, friendsResult, photosResult] = await Promise.all([
+      pool.query('SELECT COUNT(*) FROM posts WHERE user_id = $1', [userId]),
+      pool.query(
+        `SELECT COUNT(*) FROM friendships 
+         WHERE status = 'accepted' AND (requester_id = $1 OR addressee_id = $1)`,
+        [userId]
+      ),
+      pool.query(
+        'SELECT COUNT(*) FROM posts WHERE user_id = $1 AND media_url IS NOT NULL',
+        [userId]
+      )
+    ]);
+
+    res.json({
+      posts_count: parseInt(postsResult.rows[0].count),
+      friends_count: parseInt(friendsResult.rows[0].count),
+      photos_count: parseInt(photosResult.rows[0].count)
+    });
+  } catch (error) {
+    console.error('Get user stats error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+module.exports = { getUserById, getUserStats };

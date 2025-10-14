@@ -104,6 +104,7 @@ export const notificationAPI = {
 
 export const userAPI = {
   getUserById: (userId) => api.get(`/users/${userId}`),
+  getUserStats: (userId) => api.get(`/users/${userId}/stats`),
 };
 
 export const thoughtAPI = {
