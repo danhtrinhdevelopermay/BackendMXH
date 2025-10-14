@@ -9,6 +9,7 @@ import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
 import { Ionicons } from '@expo/vector-icons';
 import UserAvatar from '../components/UserAvatar';
+import VerifiedBadge from '../components/VerifiedBadge';
 
 const CreatePostScreen = ({ navigation }) => {
   const { user } = useContext(AuthContext);
@@ -76,7 +77,10 @@ const CreatePostScreen = ({ navigation }) => {
             style={styles.avatar}
           />
           <View style={styles.userDetails}>
-            <Text style={styles.userName}>{user?.full_name || user?.username}</Text>
+            <View style={styles.userNameContainer}>
+              <Text style={styles.userName}>{user?.full_name || user?.username}</Text>
+              <VerifiedBadge isVerified={user?.is_verified} size={16} />
+            </View>
             <Menu
               visible={privacyMenuVisible}
               onDismiss={() => setPrivacyMenuVisible(false)}
@@ -211,6 +215,10 @@ const styles = StyleSheet.create({
   userDetails: {
     marginLeft: 12,
     flex: 1,
+  },
+  userNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   userName: {
     fontSize: 16,

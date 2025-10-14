@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Image, A
 import { Ionicons } from '@expo/vector-icons';
 import { friendshipAPI, postAPI } from '../api/api';
 import Constants from 'expo-constants';
+import VerifiedBadge from '../components/VerifiedBadge';
 
 const SearchScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,7 +52,10 @@ const SearchScreen = ({ navigation }) => {
           </View>
         )}
         <View style={styles.userDetails}>
-          <Text style={styles.userName}>{item.full_name}</Text>
+          <View style={styles.userNameContainer}>
+            <Text style={styles.userName}>{item.full_name}</Text>
+            <VerifiedBadge isVerified={item.is_verified} size={16} />
+          </View>
           <Text style={styles.username}>@{item.username}</Text>
           {item.bio && <Text style={styles.bio} numberOfLines={1}>{item.bio}</Text>}
         </View>
@@ -82,7 +86,10 @@ const SearchScreen = ({ navigation }) => {
               </View>
             )}
             <View>
-              <Text style={styles.postAuthorName}>{item.author_name}</Text>
+              <View style={styles.postAuthorNameContainer}>
+                <Text style={styles.postAuthorName}>{item.author_name}</Text>
+                <VerifiedBadge isVerified={item.is_verified} size={14} />
+              </View>
               <Text style={styles.postTime}>{new Date(item.created_at).toLocaleDateString()}</Text>
             </View>
           </TouchableOpacity>
@@ -251,6 +258,10 @@ const styles = StyleSheet.create({
   userDetails: {
     flex: 1,
   },
+  userNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   userName: {
     fontSize: 16,
     fontWeight: '600',
@@ -292,6 +303,10 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     marginRight: 8,
+  },
+  postAuthorNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   postAuthorName: {
     fontSize: 14,
