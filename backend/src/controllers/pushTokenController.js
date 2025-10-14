@@ -103,8 +103,31 @@ const sendPushNotification = async (userId, title, body, data = {}) => {
   }
 };
 
+const sendTestNotification = async (req, res) => {
+  const user_id = req.user.id;
+
+  try {
+    const result = await sendPushNotification(
+      user_id,
+      '🔔 Test Notification',
+      'Push notifications đang hoạt động tốt! Bạn sẽ nhận được thông báo khi có tin nhắn mới, bình luận, hoặc lời mời kết bạn.',
+      { screen: 'Notifications' }
+    );
+
+    if (result.success) {
+      res.json({ message: 'Test notification sent successfully', tickets: result.tickets });
+    } else {
+      res.status(400).json({ error: result.message || 'Failed to send test notification' });
+    }
+  } catch (error) {
+    console.error('Send test notification error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 module.exports = {
   registerPushToken,
   deletePushToken,
-  sendPushNotification
+  sendPushNotification,
+  sendTestNotification
 };
