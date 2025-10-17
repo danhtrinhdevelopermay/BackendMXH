@@ -191,7 +191,7 @@ const HomeScreen = ({ navigation }) => {
   const renderHeader = () => (
     <View style={styles.headerContainer}>
       <View style={styles.fbHeader}>
-        <Text style={styles.fbLogo}>facebook</Text>
+        <Text style={styles.fbLogo}>Shatter xin chào</Text>
         <View style={styles.fbHeaderIcons}>
           <TouchableOpacity style={styles.fbIconButton}>
             <Ionicons name="search" size={24} color="#050505" />
