@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, FlatList, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, FlatList, StyleSheet, Image, TouchableOpacity, ScrollView, Animated } from 'react-native';
 import { Card, Avatar, Button, Text, Divider, IconButton } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import { Video } from 'expo-av';
+import { LinearGradient } from 'expo-linear-gradient';
 import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
 import { postAPI, userAPI, friendshipAPI, messageAPI } from '../api/api';
@@ -126,18 +127,40 @@ const ProfileScreen = ({ route, navigation }) => {
     );
   };
 
-  const renderHeader = () => (
+  const renderHeader = () => {
+    const isPro = profileUser?.is_pro;
+    
+    return (
     <View style={styles.headerContainer}>
-      {/* Cover Photo - Twitter Style */}
+      {/* Cover Photo - Pro vs Normal */}
       <View style={styles.coverContainer}>
-        {profileUser?.cover_url ? (
-          <Image
-            source={{ uri: `${API_URL}/api/cover/${profileUser.id}?${Date.now()}` }}
-            style={styles.coverPhoto}
-            resizeMode="cover"
-          />
+        {isPro ? (
+          // Pro: Gradient Cover
+          profileUser?.cover_url ? (
+            <Image
+              source={{ uri: `${API_URL}/api/cover/${profileUser.id}?${Date.now()}` }}
+              style={styles.coverPhoto}
+              resizeMode="cover"
+            />
+          ) : (
+            <LinearGradient
+              colors={['#667eea', '#764ba2', '#f093fb']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.proCover}
+            />
+          )
         ) : (
-          <View style={styles.defaultCover} />
+          // Normal: Plain Cover
+          profileUser?.cover_url ? (
+            <Image
+              source={{ uri: `${API_URL}/api/cover/${profileUser.id}?${Date.now()}` }}
+              style={styles.coverPhoto}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={styles.defaultCover} />
+          )
         )}
       </View>
       
@@ -145,21 +168,50 @@ const ProfileScreen = ({ route, navigation }) => {
       <View style={styles.profileSection}>
         {/* Avatar - Overlap on cover */}
         <View style={styles.avatarRow}>
-          <View style={styles.avatarContainer}>
-            {profileUser?.id ? (
-              <Image
-                source={{ uri: `${API_URL}/api/avatar/${profileUser.id}?${Date.now()}` }}
-                style={styles.avatarImage}
-                onError={() => console.log('Avatar load error')}
-              />
-            ) : (
-              <Avatar.Text
-                size={80}
-                label={profileUser?.username?.[0]?.toUpperCase() || 'U'}
-                style={styles.avatar}
-              />
-            )}
-          </View>
+          {isPro ? (
+            // Pro: Avatar with Gradient Border
+            <View style={styles.proAvatarWrapper}>
+              <LinearGradient
+                colors={['#667eea', '#764ba2', '#f093fb']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.proAvatarGradient}
+              >
+                <View style={styles.proAvatarInner}>
+                  {profileUser?.id ? (
+                    <Image
+                      source={{ uri: `${API_URL}/api/avatar/${profileUser.id}?${Date.now()}` }}
+                      style={styles.avatarImage}
+                      onError={() => console.log('Avatar load error')}
+                    />
+                  ) : (
+                    <Avatar.Text
+                      size={80}
+                      label={profileUser?.username?.[0]?.toUpperCase() || 'U'}
+                      style={styles.proAvatar}
+                    />
+                  )}
+                </View>
+              </LinearGradient>
+            </View>
+          ) : (
+            // Normal: Plain Avatar
+            <View style={styles.avatarContainer}>
+              {profileUser?.id ? (
+                <Image
+                  source={{ uri: `${API_URL}/api/avatar/${profileUser.id}?${Date.now()}` }}
+                  style={styles.avatarImage}
+                  onError={() => console.log('Avatar load error')}
+                />
+              ) : (
+                <Avatar.Text
+                  size={80}
+                  label={profileUser?.username?.[0]?.toUpperCase() || 'U'}
+                  style={styles.avatar}
+                />
+              )}
+            </View>
+          )}
 
           {/* Action Buttons - Top Right (Twitter Style) */}
           <View style={styles.topActions}>
@@ -227,21 +279,55 @@ const ProfileScreen = ({ route, navigation }) => {
             <Text style={styles.bio}>{profileUser.bio}</Text>
           )}
 
-          {/* Stats - Twitter Style (Inline) */}
-          <View style={styles.statsRow}>
-            <TouchableOpacity style={styles.statItem}>
-              <Text style={styles.statNumber}>{stats.posts_count} </Text>
-              <Text style={styles.statLabel}>Bài viết</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.statItem}>
-              <Text style={styles.statNumber}>{stats.friends_count} </Text>
-              <Text style={styles.statLabel}>Bạn bè</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.statItem}>
-              <Text style={styles.statNumber}>{stats.photos_count} </Text>
-              <Text style={styles.statLabel}>Ảnh</Text>
-            </TouchableOpacity>
-          </View>
+          {/* Stats - Pro vs Normal */}
+          {isPro ? (
+            // Pro: Gradient Stats Cards
+            <View style={styles.proStatsContainer}>
+              <LinearGradient
+                colors={['#667eea', '#764ba2']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.proStatCard}
+              >
+                <Text style={styles.proStatNumber}>{stats.posts_count}</Text>
+                <Text style={styles.proStatLabel}>Bài viết</Text>
+              </LinearGradient>
+              <LinearGradient
+                colors={['#f093fb', '#f5576c']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.proStatCard}
+              >
+                <Text style={styles.proStatNumber}>{stats.friends_count}</Text>
+                <Text style={styles.proStatLabel}>Bạn bè</Text>
+              </LinearGradient>
+              <LinearGradient
+                colors={['#4facfe', '#00f2fe']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.proStatCard}
+              >
+                <Text style={styles.proStatNumber}>{stats.photos_count}</Text>
+                <Text style={styles.proStatLabel}>Ảnh</Text>
+              </LinearGradient>
+            </View>
+          ) : (
+            // Normal: Plain Stats
+            <View style={styles.statsRow}>
+              <TouchableOpacity style={styles.statItem}>
+                <Text style={styles.statNumber}>{stats.posts_count} </Text>
+                <Text style={styles.statLabel}>Bài viết</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.statItem}>
+                <Text style={styles.statNumber}>{stats.friends_count} </Text>
+                <Text style={styles.statLabel}>Bạn bè</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.statItem}>
+                <Text style={styles.statNumber}>{stats.photos_count} </Text>
+                <Text style={styles.statLabel}>Ảnh</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </View>
 
@@ -250,7 +336,8 @@ const ProfileScreen = ({ route, navigation }) => {
         <Text style={styles.postsTitle}>Bài viết</Text>
       </View>
     </View>
-  );
+    );
+  };
 
   const renderPost = ({ item }) => (
     <View style={styles.postContainer}>
@@ -370,6 +457,27 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     backgroundColor: '#cfd9de',
+  },
+  proCover: {
+    width: '100%',
+    height: '100%',
+  },
+  proAvatarWrapper: {
+    backgroundColor: '#ffffff',
+    borderRadius: 46,
+    padding: 2,
+  },
+  proAvatarGradient: {
+    borderRadius: 44,
+    padding: 4,
+  },
+  proAvatarInner: {
+    backgroundColor: '#ffffff',
+    borderRadius: 40,
+    padding: 0,
+  },
+  proAvatar: {
+    backgroundColor: '#667eea',
   },
   profileSection: {
     paddingHorizontal: 16,
@@ -505,6 +613,32 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 15,
     color: '#536471',
+  },
+  proStatsContainer: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  proStatCard: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 80,
+  },
+  proStatNumber: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#ffffff',
+    marginBottom: 4,
+  },
+  proStatLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#ffffff',
+    opacity: 0.9,
   },
   postsHeader: {
     borderTopWidth: 1,

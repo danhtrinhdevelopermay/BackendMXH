@@ -26,7 +26,7 @@ const register = async (req, res) => {
     const password_hash = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
-      'INSERT INTO users (username, email, password_hash, full_name) VALUES ($1, $2, $3, $4) RETURNING id, username, email, full_name, avatar_url, bio, is_verified, created_at',
+      'INSERT INTO users (username, email, password_hash, full_name) VALUES ($1, $2, $3, $4) RETURNING id, username, email, full_name, avatar_url, bio, is_verified, is_pro, created_at',
       [username, email, password_hash, full_name]
     );
 
@@ -78,7 +78,7 @@ const login = async (req, res) => {
 const getProfile = async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT id, username, email, full_name, avatar_url, bio, is_verified, created_at FROM users WHERE id = $1',
+      'SELECT id, username, email, full_name, avatar_url, bio, is_verified, is_pro, created_at FROM users WHERE id = $1',
       [req.user.id]
     );
 
@@ -99,7 +99,7 @@ const updateProfile = async (req, res) => {
 
   try {
     const result = await pool.query(
-      'UPDATE users SET full_name = $1, bio = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id, username, email, full_name, avatar_url, bio, is_verified, created_at',
+      'UPDATE users SET full_name = $1, bio = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id, username, email, full_name, avatar_url, bio, is_verified, is_pro, created_at',
       [full_name, bio, userId]
     );
 

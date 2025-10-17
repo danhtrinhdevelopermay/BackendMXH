@@ -25,6 +25,7 @@ Lưu trữ thông tin tài khoản và hồ sơ người dùng.
 | `avatar_url` | TEXT | URL ảnh đại diện | - |
 | `cover_url` | TEXT | URL ảnh bìa | - |
 | `is_verified` | BOOLEAN | Đã xác thực | DEFAULT FALSE |
+| `is_pro` | BOOLEAN | Tài khoản Pro | DEFAULT FALSE |
 | `created_at` | TIMESTAMP | Thời gian tạo | DEFAULT CURRENT_TIMESTAMP |
 | `updated_at` | TIMESTAMP | Thời gian cập nhật | DEFAULT CURRENT_TIMESTAMP |
 
@@ -255,6 +256,7 @@ CREATE TABLE IF NOT EXISTS users (
   avatar_url TEXT,
   cover_url TEXT,
   is_verified BOOLEAN DEFAULT FALSE,
+  is_pro BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -495,5 +497,23 @@ Nếu gặp vấn đề khi thiết lập database:
 ---
 
 **Version:** 1.0  
+## 🌟 Tính Năng Pro
+
+### Tài khoản Pro (`is_pro` = TRUE)
+Người dùng có tài khoản Pro sẽ có giao diện trang hồ sơ đặc biệt:
+- **Cover Photo**: Gradient động với màu sắc hiện đại (nếu không có ảnh bìa)
+- **Avatar**: Border gradient đẹp mắt
+- **Stats Cards**: Cards với gradient backgrounds thay vì inline stats
+- **Màu sắc**: Gradient từ purple, pink đến blue
+- **Trải nghiệm**: Giao diện sống động, hiện đại
+
+### Tài khoản Thường (`is_pro` = FALSE)
+- Giao diện mặc định, kiểu Twitter
+- Cover photo đơn giản
+- Avatar thường
+- Stats inline đơn giản
+
+---
+
 **Last Updated:** 2025-10-17  
 **Compatible With:** Shatter Social Media App v1.0+
