@@ -193,6 +193,20 @@ io.on('connection', (socket) => {
     console.log(`User ${userId} is online with socket ${socket.id}`);
   });
 
+  socket.on('typing', ({ userId, receiverId }) => {
+    const receiverSocketId = activeUsers.get(receiverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit('user_typing', { userId });
+    }
+  });
+
+  socket.on('stop_typing', ({ userId, receiverId }) => {
+    const receiverSocketId = activeUsers.get(receiverId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit('user_stop_typing', { userId });
+    }
+  });
+
   socket.on('call_user', ({ callerId, callerName, receiverId }) => {
     const receiverSocketId = activeUsers.get(receiverId);
     if (receiverSocketId) {
