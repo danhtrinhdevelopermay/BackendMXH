@@ -190,9 +190,12 @@ Preferred communication style: Simple, everyday language.
 ### Database
 - **PostgreSQL** - Primary relational database (hosted on Neon)
 - Direct pool connection using `pg` driver
-- Schema includes: users, posts, comments, reactions, friendships, messages, notifications, user_thoughts tables
+- Schema includes: users, posts, comments, reactions, friendships, messages, notifications, user_thoughts, stories, push_tokens tables
 - Database URL configured via environment variable `DATABASE_URL`
 - **user_thoughts table:** Stores user thoughts/notes with unique constraint per user, includes content (max 100 chars), emoji, and timestamps
+- **stories table:** Stores 24-hour stories with automatic expiration (expires_at timestamp)
+- **push_tokens table:** Stores device push notification tokens for real-time notifications
+- **📋 Complete Database Schema Documentation:** See `DATABASE_SCHEMA.md` for full schema details, migration guide, and setup instructions
 
 ### Third-Party Services & APIs
 - **Expo Services:**
