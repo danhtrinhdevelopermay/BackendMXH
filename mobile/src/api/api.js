@@ -94,6 +94,9 @@ export const messageAPI = {
   sendMessage: (data) => api.post('/messages', data),
   getConversations: () => api.get('/messages/conversations'),
   getMessages: (userId) => api.get(`/messages/${userId}`),
+  addReaction: (messageId, data) => api.post(`/message-reactions/${messageId}`, data),
+  removeReaction: (messageId) => api.delete(`/message-reactions/${messageId}`),
+  getReactions: (messageId) => api.get(`/message-reactions/${messageId}`),
 };
 
 export const notificationAPI = {
