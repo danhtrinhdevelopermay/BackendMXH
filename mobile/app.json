@@ -24,7 +24,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#000000"
       },
       "package": "com.socialmedia.app"
     },
@@ -34,7 +34,7 @@
     "extra": {
       "apiUrl": "https://backendmxh-1.onrender.com",
       "eas": {
-        "projectId": "6b474f79-edac-4cbb-aa66-f25ee4ac2b90"
+        "projectId": "286d0a06-c3e6-4971-b2dd-445814a7b318"
       }
     },
     "plugins": [
