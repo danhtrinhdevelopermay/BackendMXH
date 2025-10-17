@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { TouchableOpacity, Animated } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -9,8 +9,10 @@ import { AuthContext } from '../context/AuthContext';
 import { useIncomingCall } from '../hooks/useIncomingCall';
 import IncomingCallModal from '../components/IncomingCallModal';
 import { registerForPushNotificationsAsync, setupNotificationListeners, unregisterPushToken } from '../services/notificationService';
+import { postsAPI, storiesAPI, notificationsAPI, friendshipAPI, thoughtsAPI, messagesAPI } from '../api/api';
 
 import { useIsFocused } from '@react-navigation/native';
+import SplashScreen from '../screens/SplashScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
@@ -204,9 +206,14 @@ const NavigationWrapper = () => {
   const { incomingCall, acceptCall, rejectCall } = useIncomingCall();
   const navigationRef = useRef(null);
   const pushTokenRef = useRef(null);
+  const [isPreloading, setIsPreloading] = useState(false);
+  const [hasPreloaded, setHasPreloaded] = useState(false);
 
   useEffect(() => {
-    if (user) {
+    if (user && !hasPreloaded) {
+      setIsPreloading(true);
+      preloadData();
+      
       registerForPushNotificationsAsync().then(token => {
         pushTokenRef.current = token;
       });
@@ -222,13 +229,45 @@ const NavigationWrapper = () => {
       return () => {
         subscription.remove();
       };
-    } else {
+    } else if (!user) {
+      setHasPreloaded(false);
       if (pushTokenRef.current) {
         unregisterPushToken(pushTokenRef.current);
         pushTokenRef.current = null;
       }
     }
   }, [user]);
+
+  const preloadData = async () => {
+    try {
+      const loadPromises = [
+        postsAPI.getFeed().catch(() => ({ data: [] })),
+        storiesAPI.getStories().catch(() => ({ data: [] })),
+        notificationsAPI.getNotifications().catch(() => ({ data: [] })),
+        friendshipAPI.getFriendRequests().catch(() => ({ data: [] })),
+        friendshipAPI.getSuggestedFriends().catch(() => ({ data: [] })),
+        thoughtsAPI.getThoughts().catch(() => ({ data: [] })),
+        messagesAPI.getConversations().catch(() => ({ data: [] })),
+      ];
+
+      await Promise.all(loadPromises);
+      
+      setTimeout(() => {
+        setIsPreloading(false);
+        setHasPreloaded(true);
+      }, 500);
+    } catch (error) {
+      console.error('Error preloading data:', error);
+      setTimeout(() => {
+        setIsPreloading(false);
+        setHasPreloaded(true);
+      }, 1000);
+    }
+  };
+
+  if (isPreloading && user) {
+    return <SplashScreen onLoadComplete={() => setIsPreloading(false)} />;
+  }
 
   return (
     <>
