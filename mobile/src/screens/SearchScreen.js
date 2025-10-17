@@ -138,7 +138,7 @@ const SearchScreen = ({ navigation }) => {
           <Ionicons name="search" size={20} color="#65676b" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Tìm kiếm trên Facebook"
+            placeholder="Tìm kiếm trên Shatter"
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoFocus
@@ -182,7 +182,7 @@ const SearchScreen = ({ navigation }) => {
           {searchQuery.trim().length === 0 ? (
             <View style={styles.emptyContainer}>
               <Ionicons name="search-outline" size={80} color="#bcc0c4" />
-              <Text style={styles.emptyTitle}>Tìm kiếm trên Facebook</Text>
+              <Text style={styles.emptyTitle}>Tìm kiếm trên </Text>
               <Text style={styles.emptyText}>Tìm kiếm bạn bè, bài viết và nhiều hơn nữa</Text>
             </View>
           ) : (
