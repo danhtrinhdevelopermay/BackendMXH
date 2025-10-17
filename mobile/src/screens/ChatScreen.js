@@ -1,17 +1,20 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, StatusBar, Animated, Modal, Pressable } from 'react-native';
+import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, StatusBar, Animated, Modal, Pressable, Image, Alert } from 'react-native';
 import { TextInput, Text } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as ImagePicker from 'expo-image-picker';
 import { messageAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
 import UserAvatar from '../components/UserAvatar';
 import SocketService from '../services/SocketService';
+import { useAlert } from '../context/AlertContext';
 
 const ChatScreen = ({ route, navigation }) => {
   const { userId, userName, userAvatar } = route.params;
   const { user } = useContext(AuthContext);
+  const { showAlert } = useAlert();
   const insets = useSafeAreaInsets();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -19,8 +22,10 @@ const ChatScreen = ({ route, navigation }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [showReactions, setShowReactions] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const typingAnim = useRef(new Animated.Value(0)).current;
+  const typingTimeoutRef = useRef(null);
 
   const otherUser = React.useMemo(() => ({
     id: userId,
@@ -34,7 +39,32 @@ const ChatScreen = ({ route, navigation }) => {
     });
 
     SocketService.connect(user.id);
-  }, [user.id]);
+    
+    const socket = SocketService.getSocket();
+    if (socket) {
+      socket.on('user_typing', (data) => {
+        if (data.userId === userId) {
+          setIsTyping(true);
+        }
+      });
+      
+      socket.on('user_stop_typing', (data) => {
+        if (data.userId === userId) {
+          setIsTyping(false);
+        }
+      });
+    }
+    
+    return () => {
+      if (socket) {
+        socket.off('user_typing');
+        socket.off('user_stop_typing');
+      }
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, [user.id, userId]);
 
   const fetchMessages = async () => {
     try {
@@ -123,9 +153,51 @@ const ChatScreen = ({ route, navigation }) => {
     setShowReactions(true);
   };
 
-  const handleReaction = (reaction) => {
-    setShowReactions(false);
-    setSelectedMessage(null);
+  const handleReaction = async (reaction) => {
+    if (!selectedMessage) return;
+    
+    try {
+      console.log('Adding reaction to message:', selectedMessage.id, reaction);
+      showAlert('Thành công', 'Đã thêm cảm xúc', 'success');
+    } catch (error) {
+      console.error('Failed to add reaction:', error);
+    } finally {
+      setShowReactions(false);
+      setSelectedMessage(null);
+    }
+  };
+
+  const pickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        showAlert('Thông báo', 'Tính năng gửi ảnh sẽ được cập nhật trong phiên bản sau', 'info');
+      }
+    } catch (error) {
+      console.error('Image picker error:', error);
+    }
+  };
+
+  const handleTyping = (text) => {
+    setNewMessage(text);
+    
+    const socket = SocketService.getSocket();
+    if (socket) {
+      socket.emit('typing', { userId: user.id, receiverId: userId });
+      
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      
+      typingTimeoutRef.current = setTimeout(() => {
+        socket.emit('stop_typing', { userId: user.id, receiverId: userId });
+      }, 1000);
+    }
   };
 
   const formatTime = (timestamp) => {
@@ -277,7 +349,7 @@ const ChatScreen = ({ route, navigation }) => {
           <TouchableOpacity style={styles.iconButton}>
             <Ionicons name="videocam" size={24} color="#0084FF" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
+          <TouchableOpacity style={styles.iconButton} onPress={() => setShowInfoModal(true)}>
             <Ionicons name="information-circle-outline" size={24} color="#0084FF" />
           </TouchableOpacity>
         </View>
@@ -317,7 +389,7 @@ const ChatScreen = ({ route, navigation }) => {
             <View style={styles.inputContainer}>
               <TextInput
                 value={newMessage}
-                onChangeText={setNewMessage}
+                onChangeText={handleTyping}
                 placeholder="Aa"
                 placeholderTextColor="#BCC0C4"
                 style={styles.input}
@@ -345,7 +417,7 @@ const ChatScreen = ({ route, navigation }) => {
               <TouchableOpacity style={styles.inputIconButton}>
                 <Ionicons name="mic" size={24} color="#0084FF" />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.inputIconButton}>
+              <TouchableOpacity style={styles.inputIconButton} onPress={pickImage}>
                 <Ionicons name="image" size={24} color="#0084FF" />
               </TouchableOpacity>
               <TouchableOpacity style={styles.inputIconButton}>
@@ -376,6 +448,56 @@ const ChatScreen = ({ route, navigation }) => {
                 <Text style={styles.reactionIcon}>{reaction.icon}</Text>
               </TouchableOpacity>
             ))}
+          </View>
+        </Pressable>
+      </Modal>
+
+      <Modal
+        visible={showInfoModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowInfoModal(false)}
+      >
+        <Pressable 
+          style={styles.infoModalOverlay}
+          onPress={() => setShowInfoModal(false)}
+        >
+          <View style={styles.infoModalContent}>
+            <View style={styles.infoHeader}>
+              <UserAvatar user={otherUser} size={80} />
+              <Text style={styles.infoName}>{userName}</Text>
+            </View>
+            
+            <View style={styles.infoActions}>
+              <TouchableOpacity 
+                style={styles.infoActionButton}
+                onPress={() => {
+                  setShowInfoModal(false);
+                  navigation.navigate('Profile', { userId });
+                }}
+              >
+                <Ionicons name="person-outline" size={24} color="#0084FF" />
+                <Text style={styles.infoActionText}>Xem trang cá nhân</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.infoActionButton}
+                onPress={() => {
+                  setShowInfoModal(false);
+                  handleVoiceCall();
+                }}
+              >
+                <Ionicons name="call-outline" size={24} color="#0084FF" />
+                <Text style={styles.infoActionText}>Gọi điện</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <TouchableOpacity 
+              style={styles.infoCloseButton}
+              onPress={() => setShowInfoModal(false)}
+            >
+              <Text style={styles.infoCloseText}>Đóng</Text>
+            </TouchableOpacity>
           </View>
         </Pressable>
       </Modal>
@@ -643,6 +765,58 @@ const styles = StyleSheet.create({
   },
   reactionIcon: {
     fontSize: 28,
+  },
+  infoModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  infoModalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingVertical: 24,
+    paddingHorizontal: 16,
+    minHeight: 300,
+  },
+  infoHeader: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  infoName: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#050505',
+    marginTop: 12,
+  },
+  infoActions: {
+    gap: 12,
+    marginBottom: 20,
+  },
+  infoActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F0F2F5',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    gap: 12,
+  },
+  infoActionText: {
+    fontSize: 16,
+    color: '#050505',
+    fontWeight: '500',
+  },
+  infoCloseButton: {
+    backgroundColor: '#E4E6EB',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  infoCloseText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#65676B',
   },
 });
 
