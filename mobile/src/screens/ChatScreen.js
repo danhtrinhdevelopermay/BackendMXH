@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, StatusBar, Animated } from 'react-native';
+import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform, TouchableOpacity, StatusBar, Animated, Modal, Pressable } from 'react-native';
 import { TextInput, Text } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -16,7 +16,11 @@ const ChatScreen = ({ route, navigation }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState(null);
+  const [showReactions, setShowReactions] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const typingAnim = useRef(new Animated.Value(0)).current;
 
   const otherUser = React.useMemo(() => ({
     id: userId,
@@ -46,6 +50,27 @@ const ChatScreen = ({ route, navigation }) => {
     const interval = setInterval(fetchMessages, 3000);
     return () => clearInterval(interval);
   }, [userId]);
+
+  useEffect(() => {
+    if (isTyping) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(typingAnim, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(typingAnim, {
+            toValue: 0,
+            duration: 600,
+            useNativeDriver: true,
+          })
+        ])
+      ).start();
+    } else {
+      typingAnim.setValue(0);
+    }
+  }, [isTyping]);
 
   const handleSend = async () => {
     if (!newMessage.trim()) return;
@@ -93,6 +118,16 @@ const ChatScreen = ({ route, navigation }) => {
     }
   };
 
+  const handleLongPress = (message) => {
+    setSelectedMessage(message);
+    setShowReactions(true);
+  };
+
+  const handleReaction = (reaction) => {
+    setShowReactions(false);
+    setSelectedMessage(null);
+  };
+
   const formatTime = (timestamp) => {
     const date = new Date(timestamp);
     const hours = date.getHours().toString().padStart(2, '0');
@@ -124,6 +159,15 @@ const ChatScreen = ({ route, navigation }) => {
     return currentDate !== nextDate;
   };
 
+  const reactions = [
+    { icon: '👍', name: 'like' },
+    { icon: '❤️', name: 'love' },
+    { icon: '😆', name: 'haha' },
+    { icon: '😮', name: 'wow' },
+    { icon: '😢', name: 'sad' },
+    { icon: '😡', name: 'angry' },
+  ];
+
   const renderMessage = React.useCallback(({ item, index }) => {
     const isMyMessage = item.sender_id === user.id;
     const showTime = index === 0 || messages[index - 1]?.sender_id !== item.sender_id;
@@ -132,51 +176,62 @@ const ChatScreen = ({ route, navigation }) => {
     return (
       <View>
         <View style={styles.messageWrapper}>
-          {!isMyMessage && showTime && (
+          {!isMyMessage && (
             <View style={styles.theirMessageContainer}>
               <View style={styles.messageRow}>
-                <UserAvatar 
-                  user={otherUser}
-                  size={34} 
-                  style={styles.messageAvatar}
-                />
-                <View style={styles.theirBubble}>
-                  <Text style={styles.theirText}>{item.content}</Text>
-                </View>
+                {showTime && (
+                  <UserAvatar 
+                    user={otherUser}
+                    size={28} 
+                    style={styles.messageAvatar}
+                  />
+                )}
+                {!showTime && <View style={styles.avatarPlaceholder} />}
+                <Pressable 
+                  onLongPress={() => handleLongPress(item)}
+                  delayLongPress={300}
+                >
+                  <View style={styles.theirBubble}>
+                    <Text style={styles.theirText}>{item.content}</Text>
+                  </View>
+                  {item.reaction && (
+                    <View style={styles.reactionBadge}>
+                      <Text style={styles.reactionText}>{item.reaction}</Text>
+                    </View>
+                  )}
+                </Pressable>
               </View>
-              <Text style={styles.timeText}>{formatTime(item.created_at)}</Text>
-            </View>
-          )}
-          
-          {!isMyMessage && !showTime && (
-            <View style={styles.theirMessageContainer}>
-              <View style={styles.messageRow}>
-                <View style={styles.avatarPlaceholder} />
-                <View style={styles.theirBubble}>
-                  <Text style={styles.theirText}>{item.content}</Text>
-                </View>
-              </View>
+              {showTime && (
+                <Text style={styles.timeText}>{formatTime(item.created_at)}</Text>
+              )}
             </View>
           )}
 
           {isMyMessage && (
             <View style={styles.myMessageContainer}>
-              <LinearGradient
-                colors={['#667eea', '#764ba2']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.myBubble}
+              <Pressable 
+                onLongPress={() => handleLongPress(item)}
+                delayLongPress={300}
               >
-                <Text style={styles.myText}>{item.content}</Text>
-              </LinearGradient>
-              <View style={styles.myTimeContainer}>
-                <Text style={styles.myTimeText}>{formatTime(item.created_at)}</Text>
-                {item.is_read ? (
-                  <MaterialCommunityIcons name="check-all" size={14} color="#667eea" style={styles.checkIcon} />
-                ) : (
-                  <MaterialCommunityIcons name="check" size={14} color="#9CA3AF" style={styles.checkIcon} />
+                <View style={styles.myBubble}>
+                  <Text style={styles.myText}>{item.content}</Text>
+                </View>
+                {item.reaction && (
+                  <View style={styles.myReactionBadge}>
+                    <Text style={styles.reactionText}>{item.reaction}</Text>
+                  </View>
                 )}
-              </View>
+              </Pressable>
+              {showTime && (
+                <View style={styles.myTimeContainer}>
+                  <Text style={styles.myTimeText}>{formatTime(item.created_at)}</Text>
+                  {item.is_read ? (
+                    <MaterialCommunityIcons name="check-all" size={12} color="#0084FF" style={styles.checkIcon} />
+                  ) : (
+                    <MaterialCommunityIcons name="check" size={12} color="#65676B" style={styles.checkIcon} />
+                  )}
+                </View>
+              )}
             </View>
           )}
         </View>
@@ -196,39 +251,37 @@ const ChatScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       
-      <LinearGradient
-        colors={['#fff', '#f8f9fa']}
-        style={styles.header}
-      >
+      <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#1a1a1a" />
+          <Ionicons name="chevron-back" size={28} color="#050505" />
         </TouchableOpacity>
         
         <View style={styles.headerCenter}>
           <View style={styles.avatarContainer}>
             <UserAvatar 
               user={otherUser} 
-              size={40}
+              size={36}
             />
             <View style={styles.onlineIndicator} />
           </View>
           <View style={styles.headerText}>
             <Text style={styles.headerName}>{userName}</Text>
-            <Text style={styles.headerStatus}>đang hoạt động</Text>
+            <Text style={styles.headerStatus}>Đang hoạt động</Text>
           </View>
         </View>
 
         <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.headerButton} onPress={handleVoiceCall}>
-            <LinearGradient
-              colors={['#667eea', '#764ba2']}
-              style={styles.callButton}
-            >
-              <Ionicons name="call" size={18} color="#fff" />
-            </LinearGradient>
+          <TouchableOpacity style={styles.iconButton} onPress={handleVoiceCall}>
+            <Ionicons name="call" size={22} color="#0084FF" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton}>
+            <Ionicons name="videocam" size={24} color="#0084FF" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton}>
+            <Ionicons name="information-circle-outline" size={24} color="#0084FF" />
           </TouchableOpacity>
         </View>
-      </LinearGradient>
+      </View>
 
       <KeyboardAvoidingView 
         style={styles.chatContainer} 
@@ -243,55 +296,89 @@ const ChatScreen = ({ route, navigation }) => {
           contentContainerStyle={styles.messagesList}
           showsVerticalScrollIndicator={false}
         />
+
+        {isTyping && (
+          <View style={styles.typingContainer}>
+            <UserAvatar user={otherUser} size={20} />
+            <View style={styles.typingBubble}>
+              <Animated.View style={[styles.typingDot, { opacity: typingAnim }]} />
+              <Animated.View style={[styles.typingDot, { opacity: typingAnim }]} />
+              <Animated.View style={[styles.typingDot, { opacity: typingAnim }]} />
+            </View>
+          </View>
+        )}
         
-        <View style={[styles.inputWrapper, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+        <View style={[styles.inputWrapper, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+          <TouchableOpacity style={styles.inputIconButton}>
+            <Ionicons name="add-circle" size={32} color="#0084FF" />
+          </TouchableOpacity>
+          
           <View style={styles.inputContainerOuter}>
-            <LinearGradient
-              colors={['#667eea', '#764ba2']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.inputGradientBorder}
-            >
-              <View style={styles.inputContainer}>
-                <TextInput
-                  value={newMessage}
-                  onChangeText={setNewMessage}
-                  placeholder="Nhập tin nhắn..."
-                  placeholderTextColor="#9CA3AF"
-                  style={styles.input}
-                  mode="flat"
-                  underlineColor="transparent"
-                  activeUnderlineColor="transparent"
-                  multiline
-                />
-                <TouchableOpacity style={styles.inputIcon}>
-                  <Ionicons name="happy-outline" size={22} color="#9CA3AF" />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.inputIcon}>
-                  <Ionicons name="image-outline" size={22} color="#9CA3AF" />
-                </TouchableOpacity>
-              </View>
-            </LinearGradient>
+            <View style={styles.inputContainer}>
+              <TextInput
+                value={newMessage}
+                onChangeText={setNewMessage}
+                placeholder="Aa"
+                placeholderTextColor="#BCC0C4"
+                style={styles.input}
+                mode="flat"
+                underlineColor="transparent"
+                activeUnderlineColor="transparent"
+                multiline
+              />
+              <TouchableOpacity style={styles.inputIcon}>
+                <Ionicons name="happy-outline" size={22} color="#0084FF" />
+              </TouchableOpacity>
+            </View>
           </View>
           
-          {newMessage.trim() && (
+          {newMessage.trim() ? (
             <TouchableOpacity 
               onPress={handleSend} 
               disabled={loading}
-              style={styles.sendButton}
+              style={styles.sendIconButton}
             >
-              <LinearGradient
-                colors={['#667eea', '#764ba2']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.sendButtonGradient}
-              >
-                <Ionicons name="send" size={18} color="#fff" />
-              </LinearGradient>
+              <Ionicons name="send" size={20} color="#0084FF" />
             </TouchableOpacity>
+          ) : (
+            <>
+              <TouchableOpacity style={styles.inputIconButton}>
+                <Ionicons name="mic" size={24} color="#0084FF" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.inputIconButton}>
+                <Ionicons name="image" size={24} color="#0084FF" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.inputIconButton}>
+                <MaterialCommunityIcons name="sticker-emoji" size={24} color="#0084FF" />
+              </TouchableOpacity>
+            </>
           )}
         </View>
       </KeyboardAvoidingView>
+
+      <Modal
+        visible={showReactions}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowReactions(false)}
+      >
+        <Pressable 
+          style={styles.modalOverlay}
+          onPress={() => setShowReactions(false)}
+        >
+          <View style={styles.reactionsContainer}>
+            {reactions.map((reaction) => (
+              <TouchableOpacity
+                key={reaction.name}
+                style={styles.reactionButton}
+                onPress={() => handleReaction(reaction.icon)}
+              >
+                <Text style={styles.reactionIcon}>{reaction.icon}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </Pressable>
+      </Modal>
     </View>
   );
 };
@@ -299,20 +386,26 @@ const ChatScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fafafa',
+    backgroundColor: '#FFFFFF',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    paddingTop: Platform.OS === 'android' ? 48 : 10,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.05)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    paddingTop: Platform.OS === 'android' ? 44 : 8,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#E4E6EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
   },
   backButton: {
-    padding: 8,
-    marginRight: 8,
+    padding: 4,
+    marginRight: 6,
   },
   headerCenter: {
     flex: 1,
@@ -329,48 +422,41 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#10B981',
+    backgroundColor: '#31A24C',
     borderWidth: 2,
     borderColor: '#fff',
   },
   headerText: {
-    marginLeft: 12,
+    marginLeft: 10,
   },
   headerName: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    letterSpacing: -0.3,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#050505',
   },
   headerStatus: {
     fontSize: 12,
-    color: '#10B981',
+    color: '#65676B',
     marginTop: 1,
-    fontWeight: '500',
   },
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
   },
-  headerButton: {
-    padding: 4,
-  },
-  callButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
+  iconButton: {
+    padding: 6,
   },
   chatContainer: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   messagesList: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
   },
   messageWrapper: {
-    marginVertical: 3,
+    marginVertical: 1,
   },
   theirMessageContainer: {
     alignItems: 'flex-start',
@@ -383,74 +469,79 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   messageAvatar: {
-    marginRight: 8,
+    marginRight: 6,
   },
   avatarPlaceholder: {
-    width: 34,
-    marginRight: 8,
+    width: 28,
+    marginRight: 6,
   },
   theirBubble: {
-    backgroundColor: '#fff',
+    backgroundColor: '#E4E6EB',
     borderRadius: 18,
-    borderTopLeftRadius: 4,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     maxWidth: '75%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 2,
   },
   myBubble: {
+    backgroundColor: '#0084FF',
     borderRadius: 18,
-    borderTopRightRadius: 4,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     maxWidth: '75%',
-    shadowColor: '#667eea',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    elevation: 4,
   },
   theirText: {
     fontSize: 15,
-    color: '#1F2937',
-    lineHeight: 21,
+    color: '#050505',
+    lineHeight: 20,
   },
   myText: {
     fontSize: 15,
-    color: '#fff',
-    lineHeight: 21,
-    fontWeight: '400',
+    color: '#FFFFFF',
+    lineHeight: 20,
   },
   timeText: {
     fontSize: 11,
-    color: '#9CA3AF',
-    marginTop: 4,
-    marginLeft: 42,
-    fontWeight: '400',
+    color: '#65676B',
+    marginTop: 2,
+    marginLeft: 40,
   },
   myTimeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 2,
     marginRight: 2,
   },
   myTimeText: {
     fontSize: 11,
-    color: '#9CA3AF',
-    fontWeight: '400',
+    color: '#65676B',
   },
   checkIcon: {
-    marginLeft: 4,
+    marginLeft: 3,
+  },
+  reactionBadge: {
+    position: 'absolute',
+    bottom: -8,
+    right: -4,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E4E6EB',
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+  },
+  myReactionBadge: {
+    position: 'absolute',
+    bottom: -8,
+    left: -4,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E4E6EB',
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+  },
+  reactionText: {
+    fontSize: 12,
   },
   dateSeparator: {
     flexDirection: 'row',
@@ -460,39 +551,56 @@ const styles = StyleSheet.create({
   },
   dateLine: {
     flex: 1,
-    height: 1,
-    backgroundColor: 'rgba(0,0,0,0.08)',
+    height: 0.5,
+    backgroundColor: '#E4E6EB',
   },
   dateText: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#65676B',
     marginHorizontal: 12,
     fontWeight: '500',
-    letterSpacing: 0.3,
+  },
+  typingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  typingBubble: {
+    flexDirection: 'row',
+    backgroundColor: '#E4E6EB',
+    borderRadius: 18,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginLeft: 6,
+    gap: 3,
+  },
+  typingDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#65676B',
   },
   inputWrapper: {
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(0,0,0,0.05)',
-    paddingHorizontal: 16,
-    paddingTop: 12,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 0.5,
+    borderTopColor: '#E4E6EB',
+    paddingHorizontal: 8,
+    paddingTop: 8,
     flexDirection: 'row',
     alignItems: 'flex-end',
+    gap: 6,
   },
   inputContainerOuter: {
     flex: 1,
   },
-  inputGradientBorder: {
-    borderRadius: 26,
-    padding: 1.5,
-  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 25,
-    paddingHorizontal: 16,
-    paddingVertical: 4,
+    backgroundColor: '#F0F2F5',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 2,
   },
   input: {
     flex: 1,
@@ -502,27 +610,39 @@ const styles = StyleSheet.create({
     maxHeight: 100,
   },
   inputIcon: {
-    padding: 6,
+    padding: 4,
     marginLeft: 4,
   },
-  sendButton: {
-    marginLeft: 10,
-    marginBottom: 2,
+  inputIconButton: {
+    padding: 4,
   },
-  sendButtonGradient: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    alignItems: 'center',
+  sendIconButton: {
+    padding: 6,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
     justifyContent: 'center',
-    shadowColor: '#667eea',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
+    alignItems: 'center',
+  },
+  reactionsContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 30,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
     elevation: 5,
+    gap: 8,
+  },
+  reactionButton: {
+    padding: 6,
+  },
+  reactionIcon: {
+    fontSize: 28,
   },
 });
 
