@@ -42,7 +42,7 @@ const SplashScreen = ({ onLoadComplete }) => {
         ]}
       >
         <Image 
-          source={require('../../assets/app-logo.png')} 
+          source={require('../../assets/icon.png')} 
           style={styles.logo}
           resizeMode="contain"
         />
