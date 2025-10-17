@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, FlatList, StyleSheet, Image, TouchableOpacity, ScrollView, Animated } from 'react-native';
+import { View, FlatList, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { Card, Avatar, Button, Text, Divider, IconButton } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import { Video } from 'expo-av';
-import { LinearGradient } from 'expo-linear-gradient';
 import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
-import { postAPI, userAPI, friendshipAPI, messageAPI, relationshipAPI } from '../api/api';
+import { postAPI, userAPI, friendshipAPI, messageAPI } from '../api/api';
 import Constants from 'expo-constants';
 import UserAvatar from '../components/UserAvatar';
 import VerifiedBadge from '../components/VerifiedBadge';
@@ -22,30 +21,31 @@ const ProfileScreen = ({ route, navigation }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [friendshipStatus, setFriendshipStatus] = useState(null);
-  const [relationshipStatus, setRelationshipStatus] = useState(null);
-  const [relationshipData, setRelationshipData] = useState(null);
   const [stats, setStats] = useState({ posts_count: 0, friends_count: 0, photos_count: 0 });
   
   const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
 
   const fetchUserData = async () => {
     try {
-      const targetUserId = isOwnProfile ? currentUser.id : userId;
-      
-      const [userResponse, postsResponse, statsResponse] = await Promise.all([
-        userAPI.getUserById(targetUserId),
-        postAPI.getUserPosts(targetUserId),
-        userAPI.getUserStats(targetUserId)
-      ]);
-      
-      setProfileUser(userResponse.data);
-      if (!isOwnProfile) {
+      if (isOwnProfile) {
+        setProfileUser(currentUser);
+        const [postsResponse, statsResponse] = await Promise.all([
+          postAPI.getUserPosts(currentUser.id),
+          userAPI.getUserStats(currentUser.id)
+        ]);
+        setPosts(postsResponse.data);
+        setStats(statsResponse.data);
+      } else {
+        const [userResponse, postsResponse, statsResponse] = await Promise.all([
+          userAPI.getUserById(userId),
+          postAPI.getUserPosts(userId),
+          userAPI.getUserStats(userId)
+        ]);
+        setProfileUser(userResponse.data);
         setFriendshipStatus(userResponse.data.friendship_status);
+        setPosts(postsResponse.data);
+        setStats(statsResponse.data);
       }
-      setRelationshipStatus(userResponse.data.relationship_status);
-      setRelationshipData(userResponse.data.relationship);
-      setPosts(postsResponse.data);
-      setStats(statsResponse.data);
     } catch (error) {
       showAlert('Lỗi', 'Không thể tải thông tin người dùng', 'error');
     } finally {
@@ -126,67 +126,18 @@ const ProfileScreen = ({ route, navigation }) => {
     );
   };
 
-  const handleCancelRelationship = () => {
-    const partnerName = relationshipData?.partner_name || relationshipData?.partner_username;
-    showAlert(
-      'Hủy hẹn hò',
-      `Bạn có chắc muốn kết thúc mối quan hệ với ${partnerName}?`,
-      'warning',
-      [
-        { text: 'Không', style: 'cancel' },
-        {
-          text: 'Có',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await relationshipAPI.cancelRelationship({ partner_id: relationshipData.partner_id });
-              showAlert('Thành công', 'Đã kết thúc mối quan hệ', 'success');
-              setRelationshipStatus(null);
-              setRelationshipData(null);
-              fetchUserData();
-            } catch (error) {
-              showAlert('Lỗi', 'Không thể kết thúc mối quan hệ', 'error');
-            }
-          }
-        },
-      ]
-    );
-  };
-
-  const renderHeader = () => {
-    const isPro = profileUser?.is_pro;
-    
-    return (
+  const renderHeader = () => (
     <View style={styles.headerContainer}>
-      {/* Cover Photo - Pro vs Normal */}
+      {/* Cover Photo - Twitter Style */}
       <View style={styles.coverContainer}>
-        {isPro ? (
-          // Pro: Gradient Cover
-          profileUser?.cover_url ? (
-            <Image
-              source={{ uri: `${API_URL}/api/cover/${profileUser.id}?${Date.now()}` }}
-              style={styles.coverPhoto}
-              resizeMode="cover"
-            />
-          ) : (
-            <LinearGradient
-              colors={['#667eea', '#764ba2', '#f093fb']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.proCover}
-            />
-          )
+        {profileUser?.cover_url ? (
+          <Image
+            source={{ uri: `${API_URL}/api/cover/${profileUser.id}?${Date.now()}` }}
+            style={styles.coverPhoto}
+            resizeMode="cover"
+          />
         ) : (
-          // Normal: Plain Cover
-          profileUser?.cover_url ? (
-            <Image
-              source={{ uri: `${API_URL}/api/cover/${profileUser.id}?${Date.now()}` }}
-              style={styles.coverPhoto}
-              resizeMode="cover"
-            />
-          ) : (
-            <View style={styles.defaultCover} />
-          )
+          <View style={styles.defaultCover} />
         )}
       </View>
       
@@ -194,50 +145,21 @@ const ProfileScreen = ({ route, navigation }) => {
       <View style={styles.profileSection}>
         {/* Avatar - Overlap on cover */}
         <View style={styles.avatarRow}>
-          {isPro ? (
-            // Pro: Avatar with Gradient Border
-            <View style={styles.proAvatarWrapper}>
-              <LinearGradient
-                colors={['#667eea', '#764ba2', '#f093fb']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.proAvatarGradient}
-              >
-                <View style={styles.proAvatarInner}>
-                  {profileUser?.id ? (
-                    <Image
-                      source={{ uri: `${API_URL}/api/avatar/${profileUser.id}?${Date.now()}` }}
-                      style={styles.avatarImage}
-                      onError={() => console.log('Avatar load error')}
-                    />
-                  ) : (
-                    <Avatar.Text
-                      size={80}
-                      label={profileUser?.username?.[0]?.toUpperCase() || 'U'}
-                      style={styles.proAvatar}
-                    />
-                  )}
-                </View>
-              </LinearGradient>
-            </View>
-          ) : (
-            // Normal: Plain Avatar
-            <View style={styles.avatarContainer}>
-              {profileUser?.id ? (
-                <Image
-                  source={{ uri: `${API_URL}/api/avatar/${profileUser.id}?${Date.now()}` }}
-                  style={styles.avatarImage}
-                  onError={() => console.log('Avatar load error')}
-                />
-              ) : (
-                <Avatar.Text
-                  size={80}
-                  label={profileUser?.username?.[0]?.toUpperCase() || 'U'}
-                  style={styles.avatar}
-                />
-              )}
-            </View>
-          )}
+          <View style={styles.avatarContainer}>
+            {profileUser?.id ? (
+              <Image
+                source={{ uri: `${API_URL}/api/avatar/${profileUser.id}?${Date.now()}` }}
+                style={styles.avatarImage}
+                onError={() => console.log('Avatar load error')}
+              />
+            ) : (
+              <Avatar.Text
+                size={80}
+                label={profileUser?.username?.[0]?.toUpperCase() || 'U'}
+                style={styles.avatar}
+              />
+            )}
+          </View>
 
           {/* Action Buttons - Top Right (Twitter Style) */}
           <View style={styles.topActions}>
@@ -305,69 +227,21 @@ const ProfileScreen = ({ route, navigation }) => {
             <Text style={styles.bio}>{profileUser.bio}</Text>
           )}
 
-          {/* Relationship Status */}
-          {relationshipStatus === 'dating' && relationshipData && (
-            <TouchableOpacity 
-              style={styles.relationshipContainer}
-              onPress={handleCancelRelationship}
-            >
-              <MaterialCommunityIcons name="heart" size={16} color="#FF6B9D" />
-              <Text style={styles.relationshipText}>
-                Đang hẹn hò với <Text style={styles.partnerName}>{relationshipData.partner_name || relationshipData.partner_username}</Text>
-              </Text>
-              <MaterialCommunityIcons name="close-circle" size={16} color="#FF6B9D" />
+          {/* Stats - Twitter Style (Inline) */}
+          <View style={styles.statsRow}>
+            <TouchableOpacity style={styles.statItem}>
+              <Text style={styles.statNumber}>{stats.posts_count} </Text>
+              <Text style={styles.statLabel}>Bài viết</Text>
             </TouchableOpacity>
-          )}
-
-          {/* Stats - Pro vs Normal */}
-          {isPro ? (
-            // Pro: Gradient Stats Cards
-            <View style={styles.proStatsContainer}>
-              <LinearGradient
-                colors={['#667eea', '#764ba2']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.proStatCard}
-              >
-                <Text style={styles.proStatNumber}>{stats.posts_count}</Text>
-                <Text style={styles.proStatLabel}>Bài viết</Text>
-              </LinearGradient>
-              <LinearGradient
-                colors={['#f093fb', '#f5576c']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.proStatCard}
-              >
-                <Text style={styles.proStatNumber}>{stats.friends_count}</Text>
-                <Text style={styles.proStatLabel}>Bạn bè</Text>
-              </LinearGradient>
-              <LinearGradient
-                colors={['#4facfe', '#00f2fe']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.proStatCard}
-              >
-                <Text style={styles.proStatNumber}>{stats.photos_count}</Text>
-                <Text style={styles.proStatLabel}>Ảnh</Text>
-              </LinearGradient>
-            </View>
-          ) : (
-            // Normal: Plain Stats
-            <View style={styles.statsRow}>
-              <TouchableOpacity style={styles.statItem}>
-                <Text style={styles.statNumber}>{stats.posts_count} </Text>
-                <Text style={styles.statLabel}>Bài viết</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.statItem}>
-                <Text style={styles.statNumber}>{stats.friends_count} </Text>
-                <Text style={styles.statLabel}>Bạn bè</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.statItem}>
-                <Text style={styles.statNumber}>{stats.photos_count} </Text>
-                <Text style={styles.statLabel}>Ảnh</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+            <TouchableOpacity style={styles.statItem}>
+              <Text style={styles.statNumber}>{stats.friends_count} </Text>
+              <Text style={styles.statLabel}>Bạn bè</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.statItem}>
+              <Text style={styles.statNumber}>{stats.photos_count} </Text>
+              <Text style={styles.statLabel}>Ảnh</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -376,8 +250,7 @@ const ProfileScreen = ({ route, navigation }) => {
         <Text style={styles.postsTitle}>Bài viết</Text>
       </View>
     </View>
-    );
-  };
+  );
 
   const renderPost = ({ item }) => (
     <View style={styles.postContainer}>
@@ -498,27 +371,6 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#cfd9de',
   },
-  proCover: {
-    width: '100%',
-    height: '100%',
-  },
-  proAvatarWrapper: {
-    backgroundColor: '#ffffff',
-    borderRadius: 46,
-    padding: 2,
-  },
-  proAvatarGradient: {
-    borderRadius: 44,
-    padding: 4,
-  },
-  proAvatarInner: {
-    backgroundColor: '#ffffff',
-    borderRadius: 40,
-    padding: 0,
-  },
-  proAvatar: {
-    backgroundColor: '#667eea',
-  },
   profileSection: {
     paddingHorizontal: 16,
   },
@@ -635,26 +487,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginTop: 12,
   },
-  relationshipContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    backgroundColor: '#FFE5EE',
-    borderRadius: 20,
-    alignSelf: 'flex-start',
-  },
-  relationshipText: {
-    fontSize: 14,
-    color: '#FF6B9D',
-    fontWeight: '600',
-  },
-  partnerName: {
-    fontWeight: '700',
-    color: '#FF1493',
-  },
   statsRow: {
     flexDirection: 'row',
     gap: 20,
@@ -673,32 +505,6 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 15,
     color: '#536471',
-  },
-  proStatsContainer: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 16,
-    marginBottom: 16,
-  },
-  proStatCard: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 80,
-  },
-  proStatNumber: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#ffffff',
-    marginBottom: 4,
-  },
-  proStatLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#ffffff',
-    opacity: 0.9,
   },
   postsHeader: {
     borderTopWidth: 1,

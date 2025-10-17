@@ -2,7 +2,7 @@
   "expo": {
     "name": "Shatter",
     "slug": "social-media-mobile",
-    "version": "1.1.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -34,7 +34,7 @@
     "extra": {
       "apiUrl": "https://5c208f1b-55f0-400e-86d7-1ca2009b154f-00-2k5xv9y8izfbn.sisko.replit.dev",
       "eas": {
-        "projectId": ""
+        "projectId": "286d0a06-c3e6-4971-b2dd-445814a7b318"
       }
     },
     "plugins": [

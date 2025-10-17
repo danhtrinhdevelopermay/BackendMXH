@@ -10,7 +10,6 @@ import { AuthContext } from '../context/AuthContext';
 import UserAvatar from '../components/UserAvatar';
 import SocketService from '../services/SocketService';
 import { useAlert } from '../context/AlertContext';
-import RelationshipInvitation from '../components/RelationshipInvitation';
 
 const ChatScreen = ({ route, navigation }) => {
   const { userId, userName, userAvatar } = route.params;
@@ -247,24 +246,6 @@ const ChatScreen = ({ route, navigation }) => {
     const isMyMessage = item.sender_id === user.id;
     const showTime = index === 0 || messages[index - 1]?.sender_id !== item.sender_id;
     const showDateSep = shouldShowDateSeparator(index);
-    
-    if (item.message_type === 'love_invitation' && !isMyMessage) {
-      return (
-        <View>
-          <RelationshipInvitation 
-            senderId={item.sender_id} 
-            onResponse={fetchMessages}
-          />
-          {showDateSep && (
-            <View style={styles.dateSeparator}>
-              <View style={styles.dateLine} />
-              <Text style={styles.dateText}>{formatDate(item.created_at)}</Text>
-              <View style={styles.dateLine} />
-            </View>
-          )}
-        </View>
-      );
-    }
     
     return (
       <View>

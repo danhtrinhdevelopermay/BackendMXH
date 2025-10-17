@@ -171,11 +171,4 @@ export const uploadAPI = {
   },
 };
 
-export const relationshipAPI = {
-  acceptRelationship: (data) => api.post('/relationships/accept', data),
-  rejectRelationship: (data) => api.post('/relationships/reject', data),
-  cancelRelationship: (data) => api.post('/relationships/cancel', data),
-  getRelationshipStatus: (userId) => api.get(`/relationships/status/${userId}`),
-};
-
 export default api;
