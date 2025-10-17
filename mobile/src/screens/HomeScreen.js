@@ -28,6 +28,7 @@ const HomeScreen = ({ navigation }) => {
   const [visibleItems, setVisibleItems] = useState([]);
   const [reactionsModalVisible, setReactionsModalVisible] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState(null);
+  const [mediaErrors, setMediaErrors] = useState({});
   const videoRefs = useRef({});
 
   const fetchPosts = async () => {
@@ -274,11 +275,25 @@ const HomeScreen = ({ navigation }) => {
 
         {item.content && <Text style={styles.postContent}>{item.content}</Text>}
         
-        {item.media_type && (() => {
+        {item.media_type && item.media_url && (() => {
           const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
-          const mediaUrl = item.media_url || `${API_URL}/api/media/${item.id}`;
+          const mediaUrl = item.media_url.startsWith('http') ? item.media_url : `${API_URL}${item.media_url}`;
           const isVideo = item.media_type?.startsWith('video/');
           const isVisible = visibleItems.includes(item.id);
+          const hasError = mediaErrors[item.id];
+          
+          const handleMediaError = () => {
+            setMediaErrors(prev => ({ ...prev, [item.id]: true }));
+          };
+          
+          if (hasError) {
+            return (
+              <View style={styles.mediaErrorContainer}>
+                <Ionicons name="image-outline" size={48} color="#d1d5db" />
+                <Text style={styles.mediaErrorText}>Không thể tải media</Text>
+              </View>
+            );
+          }
           
           return (
             <View style={styles.mediaContainer}>
@@ -299,13 +314,17 @@ const HomeScreen = ({ navigation }) => {
                     shouldPlay={isVisible}
                     isLooping
                     isMuted={false}
-                    onError={(error) => console.log('Video error:', error)}
+                    onError={(error) => {
+                      console.log('Video error:', error);
+                      handleMediaError();
+                    }}
                   />
                 </TouchableOpacity>
               ) : (
                 <Card.Cover 
                   source={{ uri: mediaUrl }} 
                   style={styles.postMedia}
+                  onError={handleMediaError}
                 />
               )}
             </View>
@@ -574,6 +593,19 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 300,
     backgroundColor: '#f3f4f6',
+  },
+  mediaErrorContainer: {
+    width: '100%',
+    height: 200,
+    backgroundColor: '#f9fafb',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  mediaErrorText: {
+    fontSize: 14,
+    color: '#9ca3af',
+    marginTop: 12,
   },
   statsContainer: {
     flexDirection: 'row',
