@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { View, FlatList, StyleSheet, TouchableOpacity, RefreshControl, ScrollView, useWindowDimensions } from 'react-native';
 import { Button, Text, IconButton, Searchbar } from 'react-native-paper';
 import { friendshipAPI } from '../api/api';
 import { useAlert } from '../context/AlertContext';
@@ -8,6 +8,13 @@ import VerifiedBadge from '../components/VerifiedBadge';
 
 const FriendsScreen = () => {
   const { showAlert } = useAlert();
+  const { width: screenWidth } = useWindowDimensions();
+  
+  const CARD_MARGIN = 4;
+  const CONTAINER_PADDING = 8;
+  const cardWidth = useMemo(() => {
+    return (screenWidth - (CONTAINER_PADDING * 2) - (CARD_MARGIN * 4)) / 2;
+  }, [screenWidth]);
   const [friends, setFriends] = useState([]);
   const [requests, setRequests] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
@@ -111,7 +118,7 @@ const FriendsScreen = () => {
   );
 
   const renderRequest = ({ item }) => (
-    <View style={styles.requestCard}>
+    <View style={[styles.requestCard, { width: cardWidth }]}>
       <View style={styles.requestTop}>
         <UserAvatar 
           user={item}
@@ -160,7 +167,7 @@ const FriendsScreen = () => {
   );
 
   const renderSuggestion = ({ item }) => (
-    <View style={styles.suggestionCard}>
+    <View style={[styles.suggestionCard, { width: cardWidth }]}>
       <View style={styles.suggestionTop}>
         <UserAvatar 
           user={item}
@@ -514,7 +521,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     margin: 4,
     borderRadius: 8,
-    width: '48%',
     borderWidth: 1,
     borderColor: '#e4e6eb',
     padding: 12,
@@ -597,7 +603,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     margin: 4,
     borderRadius: 8,
-    width: '48%',
     borderWidth: 1,
     borderColor: '#e4e6eb',
     padding: 12,
