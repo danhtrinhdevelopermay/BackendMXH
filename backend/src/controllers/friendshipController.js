@@ -152,4 +152,66 @@ const searchUsers = async (req, res) => {
   }
 };
 
-module.exports = { sendFriendRequest, respondToFriendRequest, getFriends, getFriendRequests, searchUsers };
+const getSuggestedFriends = async (req, res) => {
+  const user_id = req.user.id;
+
+  try {
+    const result = await pool.query(
+      `WITH user_friends AS (
+        SELECT CASE 
+          WHEN requester_id = $1 THEN addressee_id 
+          ELSE requester_id 
+        END AS friend_id
+        FROM friendships
+        WHERE (requester_id = $1 OR addressee_id = $1) AND status = 'accepted'
+      ),
+      pending_requests AS (
+        SELECT CASE 
+          WHEN requester_id = $1 THEN addressee_id 
+          ELSE requester_id 
+        END AS user_id
+        FROM friendships
+        WHERE (requester_id = $1 OR addressee_id = $1) AND status = 'pending'
+      ),
+      mutual_counts AS (
+        SELECT 
+          u.id,
+          u.username,
+          u.full_name,
+          u.avatar_url,
+          u.bio,
+          u.is_verified,
+          COUNT(DISTINCT uf2.friend_id) AS mutual_friends_count
+        FROM users u
+        LEFT JOIN friendships f ON (f.requester_id = u.id OR f.addressee_id = u.id)
+        LEFT JOIN user_friends uf2 ON (
+          (f.requester_id = uf2.friend_id AND f.addressee_id = u.id) OR
+          (f.addressee_id = uf2.friend_id AND f.requester_id = u.id)
+        ) AND f.status = 'accepted'
+        WHERE u.id != $1
+        AND u.id NOT IN (SELECT friend_id FROM user_friends)
+        AND u.id NOT IN (SELECT user_id FROM pending_requests)
+        GROUP BY u.id, u.username, u.full_name, u.avatar_url, u.bio, u.is_verified
+      )
+      SELECT 
+        id,
+        username,
+        full_name,
+        avatar_url,
+        bio,
+        is_verified,
+        mutual_friends_count
+      FROM mutual_counts
+      ORDER BY mutual_friends_count DESC, RANDOM()
+      LIMIT 20`,
+      [user_id]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Get suggested friends error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+module.exports = { sendFriendRequest, respondToFriendRequest, getFriends, getFriendRequests, searchUsers, getSuggestedFriends };

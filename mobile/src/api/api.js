@@ -87,6 +87,7 @@ export const friendshipAPI = {
   respondToFriendRequest: (requestId, data) => api.put(`/friendships/request/${requestId}`, data),
   getFriends: () => api.get('/friendships/friends'),
   getFriendRequests: () => api.get('/friendships/requests'),
+  getSuggestedFriends: () => api.get('/friendships/suggestions'),
   searchUsers: (query) => api.get('/friendships/search', { params: { query } }),
 };
 

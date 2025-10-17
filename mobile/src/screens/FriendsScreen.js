@@ -10,9 +10,11 @@ const FriendsScreen = () => {
   const { showAlert } = useAlert();
   const [friends, setFriends] = useState([]);
   const [requests, setRequests] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
   const [activeTab, setActiveTab] = useState('suggestions');
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sentRequests, setSentRequests] = useState(new Set());
 
   const fetchFriends = async () => {
     try {
@@ -32,14 +34,24 @@ const FriendsScreen = () => {
     }
   };
 
+  const fetchSuggestions = async () => {
+    try {
+      const response = await friendshipAPI.getSuggestedFriends();
+      setSuggestions(response.data);
+    } catch (error) {
+      showAlert('Lỗi', 'Không thể tải gợi ý kết bạn', 'error');
+    }
+  };
+
   useEffect(() => {
     fetchFriends();
     fetchRequests();
+    fetchSuggestions();
   }, []);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([fetchFriends(), fetchRequests()]);
+    await Promise.all([fetchFriends(), fetchRequests(), fetchSuggestions()]);
     setRefreshing(false);
   };
 
@@ -52,6 +64,21 @@ const FriendsScreen = () => {
     } catch (error) {
       showAlert('Lỗi', 'Không thể phản hồi yêu cầu', 'error');
     }
+  };
+
+  const handleSendFriendRequest = async (userId) => {
+    try {
+      await friendshipAPI.sendFriendRequest({ addressee_id: userId });
+      setSentRequests(prev => new Set([...prev, userId]));
+      showAlert('Thành công', 'Đã gửi lời mời kết bạn', 'success');
+      fetchSuggestions();
+    } catch (error) {
+      showAlert('Lỗi', 'Không thể gửi lời mời kết bạn', 'error');
+    }
+  };
+
+  const handleRemoveSuggestion = (userId) => {
+    setSuggestions(prev => prev.filter(item => item.id !== userId));
   };
 
   const renderFriend = ({ item }) => (
@@ -132,18 +159,94 @@ const FriendsScreen = () => {
     </View>
   );
 
-  const renderSuggestions = () => (
-    <View style={styles.suggestionsContainer}>
-      <View style={styles.emptyContainer}>
-        <IconButton
-          icon="account-multiple-outline"
-          size={64}
-          iconColor="#bcc0c4"
+  const renderSuggestion = ({ item }) => (
+    <View style={styles.suggestionCard}>
+      <View style={styles.suggestionTop}>
+        <UserAvatar 
+          user={item}
+          size={80}
         />
-        <Text style={styles.emptyText}>Gợi ý kết bạn</Text>
-        <Text style={styles.emptySubText}>Chức năng đang phát triển</Text>
+        <IconButton
+          icon="close"
+          size={20}
+          iconColor="#65676b"
+          onPress={() => handleRemoveSuggestion(item.id)}
+          style={styles.closeButton}
+        />
+      </View>
+      <View style={styles.suggestionInfo}>
+        <View style={styles.nameContainer}>
+          <Text style={styles.suggestionName} numberOfLines={1}>
+            {item.full_name || item.username}
+          </Text>
+          <VerifiedBadge isVerified={item.is_verified} size={16} />
+        </View>
+        {item.mutual_friends_count > 0 && (
+          <Text style={styles.mutualText} numberOfLines={1}>
+            {item.mutual_friends_count} bạn chung
+          </Text>
+        )}
+      </View>
+      <View style={styles.suggestionButtons}>
+        <Button 
+          mode="contained" 
+          onPress={() => handleSendFriendRequest(item.id)}
+          style={styles.addFriendButton}
+          buttonColor="#1877f2"
+          labelStyle={styles.buttonLabel}
+          disabled={sentRequests.has(item.id)}
+        >
+          {sentRequests.has(item.id) ? 'Đã gửi' : 'Thêm bạn bè'}
+        </Button>
+        <Button 
+          mode="outlined" 
+          onPress={() => handleRemoveSuggestion(item.id)}
+          style={styles.removeButton}
+          textColor="#050505"
+          labelStyle={styles.buttonLabel}
+        >
+          Gỡ
+        </Button>
       </View>
     </View>
+  );
+
+  const renderSuggestions = () => (
+    <ScrollView
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={['#1877f2']}
+          tintColor="#1877f2"
+        />
+      }
+      contentContainerStyle={suggestions.length === 0 ? styles.emptyList : styles.suggestionsContent}
+    >
+      {suggestions.length > 0 ? (
+        <>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Những người bạn có thể biết</Text>
+          </View>
+          <View style={styles.suggestionsGrid}>
+            {suggestions.map((item) => (
+              <View key={item.id?.toString()}>
+                {renderSuggestion({ item })}
+              </View>
+            ))}
+          </View>
+        </>
+      ) : (
+        <View style={styles.emptyContainer}>
+          <IconButton
+            icon="account-multiple-outline"
+            size={64}
+            iconColor="#bcc0c4"
+          />
+          <Text style={styles.emptyText}>Không có gợi ý kết bạn</Text>
+        </View>
+      )}
+    </ScrollView>
   );
 
   const renderAllFriends = () => (
@@ -480,6 +583,56 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#8a8d91',
     marginTop: 4,
+  },
+  suggestionsContent: {
+    paddingBottom: 16,
+  },
+  suggestionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 8,
+    backgroundColor: '#fff',
+  },
+  suggestionCard: {
+    backgroundColor: '#fff',
+    margin: 4,
+    borderRadius: 8,
+    width: '48%',
+    borderWidth: 1,
+    borderColor: '#e4e6eb',
+    padding: 12,
+  },
+  suggestionTop: {
+    position: 'relative',
+    alignItems: 'center',
+  },
+  suggestionInfo: {
+    marginTop: 8,
+    alignItems: 'center',
+  },
+  suggestionName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#050505',
+    textAlign: 'center',
+  },
+  mutualText: {
+    fontSize: 13,
+    color: '#65676b',
+    marginTop: 2,
+    textAlign: 'center',
+  },
+  suggestionButtons: {
+    marginTop: 12,
+    gap: 8,
+  },
+  addFriendButton: {
+    borderRadius: 6,
+  },
+  removeButton: {
+    borderRadius: 6,
+    borderColor: '#ccd0d5',
+    backgroundColor: '#e4e6eb',
   },
 });
 
