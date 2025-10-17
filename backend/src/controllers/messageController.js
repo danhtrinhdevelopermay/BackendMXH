@@ -74,12 +74,10 @@ const getMessages = async (req, res) => {
     const result = await pool.query(
       `SELECT m.*, 
        sender.username as sender_username, sender.avatar_url as sender_avatar,
-       receiver.username as receiver_username, receiver.avatar_url as receiver_avatar,
-       mr.reaction_type as reaction
+       receiver.username as receiver_username, receiver.avatar_url as receiver_avatar
        FROM messages m
        JOIN users sender ON m.sender_id = sender.id
        JOIN users receiver ON m.receiver_id = receiver.id
-       LEFT JOIN message_reactions mr ON m.id = mr.message_id
        WHERE (sender_id = $1 AND receiver_id = $2) OR (sender_id = $2 AND receiver_id = $1)
        ORDER BY created_at ASC`,
       [current_user_id, userId]
