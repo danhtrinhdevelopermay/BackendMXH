@@ -30,7 +30,7 @@ class SocketService {
 
       this.socket.on('connect_error', (error) => {
         if (error.message !== 'websocket error') {
-          console.error('Socket connection error:', error);
+          console.log('⚠️ Socket connection issue:', error.message || 'Unknown error');
         }
       });
 
