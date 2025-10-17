@@ -19,6 +19,9 @@ const PostDetailScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [menuVisible, setMenuVisible] = useState(false);
   const [reactionMenuVisible, setReactionMenuVisible] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -197,22 +200,53 @@ const PostDetailScreen = ({ route, navigation }) => {
         {post.media_type && (
           <View style={styles.mediaContainer}>
             {isVideo ? (
-              <Video
-                ref={videoRef}
-                source={{ uri: mediaUrl }}
-                style={styles.postMedia}
-                useNativeControls
-                resizeMode="contain"
-                isLooping
-                shouldPlay={true}
-                onLoad={handleVideoLoad}
-                onError={(error) => console.log('Video error:', error)}
-              />
+              <>
+                {!videoError ? (
+                  <Video
+                    ref={videoRef}
+                    source={{ uri: mediaUrl }}
+                    style={styles.postMedia}
+                    useNativeControls
+                    resizeMode="contain"
+                    isLooping
+                    shouldPlay={true}
+                    onLoad={handleVideoLoad}
+                    onError={(error) => {
+                      console.log('Video error:', error);
+                      setVideoError(true);
+                    }}
+                  />
+                ) : (
+                  <View style={[styles.postMedia, styles.errorContainer]}>
+                    <Ionicons name="videocam-off" size={48} color="#8e8e93" />
+                    <Text style={styles.errorText}>Không thể tải video</Text>
+                  </View>
+                )}
+              </>
             ) : (
-              <Card.Cover 
-                source={{ uri: mediaUrl }} 
-                style={styles.postMedia}
-              />
+              <>
+                {imageLoading && !imageError && (
+                  <View style={[styles.postMedia, styles.loadingContainer]}>
+                    <ActivityIndicator size="large" color="#667eea" />
+                  </View>
+                )}
+                {!imageError ? (
+                  <Card.Cover 
+                    source={{ uri: mediaUrl }} 
+                    style={[styles.postMedia, imageLoading && { display: 'none' }]}
+                    onLoad={() => setImageLoading(false)}
+                    onError={() => {
+                      setImageLoading(false);
+                      setImageError(true);
+                    }}
+                  />
+                ) : (
+                  <View style={[styles.postMedia, styles.errorContainer]}>
+                    <Ionicons name="image-off" size={48} color="#8e8e93" />
+                    <Text style={styles.errorText}>Không thể tải ảnh</Text>
+                  </View>
+                )}
+              </>
             )}
           </View>
         )}
@@ -376,6 +410,20 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 400,
     backgroundColor: '#000',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+  },
+  errorText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#8e8e93',
   },
   statsContainer: {
     flexDirection: 'row',
