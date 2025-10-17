@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, FlatList, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { Card, Avatar, Button, Text, Divider, IconButton } from 'react-native-paper';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect } from '@react-navigation/native';
 import { Video } from 'expo-av';
 import { AuthContext } from '../context/AuthContext';
@@ -10,7 +9,7 @@ import { postAPI, userAPI, friendshipAPI, messageAPI } from '../api/api';
 import Constants from 'expo-constants';
 import UserAvatar from '../components/UserAvatar';
 import VerifiedBadge from '../components/VerifiedBadge';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 
 const ProfileScreen = ({ route, navigation }) => {
   const { user: currentUser, logout } = useContext(AuthContext);
@@ -129,6 +128,7 @@ const ProfileScreen = ({ route, navigation }) => {
 
   const renderHeader = () => (
     <View style={styles.headerContainer}>
+      {/* Cover Photo - Twitter Style */}
       <View style={styles.coverContainer}>
         {profileUser?.cover_url ? (
           <Image
@@ -137,174 +137,123 @@ const ProfileScreen = ({ route, navigation }) => {
             resizeMode="cover"
           />
         ) : (
-          <LinearGradient
-            colors={['#667eea', '#764ba2']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.coverPhoto}
-          />
+          <View style={styles.defaultCover} />
         )}
-        <LinearGradient
-          colors={['transparent', 'rgba(102, 126, 234, 0.2)', 'rgba(118, 75, 162, 0.3)']}
-          style={styles.coverGradient}
-        />
       </View>
       
+      {/* Profile Info Section */}
       <View style={styles.profileSection}>
-        <View style={styles.avatarContainer}>
-          {profileUser?.id ? (
-            <View style={styles.avatarWrapper}>
+        {/* Avatar - Overlap on cover */}
+        <View style={styles.avatarRow}>
+          <View style={styles.avatarContainer}>
+            {profileUser?.id ? (
               <Image
                 source={{ uri: `${API_URL}/api/avatar/${profileUser.id}?${Date.now()}` }}
                 style={styles.avatarImage}
                 onError={() => console.log('Avatar load error')}
               />
-              <View style={styles.avatarBorder} />
-            </View>
-          ) : (
-            <View style={styles.avatarWrapper}>
+            ) : (
               <Avatar.Text
-                size={130}
+                size={80}
                 label={profileUser?.username?.[0]?.toUpperCase() || 'U'}
                 style={styles.avatar}
               />
-              <View style={styles.avatarBorder} />
-            </View>
-          )}
+            )}
+          </View>
+
+          {/* Action Buttons - Top Right (Twitter Style) */}
+          <View style={styles.topActions}>
+            {isOwnProfile ? (
+              <>
+                <TouchableOpacity 
+                  style={styles.iconButton}
+                  onPress={handleLogout}
+                >
+                  <Ionicons name="log-out-outline" size={20} color="#0f1419" />
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.editButton}
+                  onPress={() => navigation.navigate('EditProfile')}
+                >
+                  <Text style={styles.editButtonText}>Chỉnh sửa</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <TouchableOpacity 
+                  style={styles.iconButton}
+                  onPress={handleMessage}
+                >
+                  <Ionicons name="mail-outline" size={20} color="#0f1419" />
+                </TouchableOpacity>
+                {friendshipStatus === 'friends' ? (
+                  <TouchableOpacity style={styles.followingButton}>
+                    <Ionicons name="checkmark" size={16} color="#0f1419" />
+                    <Text style={styles.followingButtonText}>Bạn bè</Text>
+                  </TouchableOpacity>
+                ) : friendshipStatus === 'request_sent' ? (
+                  <TouchableOpacity style={styles.pendingButton}>
+                    <Text style={styles.pendingButtonText}>Đã gửi</Text>
+                  </TouchableOpacity>
+                ) : friendshipStatus === 'request_received' ? (
+                  <TouchableOpacity 
+                    style={styles.followButton}
+                    onPress={handleRespondRequest}
+                  >
+                    <Text style={styles.followButtonText}>Phản hồi</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity 
+                    style={styles.followButton}
+                    onPress={handleAddFriend}
+                  >
+                    <Text style={styles.followButtonText}>Kết bạn</Text>
+                  </TouchableOpacity>
+                )}
+              </>
+            )}
+          </View>
         </View>
-        
-        <View style={styles.profileInfo}>
-          <View style={styles.nameContainer}>
-            <Text style={styles.name}>{profileUser?.full_name || profileUser?.username}</Text>
-            <VerifiedBadge isVerified={profileUser?.is_verified} size={20} />
+
+        {/* User Info */}
+        <View style={styles.userInfo}>
+          <View style={styles.nameRow}>
+            <Text style={styles.displayName}>{profileUser?.full_name || profileUser?.username}</Text>
+            <VerifiedBadge isVerified={profileUser?.is_verified} size={18} />
           </View>
           <Text style={styles.username}>@{profileUser?.username}</Text>
+          
           {profileUser?.bio && (
-            <View style={styles.bioContainer}>
-              <Text style={styles.bio}>{profileUser.bio}</Text>
-            </View>
+            <Text style={styles.bio}>{profileUser.bio}</Text>
           )}
-        </View>
 
-        <View style={styles.statsContainer}>
-          <TouchableOpacity style={styles.statItem}>
-            <View style={styles.statIconContainer}>
-              <MaterialCommunityIcons name="post-outline" size={20} color="#1877f2" />
-            </View>
-            <Text style={styles.statNumber}>{stats.posts_count}</Text>
-            <Text style={styles.statLabel}>Bài viết</Text>
-          </TouchableOpacity>
-          
-          <View style={styles.statDivider} />
-          
-          <TouchableOpacity style={styles.statItem}>
-            <View style={styles.statIconContainer}>
-              <MaterialCommunityIcons name="account-group" size={20} color="#1877f2" />
-            </View>
-            <Text style={styles.statNumber}>{stats.friends_count}</Text>
-            <Text style={styles.statLabel}>Bạn bè</Text>
-          </TouchableOpacity>
-          
-          <View style={styles.statDivider} />
-          
-          <TouchableOpacity style={styles.statItem}>
-            <View style={styles.statIconContainer}>
-              <MaterialCommunityIcons name="image-multiple" size={20} color="#1877f2" />
-            </View>
-            <Text style={styles.statNumber}>{stats.photos_count}</Text>
-            <Text style={styles.statLabel}>Ảnh</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.actionButtons}>
-          {isOwnProfile ? (
-            <>
-              <TouchableOpacity 
-                style={styles.primaryButton}
-                onPress={() => navigation.navigate('EditProfile')}
-              >
-                <LinearGradient
-                  colors={['#667eea', '#764ba2']}
-                  start={{x: 0, y: 0}}
-                  end={{x: 1, y: 0}}
-                  style={styles.gradientButton}
-                >
-                  <MaterialCommunityIcons name="pencil" size={18} color="#fff" />
-                  <Text style={styles.primaryButtonText}>Chỉnh sửa hồ sơ</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.secondaryButton}
-                onPress={handleLogout}
-              >
-                <MaterialCommunityIcons name="logout" size={18} color="#65676b" />
-                <Text style={styles.secondaryButtonText}>Đăng xuất</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <>
-              {friendshipStatus === 'friends' ? (
-                <TouchableOpacity style={styles.friendButton}>
-                  <MaterialCommunityIcons name="check-circle" size={18} color="#42b72a" />
-                  <Text style={styles.friendButtonText}>Bạn bè</Text>
-                </TouchableOpacity>
-              ) : friendshipStatus === 'request_sent' ? (
-                <TouchableOpacity style={styles.requestSentButton}>
-                  <MaterialCommunityIcons name="clock-outline" size={18} color="#65676b" />
-                  <Text style={styles.requestSentButtonText}>Đã gửi lời mời</Text>
-                </TouchableOpacity>
-              ) : friendshipStatus === 'request_received' ? (
-                <TouchableOpacity 
-                  style={styles.primaryButton}
-                  onPress={handleRespondRequest}
-                >
-                  <LinearGradient
-                    colors={['#1877f2', '#0c63d4']}
-                    start={{x: 0, y: 0}}
-                    end={{x: 1, y: 0}}
-                    style={styles.gradientButton}
-                  >
-                    <MaterialCommunityIcons name="account-check" size={18} color="#fff" />
-                    <Text style={styles.primaryButtonText}>Phản hồi</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity 
-                  style={styles.primaryButton}
-                  onPress={handleAddFriend}
-                >
-                  <LinearGradient
-                    colors={['#1877f2', '#0c63d4']}
-                    start={{x: 0, y: 0}}
-                    end={{x: 1, y: 0}}
-                    style={styles.gradientButton}
-                  >
-                    <MaterialCommunityIcons name="account-plus" size={18} color="#fff" />
-                    <Text style={styles.primaryButtonText}>Thêm bạn bè</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              )}
-              <TouchableOpacity 
-                style={styles.secondaryButton}
-                onPress={handleMessage}
-              >
-                <MaterialCommunityIcons name="message-text" size={18} color="#1877f2" />
-                <Text style={styles.messageButtonText}>Nhắn tin</Text>
-              </TouchableOpacity>
-            </>
-          )}
+          {/* Stats - Twitter Style (Inline) */}
+          <View style={styles.statsRow}>
+            <TouchableOpacity style={styles.statItem}>
+              <Text style={styles.statNumber}>{stats.posts_count} </Text>
+              <Text style={styles.statLabel}>Bài viết</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.statItem}>
+              <Text style={styles.statNumber}>{stats.friends_count} </Text>
+              <Text style={styles.statLabel}>Bạn bè</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.statItem}>
+              <Text style={styles.statNumber}>{stats.photos_count} </Text>
+              <Text style={styles.statLabel}>Ảnh</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
+      {/* Posts Header */}
       <View style={styles.postsHeader}>
-        <MaterialCommunityIcons name="grid" size={20} color="#050505" />
         <Text style={styles.postsTitle}>Bài viết</Text>
       </View>
     </View>
   );
 
   const renderPost = ({ item }) => (
-    <Card style={styles.postCard} elevation={0}>
+    <View style={styles.postContainer}>
       <View style={styles.postHeader}>
         <TouchableOpacity 
           style={styles.postHeaderLeft}
@@ -312,20 +261,21 @@ const ProfileScreen = ({ route, navigation }) => {
         >
           <UserAvatar 
             user={profileUser}
-            size={40}
+            size={48}
             style={styles.postAvatar}
           />
           <View style={styles.postHeaderInfo}>
-            <View style={styles.postAuthorNameContainer}>
+            <View style={styles.postAuthorRow}>
               <Text style={styles.postAuthorName}>{profileUser?.full_name || profileUser?.username}</Text>
-              <VerifiedBadge isVerified={profileUser?.is_verified} size={14} />
+              <VerifiedBadge isVerified={profileUser?.is_verified} size={16} />
             </View>
-            <Text style={styles.postTime}>{new Date(item.created_at).toLocaleDateString()}</Text>
+            <Text style={styles.postUsername}>@{profileUser?.username} · {new Date(item.created_at).toLocaleDateString()}</Text>
           </View>
         </TouchableOpacity>
       </View>
       
       {item.content && <Text style={styles.postContent}>{item.content}</Text>}
+      
       {item.media_type && (() => {
         const mediaUrl = item.media_url || `${API_URL}/api/media/${item.id}`;
         const isVideo = item.media_type?.startsWith('video/');
@@ -339,7 +289,7 @@ const ProfileScreen = ({ route, navigation }) => {
               >
                 <Video
                   source={{ uri: mediaUrl }}
-                  style={styles.postImage}
+                  style={styles.postMedia}
                   resizeMode="cover"
                   shouldPlay={false}
                   isLooping
@@ -352,9 +302,10 @@ const ProfileScreen = ({ route, navigation }) => {
                 activeOpacity={1}
                 onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
               >
-                <Card.Cover 
+                <Image 
                   source={{ uri: mediaUrl }} 
-                  style={styles.postImage}
+                  style={styles.postMedia}
+                  resizeMode="cover"
                 />
               </TouchableOpacity>
             )}
@@ -362,17 +313,19 @@ const ProfileScreen = ({ route, navigation }) => {
         );
       })()}
       
-      <View style={styles.postStats}>
-        <View style={styles.postStatItem}>
-          <MaterialCommunityIcons name="heart" size={16} color="#f02849" />
-          <Text style={styles.statText}>{item.reaction_count || 0}</Text>
+      <View style={styles.postActions}>
+        <View style={styles.actionItem}>
+          <Ionicons name="heart-outline" size={18} color="#536471" />
+          <Text style={styles.actionText}>{item.reaction_count || 0}</Text>
         </View>
-        <View style={styles.postStatItem}>
-          <MaterialCommunityIcons name="comment" size={16} color="#65676b" />
-          <Text style={styles.statText}>{item.comment_count || 0}</Text>
+        <View style={styles.actionItem}>
+          <Ionicons name="chatbubble-outline" size={18} color="#536471" />
+          <Text style={styles.actionText}>{item.comment_count || 0}</Text>
         </View>
       </View>
-    </Card>
+
+      <View style={styles.postDivider} />
+    </View>
   );
 
   return (
@@ -383,7 +336,7 @@ const ProfileScreen = ({ route, navigation }) => {
       ListHeaderComponent={renderHeader}
       ListEmptyComponent={
         <View style={styles.emptyContainer}>
-          <MaterialCommunityIcons name="post-outline" size={64} color="#ccd0d5" />
+          <Ionicons name="document-text-outline" size={64} color="#cfd9de" />
           <Text style={styles.emptyText}>Chưa có bài viết nào</Text>
         </View>
       }
@@ -397,295 +350,260 @@ const ProfileScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   list: {
     flex: 1,
-    backgroundColor: '#f0f2f5',
+    backgroundColor: '#ffffff',
   },
   container: {
     flexGrow: 1,
   },
   headerContainer: {
-    backgroundColor: '#fff',
-    marginBottom: 8,
+    backgroundColor: '#ffffff',
   },
   coverContainer: {
-    height: 220,
-    backgroundColor: '#1877f2',
-    position: 'relative',
+    height: 200,
+    backgroundColor: '#cfd9de',
   },
   coverPhoto: {
     width: '100%',
     height: '100%',
   },
-  coverGradient: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 80,
+  defaultCover: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#cfd9de',
   },
   profileSection: {
     paddingHorizontal: 16,
-    paddingBottom: 20,
+  },
+  avatarRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginTop: -40,
   },
   avatarContainer: {
-    alignItems: 'center',
-    marginTop: -70,
-  },
-  avatarWrapper: {
-    position: 'relative',
-  },
-  avatar: {
-    backgroundColor: '#1877f2',
+    backgroundColor: '#ffffff',
+    borderRadius: 40,
+    padding: 4,
   },
   avatarImage: {
-    width: 130,
-    height: 130,
-    borderRadius: 65,
-    borderWidth: 5,
-    borderColor: '#fff',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
   },
-  avatarBorder: {
-    position: 'absolute',
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    borderWidth: 2,
-    borderColor: '#e4e6eb',
-    top: -5,
-    left: -5,
+  avatar: {
+    backgroundColor: '#1d9bf0',
   },
-  profileInfo: {
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  nameContainer: {
+  topActions: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
+    marginTop: 12,
   },
-  name: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#050505',
-    letterSpacing: 0.3,
+  iconButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#cfd9de',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ffffff',
+  },
+  editButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#cfd9de',
+    backgroundColor: '#ffffff',
+  },
+  editButtonText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#0f1419',
+  },
+  followButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#0f1419',
+  },
+  followButtonText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#ffffff',
+  },
+  followingButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#cfd9de',
+    backgroundColor: '#ffffff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  followingButtonText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#0f1419',
+  },
+  pendingButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#cfd9de',
+    backgroundColor: '#ffffff',
+  },
+  pendingButtonText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#536471',
+  },
+  userInfo: {
+    marginTop: 12,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  displayName: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#0f1419',
+    letterSpacing: -0.3,
   },
   username: {
     fontSize: 15,
-    color: '#65676b',
-    marginTop: 4,
-    fontWeight: '500',
-  },
-  bioContainer: {
-    marginTop: 12,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    backgroundColor: '#f0f2f5',
-    borderRadius: 12,
+    color: '#536471',
+    marginTop: 2,
   },
   bio: {
     fontSize: 15,
-    color: '#050505',
-    textAlign: 'center',
-    lineHeight: 22,
+    color: '#0f1419',
+    lineHeight: 20,
+    marginTop: 12,
   },
-  statsContainer: {
+  statsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 24,
-    marginBottom: 20,
-    paddingVertical: 16,
-    backgroundColor: '#f8f9fa',
-    borderRadius: 16,
+    gap: 20,
+    marginTop: 12,
+    marginBottom: 16,
   },
   statItem: {
+    flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
-  },
-  statIconContainer: {
-    marginBottom: 8,
-  },
-  statDivider: {
-    width: 1,
-    height: '80%',
-    backgroundColor: '#e4e6eb',
-    alignSelf: 'center',
   },
   statNumber: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#050505',
-    marginTop: 4,
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#0f1419',
   },
   statLabel: {
-    fontSize: 13,
-    color: '#65676b',
-    marginTop: 4,
-    fontWeight: '500',
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  primaryButton: {
-    flex: 1,
-    borderRadius: 12,
-    overflow: 'hidden',
-    elevation: 2,
-    shadowColor: '#1877f2',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
-  gradientButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    gap: 8,
-  },
-  primaryButtonText: {
-    color: '#fff',
     fontSize: 15,
-    fontWeight: '600',
-  },
-  secondaryButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: '#f0f2f5',
-    gap: 8,
-  },
-  secondaryButtonText: {
-    color: '#65676b',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  messageButtonText: {
-    color: '#1877f2',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  friendButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: '#e7f3ff',
-    gap: 8,
-  },
-  friendButtonText: {
-    color: '#42b72a',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  requestSentButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: '#f0f2f5',
-    gap: 8,
-  },
-  requestSentButtonText: {
-    color: '#65676b',
-    fontSize: 15,
-    fontWeight: '600',
+    color: '#536471',
   },
   postsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#eff3f4',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eff3f4',
     paddingVertical: 16,
-    borderTopWidth: 8,
-    borderTopColor: '#f0f2f5',
-    gap: 8,
+    paddingHorizontal: 16,
   },
   postsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#050505',
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#0f1419',
   },
-  postCard: {
-    backgroundColor: '#fff',
-    marginBottom: 8,
-    borderRadius: 0,
+  postContainer: {
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 16,
+    paddingTop: 12,
   },
   postHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 12,
+    alignItems: 'flex-start',
+    marginBottom: 8,
   },
   postHeaderLeft: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     flex: 1,
   },
   postAvatar: {
-    backgroundColor: '#1877f2',
+    backgroundColor: '#1d9bf0',
   },
   postHeaderInfo: {
-    marginLeft: 10,
+    marginLeft: 12,
     flex: 1,
   },
-  postAuthorNameContainer: {
+  postAuthorRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
   },
   postAuthorName: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#050505',
+    fontWeight: '700',
+    color: '#0f1419',
   },
-  postTime: {
-    fontSize: 13,
-    color: '#65676b',
+  postUsername: {
+    fontSize: 15,
+    color: '#536471',
     marginTop: 2,
   },
   postContent: {
     fontSize: 15,
     lineHeight: 20,
-    color: '#050505',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
+    color: '#0f1419',
+    marginLeft: 60,
+    marginBottom: 12,
   },
   mediaContainer: {
-    width: '100%',
+    marginLeft: 60,
+    marginBottom: 12,
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#eff3f4',
   },
-  postImage: {
+  postMedia: {
     width: '100%',
-    height: 300,
+    height: 280,
   },
-  postStats: {
+  postActions: {
     flexDirection: 'row',
-    gap: 20,
-    paddingHorizontal: 16,
+    gap: 60,
+    marginLeft: 60,
     paddingVertical: 12,
   },
-  postStatItem: {
+  actionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
   },
-  statText: {
-    fontSize: 14,
-    color: '#65676b',
-    fontWeight: '500',
+  actionText: {
+    fontSize: 13,
+    color: '#536471',
+  },
+  postDivider: {
+    height: 1,
+    backgroundColor: '#eff3f4',
   },
   emptyContainer: {
     padding: 48,
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 16,
-    color: '#65676b',
+    fontSize: 15,
+    color: '#536471',
     textAlign: 'center',
-    marginTop: 16,
+    marginTop: 12,
   },
 });
 
