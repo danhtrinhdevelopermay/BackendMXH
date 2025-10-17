@@ -101,7 +101,13 @@ const NotificationsScreen = () => {
     >
       <View style={styles.avatarContainer}>
         <UserAvatar 
-          userId={item.sender_id}
+          user={{
+            id: item.related_user_id,
+            user_id: item.related_user_id,
+            username: item.username,
+            full_name: item.full_name,
+            avatar_url: item.avatar_url
+          }}
           size={56}
         />
         <View style={[styles.iconBadge, { backgroundColor: getNotificationColor(item.type) }]}>
