@@ -9,7 +9,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -34,7 +34,7 @@
     "extra": {
       "apiUrl": "https://backendmxh-1.onrender.com",
       "eas": {
-        "projectId": "a0c8f188-b34c-4c16-8f3b-d3bfcfccfb64"
+        "projectId": "6b474f79-edac-4cbb-aa66-f25ee4ac2b90"
       }
     },
     "plugins": [
