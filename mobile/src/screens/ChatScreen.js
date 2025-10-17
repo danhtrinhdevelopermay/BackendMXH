@@ -157,10 +157,12 @@ const ChatScreen = ({ route, navigation }) => {
     if (!selectedMessage) return;
     
     try {
-      console.log('Adding reaction to message:', selectedMessage.id, reaction);
+      await messageAPI.addReaction(selectedMessage.id, { reaction_type: reaction });
       showAlert('Thành công', 'Đã thêm cảm xúc', 'success');
+      fetchMessages();
     } catch (error) {
       console.error('Failed to add reaction:', error);
+      showAlert('Lỗi', 'Không thể thêm cảm xúc', 'error');
     } finally {
       setShowReactions(false);
       setSelectedMessage(null);
