@@ -32,9 +32,9 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "apiUrl": "https://backendmxh-1.onrender.com",
+      "apiUrl": "https://721f519d-e65c-483d-980c-92be932635ad-00-1y5d28ipsavtx.pike.replit.dev",
       "eas": {
-        "projectId": "286d0a06-c3e6-4971-b2dd-445814a7b318"
+        "projectId": ""
       }
     },
     "plugins": [
