@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { Text, Searchbar } from 'react-native-paper';
+import { View, FlatList, StyleSheet, TouchableOpacity, Platform, TextInput } from 'react-native';
+import { Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -27,7 +27,7 @@ const MessagesScreen = ({ navigation }) => {
       const response = await messageAPI.getConversations();
       setConversations(response.data);
     } catch (error) {
-      console.error('Failed to fetch messages');
+      console.log('Failed to fetch messages');
     } finally {
       setLoading(false);
     }
@@ -42,7 +42,7 @@ const MessagesScreen = ({ navigation }) => {
       const userThought = response.data.find(t => t.user_id === user.id);
       setCurrentUserThought(userThought || null);
     } catch (error) {
-      console.error('Failed to fetch thoughts:', error);
+      console.log('Failed to fetch thoughts:', error);
     }
   };
 
@@ -88,9 +88,9 @@ const MessagesScreen = ({ navigation }) => {
     const days = Math.floor(diff / 86400000);
 
     if (minutes < 1) return 'Vừa xong';
-    if (minutes < 60) return `${minutes}p`;
-    if (hours < 24) return `${hours}h`;
-    if (days < 7) return `${days}d`;
+    if (minutes < 60) return `${minutes} phút`;
+    if (hours < 24) return `${hours} giờ`;
+    if (days < 7) return `${days} ngày`;
     return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
   };
 
@@ -101,6 +101,7 @@ const MessagesScreen = ({ navigation }) => {
 
   const renderConversation = React.useCallback(({ item }) => {
     const isUnread = !item.is_read && item.sender_id !== item.other_user_id;
+    const isOnline = Math.random() > 0.5; // TODO: Replace with real online status
     
     return (
       <TouchableOpacity 
@@ -109,31 +110,34 @@ const MessagesScreen = ({ navigation }) => {
           userName: item.full_name || item.username,
           userAvatar: item.avatar_url
         })}
-        activeOpacity={0.7}
+        activeOpacity={0.8}
+        style={styles.conversationItem}
       >
-        <View style={styles.conversationItem}>
-          <View style={styles.avatarWrapper}>
-            <UserAvatar 
-              user={item}
-              userId={item.other_user_id}
-              size={56}
-            />
-            {isUnread && <View style={styles.unreadDot} />}
+        <View style={styles.avatarContainer}>
+          <UserAvatar 
+            user={item}
+            userId={item.other_user_id}
+            size={56}
+          />
+          {isOnline && <View style={styles.onlineDot} />}
+        </View>
+        
+        <View style={styles.conversationContent}>
+          <View style={styles.topRow}>
+            <Text style={[styles.userName, isUnread && styles.unreadName]} numberOfLines={1}>
+              {item.full_name || item.username}
+            </Text>
+            {isUnread && <View style={styles.unreadBadge} />}
           </View>
           
-          <View style={styles.conversationContent}>
-            <View style={styles.nameRow}>
-              <Text style={[styles.userName, isUnread && styles.unreadName]} numberOfLines={1}>
-                {item.full_name || item.username}
-              </Text>
-              <Text style={styles.timeText}>{formatTime(item.last_message_time)}</Text>
-            </View>
+          <View style={styles.messageRow}>
             <Text 
               style={[styles.lastMessage, isUnread && styles.unreadMessage]} 
-              numberOfLines={2}
+              numberOfLines={1}
             >
               {item.last_message || 'Bắt đầu trò chuyện'}
             </Text>
+            <Text style={styles.timeText}>· {formatTime(item.last_message_time)}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -146,29 +150,48 @@ const MessagesScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <View style={styles.headerTop}>
-          <Text style={styles.headerTitle}>Tin nhắn</Text>
-          <TouchableOpacity style={styles.composeButton}>
-            <LinearGradient
-              colors={['#667eea', '#764ba2']}
-              style={styles.composeGradient}
+      {/* Header - Messenger Style */}
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
+        <View style={styles.headerContent}>
+          <View style={styles.headerLeft}>
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('Profile')}
+              style={styles.userAvatarButton}
             >
-              <Ionicons name="create-outline" size={20} color="#fff" />
-            </LinearGradient>
-          </TouchableOpacity>
+              <UserAvatar 
+                user={user}
+                userId={user.id}
+                size={36}
+              />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Tin nhắn</Text>
+          </View>
+          
+          <View style={styles.headerRight}>
+            <TouchableOpacity style={styles.headerIconButton}>
+              <Ionicons name="camera-outline" size={24} color="#000" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.headerIconButton}>
+              <Ionicons name="create-outline" size={24} color="#000" />
+            </TouchableOpacity>
+          </View>
         </View>
-        
+
+        {/* Search Bar - Messenger Style */}
         <View style={styles.searchContainer}>
-          <Searchbar
+          <Ionicons name="search" size={18} color="#65676B" style={styles.searchIcon} />
+          <TextInput
             placeholder="Tìm kiếm"
-            onChangeText={setSearchQuery}
             value={searchQuery}
-            style={styles.searchBar}
-            inputStyle={styles.searchInput}
-            icon="magnify"
-            iconColor="#9CA3AF"
+            onChangeText={setSearchQuery}
+            style={styles.searchInput}
+            placeholderTextColor="#65676B"
           />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
+              <Ionicons name="close-circle" size={18} color="#65676B" />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
@@ -185,15 +208,17 @@ const MessagesScreen = ({ navigation }) => {
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <LinearGradient
-              colors={['#F3F4F6', '#E5E7EB']}
-              style={styles.emptyIconContainer}
-            >
-              <Ionicons name="chatbubbles-outline" size={60} color="#9CA3AF" />
-            </LinearGradient>
+            <View style={styles.emptyIconContainer}>
+              <LinearGradient
+                colors={['#0084FF', '#00C6FF']}
+                style={styles.emptyGradient}
+              >
+                <Ionicons name="chatbubbles" size={48} color="#fff" />
+              </LinearGradient>
+            </View>
             <Text style={styles.emptyTitle}>Chưa có tin nhắn</Text>
             <Text style={styles.emptyText}>
-              Bắt đầu cuộc trò chuyện{'\n'}với bạn bè của bạn
+              Bắt đầu cuộc trò chuyện với bạn bè của bạn
             </Text>
           </View>
         }
@@ -218,51 +243,68 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#fff',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.05)',
+    borderBottomColor: '#E4E6EB',
   },
-  headerTop: {
+  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  userAvatarButton: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   headerTitle: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#1a1a1a',
-    letterSpacing: -0.5,
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#050505',
+    letterSpacing: -0.3,
   },
-  composeButton: {
-    shadowColor: '#667eea',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  composeGradient: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
+  headerRight: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
+  },
+  headerIconButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F0F2F5',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   searchContainer: {
-    marginBottom: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F0F2F5',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    height: 36,
   },
-  searchBar: {
-    backgroundColor: '#F3F4F6',
-    borderRadius: 12,
-    elevation: 0,
-    shadowOpacity: 0,
-    height: 44,
+  searchIcon: {
+    marginRight: 8,
   },
   searchInput: {
+    flex: 1,
     fontSize: 15,
-    color: '#1a1a1a',
-    minHeight: 0,
+    color: '#050505',
+    padding: 0,
+    height: 36,
+  },
+  clearButton: {
+    padding: 4,
   },
   listContent: {
     flexGrow: 1,
@@ -271,85 +313,95 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0,0,0,0.04)',
   },
-  avatarWrapper: {
+  avatarContainer: {
     position: 'relative',
     marginRight: 12,
   },
-  unreadDot: {
+  onlineDot: {
     position: 'absolute',
-    top: 0,
-    right: 0,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#667eea',
+    bottom: 2,
+    right: 2,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#31A24C',
     borderWidth: 2,
     borderColor: '#fff',
   },
   conversationContent: {
     flex: 1,
   },
-  nameRow: {
+  topRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 4,
   },
   userName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1a1a1a',
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#050505',
     flex: 1,
     marginRight: 8,
   },
   unreadName: {
-    fontWeight: '700',
+    fontWeight: '600',
   },
-  timeText: {
-    fontSize: 13,
-    color: '#9CA3AF',
-    fontWeight: '400',
+  unreadBadge: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#0084FF',
+  },
+  messageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   lastMessage: {
-    fontSize: 14,
-    color: '#9CA3AF',
-    lineHeight: 20,
+    fontSize: 13,
+    color: '#65676B',
+    flex: 1,
+    marginRight: 4,
   },
   unreadMessage: {
-    color: '#4B5563',
+    color: '#050505',
     fontWeight: '500',
+  },
+  timeText: {
+    fontSize: 12,
+    color: '#65676B',
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 100,
+    paddingVertical: 80,
     paddingHorizontal: 32,
   },
   emptyIconContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    marginBottom: 20,
+  },
+  emptyGradient: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
   },
   emptyTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#1a1a1a',
+    color: '#050505',
     marginBottom: 8,
   },
   emptyText: {
     fontSize: 15,
-    color: '#9CA3AF',
+    color: '#65676B',
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 20,
   },
 });
 
