@@ -74,29 +74,6 @@ const ProfileScreen = ({ route, navigation }) => {
     );
   };
 
-  const handleTestNotification = async () => {
-    try {
-      const response = await fetch(`${API_URL}/api/push-tokens/test`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${await import('expo-secure-store').then(m => m.getItemAsync('token'))}`,
-        },
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        showAlert('Thành công', 'Đã gửi test notification! Kiểm tra thông báo trên điện thoại của bạn.', 'success');
-      } else {
-        showAlert('Lỗi', data.error || 'Không thể gửi test notification', 'error');
-      }
-    } catch (error) {
-      console.error('Test notification error:', error);
-      showAlert('Lỗi', 'Không thể gửi test notification', 'error');
-    }
-  };
-
   const handleAddFriend = async () => {
     try {
       await friendshipAPI.sendFriendRequest({ addressee_id: userId });
@@ -255,13 +232,6 @@ const ProfileScreen = ({ route, navigation }) => {
                   <MaterialCommunityIcons name="pencil" size={18} color="#fff" />
                   <Text style={styles.primaryButtonText}>Chỉnh sửa hồ sơ</Text>
                 </LinearGradient>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.secondaryButton}
-                onPress={handleTestNotification}
-              >
-                <MaterialCommunityIcons name="bell-ring" size={18} color="#1877f2" />
-                <Text style={styles.testNotificationButtonText}>Test Thông báo</Text>
               </TouchableOpacity>
               <TouchableOpacity 
                 style={styles.secondaryButton}
@@ -588,11 +558,6 @@ const styles = StyleSheet.create({
   },
   secondaryButtonText: {
     color: '#65676b',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  testNotificationButtonText: {
-    color: '#1877f2',
     fontSize: 15,
     fontWeight: '600',
   },
