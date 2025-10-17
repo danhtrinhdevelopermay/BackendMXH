@@ -72,9 +72,11 @@ const styles = StyleSheet.create({
     marginBottom: 60,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 70,
+    height: 70,
     marginBottom: 16,
+    backgroundColor: '#fff',
+    borderRadius: 15,
   },
   appName: {
     fontSize: 42,
