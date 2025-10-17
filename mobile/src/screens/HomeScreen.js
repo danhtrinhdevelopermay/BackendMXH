@@ -192,14 +192,7 @@ const HomeScreen = ({ navigation }) => {
     <View style={styles.headerContainer}>
       <View style={styles.fbHeader}>
         <Text style={styles.fbLogo}>Shatter xin chào</Text>
-        <View style={styles.fbHeaderIcons}>
-          <TouchableOpacity style={styles.fbIconButton}>
-            <Ionicons name="search" size={24} color="#050505" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.fbIconButton}>
-            <Ionicons name="chatbubble-ellipses" size={24} color="#050505" />
-          </TouchableOpacity>
-        </View>
+        
       </View>
       
       <Pressable 
