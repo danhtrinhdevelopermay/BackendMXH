@@ -6,7 +6,7 @@ import { Video } from 'expo-av';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
-import { postAPI, userAPI, friendshipAPI, messageAPI } from '../api/api';
+import { postAPI, userAPI, friendshipAPI, messageAPI, relationshipAPI } from '../api/api';
 import Constants from 'expo-constants';
 import UserAvatar from '../components/UserAvatar';
 import VerifiedBadge from '../components/VerifiedBadge';
@@ -22,6 +22,8 @@ const ProfileScreen = ({ route, navigation }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [friendshipStatus, setFriendshipStatus] = useState(null);
+  const [relationshipStatus, setRelationshipStatus] = useState(null);
+  const [relationshipData, setRelationshipData] = useState(null);
   const [stats, setStats] = useState({ posts_count: 0, friends_count: 0, photos_count: 0 });
   
   const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
@@ -40,6 +42,8 @@ const ProfileScreen = ({ route, navigation }) => {
       if (!isOwnProfile) {
         setFriendshipStatus(userResponse.data.friendship_status);
       }
+      setRelationshipStatus(userResponse.data.relationship_status);
+      setRelationshipData(userResponse.data.relationship);
       setPosts(postsResponse.data);
       setStats(statsResponse.data);
     } catch (error) {
@@ -115,6 +119,33 @@ const ProfileScreen = ({ route, navigation }) => {
               setFriendshipStatus('friends');
             } catch (error) {
               showAlert('Lỗi', 'Không thể chấp nhận lời mời', 'error');
+            }
+          }
+        },
+      ]
+    );
+  };
+
+  const handleCancelRelationship = () => {
+    const partnerName = relationshipData?.partner_name || relationshipData?.partner_username;
+    showAlert(
+      'Hủy hẹn hò',
+      `Bạn có chắc muốn kết thúc mối quan hệ với ${partnerName}?`,
+      'warning',
+      [
+        { text: 'Không', style: 'cancel' },
+        {
+          text: 'Có',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await relationshipAPI.cancelRelationship({ partner_id: relationshipData.partner_id });
+              showAlert('Thành công', 'Đã kết thúc mối quan hệ', 'success');
+              setRelationshipStatus(null);
+              setRelationshipData(null);
+              fetchUserData();
+            } catch (error) {
+              showAlert('Lỗi', 'Không thể kết thúc mối quan hệ', 'error');
             }
           }
         },
@@ -272,6 +303,20 @@ const ProfileScreen = ({ route, navigation }) => {
           
           {profileUser?.bio && (
             <Text style={styles.bio}>{profileUser.bio}</Text>
+          )}
+
+          {/* Relationship Status */}
+          {relationshipStatus === 'dating' && relationshipData && (
+            <TouchableOpacity 
+              style={styles.relationshipContainer}
+              onPress={handleCancelRelationship}
+            >
+              <MaterialCommunityIcons name="heart" size={16} color="#FF6B9D" />
+              <Text style={styles.relationshipText}>
+                Đang hẹn hò với <Text style={styles.partnerName}>{relationshipData.partner_name || relationshipData.partner_username}</Text>
+              </Text>
+              <MaterialCommunityIcons name="close-circle" size={16} color="#FF6B9D" />
+            </TouchableOpacity>
           )}
 
           {/* Stats - Pro vs Normal */}
@@ -589,6 +634,26 @@ const styles = StyleSheet.create({
     color: '#0f1419',
     lineHeight: 20,
     marginTop: 12,
+  },
+  relationshipContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#FFE5EE',
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+  },
+  relationshipText: {
+    fontSize: 14,
+    color: '#FF6B9D',
+    fontWeight: '600',
+  },
+  partnerName: {
+    fontWeight: '700',
+    color: '#FF1493',
   },
   statsRow: {
     flexDirection: 'row',

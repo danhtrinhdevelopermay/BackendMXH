@@ -42,10 +42,47 @@ const getUserById = async (req, res) => {
       }
     }
 
+    const user1_id = Math.min(currentUserId, userId);
+    const user2_id = Math.max(currentUserId, userId);
+
+    const relationshipResult = await pool.query(
+      `SELECT r.*, u.id as partner_id, u.username as partner_username, u.full_name as partner_name, u.avatar_url as partner_avatar
+       FROM relationships r
+       JOIN users u ON (CASE WHEN r.user1_id = $1 THEN r.user2_id ELSE r.user1_id END = u.id)
+       WHERE r.user1_id = $2 AND r.user2_id = $3`,
+      [currentUserId, user1_id, user2_id]
+    );
+
+    let relationshipStatus = null;
+    let relationshipData = null;
+
+    if (relationshipResult.rows.length > 0) {
+      const relationship = relationshipResult.rows[0];
+      
+      if (relationship.status === 'accepted') {
+        relationshipStatus = 'dating';
+        relationshipData = {
+          partner_id: relationship.partner_id,
+          partner_username: relationship.partner_username,
+          partner_name: relationship.partner_name,
+          partner_avatar: relationship.partner_avatar,
+          since: relationship.created_at
+        };
+      } else if (relationship.status === 'pending') {
+        if (relationship.requester_id === parseInt(currentUserId)) {
+          relationshipStatus = 'love_request_sent';
+        } else {
+          relationshipStatus = 'love_request_received';
+        }
+      }
+    }
+
     res.json({
       ...user,
       friendship_status: friendshipStatus,
-      friendship_id: friendshipId
+      friendship_id: friendshipId,
+      relationship_status: relationshipStatus,
+      relationship: relationshipData
     });
   } catch (error) {
     console.error('Get user error:', error);

@@ -6,6 +6,56 @@ const sendMessage = async (req, res) => {
   const sender_id = req.user.id;
 
   try {
+    if (content.trim() === '/love') {
+      const existingRelationship = await pool.query(
+        `SELECT * FROM relationships 
+         WHERE (user1_id = $1 AND user2_id = $2) OR (user1_id = $2 AND user2_id = $1)`,
+        [sender_id, receiver_id]
+      );
+
+      if (existingRelationship.rows.length > 0) {
+        const rel = existingRelationship.rows[0];
+        if (rel.status === 'pending') {
+          return res.status(400).json({ error: 'Đã có lời mời hẹn hò đang chờ xử lý' });
+        } else if (rel.status === 'accepted') {
+          return res.status(400).json({ error: 'Bạn đã đang hẹn hò với người này rồi' });
+        }
+      }
+
+      const user1_id = Math.min(sender_id, receiver_id);
+      const user2_id = Math.max(sender_id, receiver_id);
+
+      await pool.query(
+        `INSERT INTO relationships (user1_id, user2_id, requester_id, status) 
+         VALUES ($1, $2, $3, 'pending')`,
+        [user1_id, user2_id, sender_id]
+      );
+
+      const messageContent = '💕 Lời mời hẹn hò';
+      const result = await pool.query(
+        'INSERT INTO messages (sender_id, receiver_id, content, message_type) VALUES ($1, $2, $3, $4) RETURNING *',
+        [sender_id, receiver_id, messageContent, 'love_invitation']
+      );
+
+      await pool.query(
+        `INSERT INTO notifications (user_id, type, content, related_user_id) 
+         VALUES ($1, $2, $3, $4)`,
+        [receiver_id, 'love_invitation', 'đã gửi lời mời hẹn hò cho bạn', sender_id]
+      );
+
+      const sender = await pool.query('SELECT full_name, username FROM users WHERE id = $1', [sender_id]);
+      const senderName = sender.rows[0]?.full_name || sender.rows[0]?.username || 'Someone';
+      
+      await sendPushNotification(
+        receiver_id,
+        '💕 Lời mời hẹn hò',
+        `${senderName} muốn hẹn hò với bạn`,
+        { screen: 'Chat', userId: sender_id, userName: senderName }
+      );
+
+      return res.status(201).json(result.rows[0]);
+    }
+
     const result = await pool.query(
       'INSERT INTO messages (sender_id, receiver_id, content) VALUES ($1, $2, $3) RETURNING *',
       [sender_id, receiver_id, content]
