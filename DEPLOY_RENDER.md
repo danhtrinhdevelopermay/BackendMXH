@@ -164,11 +164,42 @@ CREATE TABLE IF NOT EXISTS notifications (
 3. Thử đăng ký tài khoản mới
 4. Thử đăng bài viết có video
 
+## 🔄 Hệ Thống Anti-Spindown (Tự động)
+
+**Tin tốt!** Backend này đã được tích hợp sẵn hệ thống **Anti-Spindown** tự động.
+
+### Cách hoạt động:
+- ✅ Server tự động phát hiện môi trường Render
+- ✅ Tự động ping endpoint `/health` mỗi **14 phút**
+- ✅ Giữ server luôn hoạt động, không bị "ngủ"
+- ✅ Không cần cấu hình thêm gì!
+
+### Kiểm tra trong Logs:
+Sau khi deploy, bạn sẽ thấy log:
+```
+🔄 Render Anti-Spindown activated
+📡 Pinging: https://your-app.onrender.com/health every 14 minutes
+✅ Keep-alive ping successful at 2025-10-17T10:30:00.000Z
+```
+
+### Health Check Endpoint:
+Test server health tại: `https://your-app.onrender.com/health`
+
+Response:
+```json
+{
+  "status": "ok",
+  "timestamp": "2025-10-17T10:30:00.000Z",
+  "uptime": 3600,
+  "message": "Server is healthy"
+}
+```
+
 ## Lưu Ý Quan Trọng
 
 ### Free Tier Render
-- Backend sẽ "ngủ" sau 15 phút không hoạt động
-- Khi có request mới, mất 30-60 giây để "thức dậy"
+- ~~Backend sẽ "ngủ" sau 15 phút không hoạt động~~ → **Đã fix bằng Anti-Spindown!** ✅
+- Server giờ luôn sẵn sàng, phản hồi nhanh
 - Giới hạn 750 giờ/tháng (đủ dùng cho development)
 
 ### Nâng Cấp (Nếu Cần)

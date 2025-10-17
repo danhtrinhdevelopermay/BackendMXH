@@ -39,10 +39,12 @@ The backend is a RESTful API built with Node.js and Express, following an MVC-li
 - `/api/upload`: Media upload.
 - `/api/media/:id`: Media retrieval.
 - `/api/avatar` & `/api/cover`: User avatar and cover photo management.
+- `/health`: Health check endpoint for monitoring server status (returns status, timestamp, uptime).
 
 **Key Backend Features:**
 - **Media Storage:** Cloudinary is used for cloud-based storage and delivery of images and videos, with URLs stored in the PostgreSQL database.
 - **Privacy & Visibility:** Posts support `public` and `friends` privacy settings, with filtering applied across all relevant API endpoints.
+- **Anti-Spindown System:** Automatic keep-alive mechanism for Render.com deployment that pings `/health` endpoint every 14 minutes to prevent free-tier spindown. Activates automatically when `RENDER_EXTERNAL_URL` environment variable is detected. Includes dedicated health check endpoint with server status and uptime information.
 
 ## External Dependencies
 
@@ -61,6 +63,7 @@ The backend is a RESTful API built with Node.js and Express, following an MVC-li
   - **JWT (jsonwebtoken)**: For token generation and verification.
   - **Bcrypt**: For password hashing.
   - **Cloudinary**: Cloud-based media storage and delivery for images and videos.
+  - **Axios**: HTTP client for keep-alive pings in Anti-Spindown system.
 
 ### Deployment
 - **Replit**: Current backend deployment.

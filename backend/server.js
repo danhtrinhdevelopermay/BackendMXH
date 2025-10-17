@@ -41,6 +41,15 @@ app.get('/', (req, res) => {
   res.json({ message: 'Social Media API is running' });
 });
 
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    message: 'Server is healthy'
+  });
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
@@ -265,4 +274,27 @@ io.on('connection', (socket) => {
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
+  
+  if (process.env.RENDER_EXTERNAL_URL) {
+    const axios = require('axios');
+    const url = `${process.env.RENDER_EXTERNAL_URL}/health`;
+    const interval = 14 * 60 * 1000;
+    
+    console.log(`🔄 Render Anti-Spindown activated`);
+    console.log(`📡 Pinging: ${url} every 14 minutes`);
+    
+    function keepAlive() {
+      axios.get(url, { timeout: 30000 })
+        .then(response => {
+          console.log(`✅ Keep-alive ping successful at ${new Date().toISOString()}`);
+        })
+        .catch(error => {
+          console.error(`❌ Keep-alive error at ${new Date().toISOString()}:`, error.message);
+        });
+    }
+    
+    setInterval(keepAlive, interval);
+    
+    setTimeout(keepAlive, 5000);
+  }
 });
