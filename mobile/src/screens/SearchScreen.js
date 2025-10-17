@@ -131,13 +131,10 @@ const SearchScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#050505" />
-        </TouchableOpacity>
         <View style={styles.searchInputContainer}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="#050505" />
+          </TouchableOpacity>
           <Ionicons name="search" size={20} color="#65676b" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
@@ -155,7 +152,7 @@ const SearchScreen = ({ navigation }) => {
         </View>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filtersContainer}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filtersContainer} contentContainerStyle={styles.filtersContent}>
         <TouchableOpacity 
           style={[styles.filterChip, activeTab === 'all' && styles.activeFilterChip]}
           onPress={() => setActiveTab('all')}
@@ -229,29 +226,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e4e6eb',
-    gap: 12,
-  },
-  backButton: {
-    padding: 4,
   },
   searchInputContainer: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f0f2f5',
     borderRadius: 20,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 6,
+    gap: 8,
   },
   searchIcon: {
-    marginRight: 8,
+    marginRight: 4,
   },
   searchInput: {
     flex: 1,
@@ -260,17 +251,24 @@ const styles = StyleSheet.create({
   },
   filtersContainer: {
     backgroundColor: '#fff',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#e4e6eb',
+    maxHeight: 50,
+  },
+  filtersContent: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    alignItems: 'center',
   },
   filterChip: {
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 6,
     borderRadius: 20,
     backgroundColor: '#e4e6eb',
     marginRight: 8,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   activeFilterChip: {
     backgroundColor: '#e7f3ff',
