@@ -190,37 +190,50 @@ const HomeScreen = ({ navigation }) => {
 
   const renderHeader = () => (
     <View style={styles.headerContainer}>
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={styles.gradientHeader}
-      >
-        <Text style={styles.headerTitle}>Shatter</Text>
-        <Text style={styles.headerSubtitle}>Chia sẻ khoảnh khắc của bạn</Text>
-      </LinearGradient>
+      <View style={styles.fbHeader}>
+        <Text style={styles.fbLogo}>facebook</Text>
+        <View style={styles.fbHeaderIcons}>
+          <TouchableOpacity style={styles.fbIconButton}>
+            <Ionicons name="search" size={24} color="#050505" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.fbIconButton}>
+            <Ionicons name="chatbubble-ellipses" size={24} color="#050505" />
+          </TouchableOpacity>
+        </View>
+      </View>
       
+      <Pressable 
+        style={styles.createPostContainer}
+        onPress={() => navigation.navigate('CreatePost')}
+      >
+        <View style={styles.createPostTop}>
+          <UserAvatar 
+            user={user} 
+            size={40}
+          />
+          <View style={styles.createPostInput}>
+            <Text style={styles.createPostText}>Bạn đang nghĩ gì?</Text>
+          </View>
+        </View>
+        <View style={styles.createPostDivider} />
+        <View style={styles.createPostActions}>
+          <TouchableOpacity style={styles.createPostAction}>
+            <Ionicons name="videocam" size={24} color="#f3425f" />
+            <Text style={styles.createActionText}>Video trực tiếp</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.createPostAction}>
+            <Ionicons name="image" size={24} color="#45bd62" />
+            <Text style={styles.createActionText}>Ảnh/video</Text>
+          </TouchableOpacity>
+        </View>
+      </Pressable>
+
       <StoriesBar
         stories={stories}
         currentUserId={user?.id}
         onCreateStory={() => navigation.navigate('CreateStory')}
         onViewStory={(userId) => navigation.navigate('ViewStory', { userId })}
       />
-
-      <Pressable 
-        style={styles.postInputContainer}
-        onPress={() => navigation.navigate('CreatePost')}
-      >
-        <UserAvatar 
-          user={user} 
-          size={44}
-          style={styles.headerAvatar}
-        />
-        <View style={styles.postInput}>
-          <Text style={styles.postInputText}>Hôm nay bạn như thế nào?</Text>
-        </View>
-        <Ionicons name="image-outline" size={24} color="#667eea" />
-      </Pressable>
     </View>
   );
 
@@ -368,63 +381,52 @@ const HomeScreen = ({ navigation }) => {
 
         <View style={styles.actionsContainer}>
           <TouchableOpacity 
-            style={styles.actionButton}
+            style={styles.fbActionButton}
             onLongPress={() => toggleReactionMenu(item.id)}
             onPress={() => handleReaction(item.id, 'like', item.user_reaction)}
           >
-            <View style={[
-              styles.actionIconContainer,
-              item.user_reaction && { backgroundColor: getReactionColor(item.user_reaction) + '15' }
-            ]}>
-              <Text style={[
-                styles.actionIcon, 
-                item.user_reaction && { color: getReactionColor(item.user_reaction) }
-              ]}>
-                {item.user_reaction ? getReactionIcon(item.user_reaction) : '👍'}
-              </Text>
-            </View>
-            <Text style={[
-              styles.actionText,
-              item.user_reaction && { color: getReactionColor(item.user_reaction), fontWeight: '600' }
-            ]}>
-              {item.user_reaction ? item.user_reaction.charAt(0).toUpperCase() + item.user_reaction.slice(1) : 'Thích'}
-            </Text>
+            {item.user_reaction ? (
+              <>
+                <Text style={styles.fbActionIcon}>{getReactionIcon(item.user_reaction)}</Text>
+                <Text style={[styles.fbActionText, { color: getReactionColor(item.user_reaction) }]}>
+                  {item.user_reaction.charAt(0).toUpperCase() + item.user_reaction.slice(1)}
+                </Text>
+              </>
+            ) : (
+              <>
+                <Ionicons name="thumbs-up-outline" size={20} color="#65676b" />
+                <Text style={styles.fbActionText}>Thích</Text>
+              </>
+            )}
           </TouchableOpacity>
 
           {reactionMenuVisible[item.id] && (
-            <View style={styles.reactionMenu}>
-              <LinearGradient
-                colors={['#ffffff', '#f8f9fa']}
-                style={styles.reactionMenuGradient}
-              >
+            <View style={styles.fbReactionMenu}>
+              <View style={styles.fbReactionMenuContent}>
                 {['like', 'love', 'haha', 'wow', 'sad', 'angry'].map((reaction) => (
                   <TouchableOpacity
                     key={reaction}
                     onPress={() => handleReaction(item.id, reaction, item.user_reaction)}
-                    style={styles.reactionOption}
+                    style={styles.fbReactionOption}
                   >
-                    <Text style={styles.reactionOptionIcon}>{getReactionIcon(reaction)}</Text>
+                    <Text style={styles.fbReactionIcon}>{getReactionIcon(reaction)}</Text>
                   </TouchableOpacity>
                 ))}
-              </LinearGradient>
+              </View>
             </View>
           )}
 
           <TouchableOpacity 
-            style={styles.actionButton}
+            style={styles.fbActionButton}
             onPress={() => navigation.navigate('Comments', { postId: item.id })}
           >
-            <View style={styles.actionIconContainer}>
-              <Ionicons name="chatbubble-outline" size={20} color="#667eea" />
-            </View>
-            <Text style={styles.actionText}>Bình luận</Text>
+            <Ionicons name="chatbubble-outline" size={20} color="#65676b" />
+            <Text style={styles.fbActionText}>Bình luận</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton}>
-            <View style={styles.actionIconContainer}>
-              <Ionicons name="arrow-redo-outline" size={20} color="#667eea" />
-            </View>
-            <Text style={styles.actionText}>Chia sẻ</Text>
+          <TouchableOpacity style={styles.fbActionButton}>
+            <Ionicons name="arrow-redo-outline" size={20} color="#65676b" />
+            <Text style={styles.fbActionText}>Chia sẻ</Text>
           </TouchableOpacity>
         </View>
       </Card>
@@ -441,8 +443,8 @@ const HomeScreen = ({ navigation }) => {
           <RefreshControl 
             refreshing={refreshing} 
             onRefresh={onRefresh}
-            colors={['#667eea', '#764ba2']}
-            tintColor="#667eea"
+            colors={['#1877f2']}
+            tintColor="#1877f2"
           />
         }
         ListHeaderComponent={renderHeader}
@@ -471,66 +473,96 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f0f2f5',
   },
   listContent: {
     flexGrow: 1,
     paddingBottom: 16,
   },
   headerContainer: {
-    marginBottom: 12,
-  },
-  gradientHeader: {
-    paddingVertical: 24,
-    paddingHorizontal: 20,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
-    letterSpacing: 0.5,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
-    marginTop: 4,
-  },
-  postInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: '#fff',
-    marginHorizontal: 16,
-    marginTop: -16,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e4e6eb',
+  },
+  fbHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 16,
-    elevation: 3,
-    shadowColor: '#667eea',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    backgroundColor: '#fff',
   },
-  headerAvatar: {
-    backgroundColor: '#667eea',
+  fbLogo: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#1877f2',
+    fontFamily: 'System',
   },
-  postInput: {
+  fbHeaderIcons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  fbIconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#e4e6eb',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  createPostContainer: {
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginVertical: 8,
+    borderRadius: 8,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#e4e6eb',
+  },
+  createPostTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  createPostInput: {
     flex: 1,
-    marginLeft: 12,
-    marginRight: 12,
+    marginLeft: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#e4e6eb',
   },
-  postInputText: {
-    color: '#9ca3af',
+  createPostText: {
+    color: '#65676b',
+    fontSize: 16,
+  },
+  createPostDivider: {
+    height: 1,
+    backgroundColor: '#e4e6eb',
+    marginVertical: 12,
+  },
+  createPostActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  createPostAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  createActionText: {
     fontSize: 15,
+    color: '#65676b',
+    fontWeight: '500',
   },
   cardWrapper: {
-    marginHorizontal: 16,
-    marginTop: 12,
+    marginTop: 8,
   },
   card: {
     backgroundColor: '#fff',
-    borderRadius: 16,
+    borderTopWidth: 8,
+    borderTopColor: '#f0f2f5',
     overflow: 'hidden',
   },
   postHeader: {
@@ -545,9 +577,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatar: {
-    backgroundColor: '#667eea',
-    borderWidth: 2,
-    borderColor: '#f0f0f0',
+    backgroundColor: '#1877f2',
   },
   postHeaderInfo: {
     marginLeft: 12,
@@ -645,63 +675,55 @@ const styles = StyleSheet.create({
   },
   actionsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 8,
-    paddingHorizontal: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#e4e6eb',
+    paddingVertical: 4,
+    paddingHorizontal: 4,
     position: 'relative',
   },
-  actionButton: {
+  fbActionButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
     flex: 1,
-    borderRadius: 12,
+    gap: 6,
   },
-  actionIconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#f3f4f6',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 6,
+  fbActionIcon: {
+    fontSize: 18,
   },
-  actionIcon: {
-    fontSize: 16,
-    color: '#667eea',
-  },
-  actionText: {
-    fontSize: 14,
-    color: '#6b7280',
+  fbActionText: {
+    fontSize: 15,
+    color: '#65676b',
     fontWeight: '600',
   },
-  reactionMenu: {
+  fbReactionMenu: {
     position: 'absolute',
-    bottom: 60,
-    left: 20,
-    borderRadius: 30,
-    elevation: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
+    bottom: 50,
+    left: 16,
     zIndex: 1000,
-    overflow: 'hidden',
   },
-  reactionMenuGradient: {
+  fbReactionMenuContent: {
     flexDirection: 'row',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 30,
+    backgroundColor: '#fff',
+    borderRadius: 25,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e4e6eb',
   },
-  reactionOption: {
-    padding: 8,
+  fbReactionOption: {
+    padding: 6,
     marginHorizontal: 2,
   },
-  reactionOptionIcon: {
-    fontSize: 28,
+  fbReactionIcon: {
+    fontSize: 32,
   },
   emptyContainer: {
     alignItems: 'center',
