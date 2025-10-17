@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { List, Avatar, Button, Text, Divider, Card } from 'react-native-paper';
+import { View, FlatList, StyleSheet, TouchableOpacity, RefreshControl, ScrollView } from 'react-native';
+import { Button, Text, IconButton, Searchbar } from 'react-native-paper';
 import { friendshipAPI } from '../api/api';
 import { useAlert } from '../context/AlertContext';
 import UserAvatar from '../components/UserAvatar';
@@ -10,14 +10,16 @@ const FriendsScreen = () => {
   const { showAlert } = useAlert();
   const [friends, setFriends] = useState([]);
   const [requests, setRequests] = useState([]);
-  const [activeTab, setActiveTab] = useState('friends');
+  const [activeTab, setActiveTab] = useState('suggestions');
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchFriends = async () => {
     try {
       const response = await friendshipAPI.getFriends();
       setFriends(response.data);
     } catch (error) {
-      showAlert('Error', 'Failed to fetch friends', 'error');
+      showAlert('Lỗi', 'Không thể tải danh sách bạn bè', 'error');
     }
   };
 
@@ -26,7 +28,7 @@ const FriendsScreen = () => {
       const response = await friendshipAPI.getFriendRequests();
       setRequests(response.data);
     } catch (error) {
-      showAlert('Error', 'Failed to fetch requests', 'error');
+      showAlert('Lỗi', 'Không thể tải yêu cầu kết bạn', 'error');
     }
   };
 
@@ -35,101 +37,214 @@ const FriendsScreen = () => {
     fetchRequests();
   }, []);
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await Promise.all([fetchFriends(), fetchRequests()]);
+    setRefreshing(false);
+  };
+
   const handleRespondRequest = async (requestId, status) => {
     try {
       await friendshipAPI.respondToFriendRequest(requestId, { status });
-      showAlert('Success', `Request ${status}`, 'success');
+      showAlert('Thành công', status === 'accepted' ? 'Đã chấp nhận lời mời kết bạn' : 'Đã xóa lời mời', 'success');
       fetchRequests();
       fetchFriends();
     } catch (error) {
-      showAlert('Error', 'Failed to respond', 'error');
+      showAlert('Lỗi', 'Không thể phản hồi yêu cầu', 'error');
     }
   };
 
   const renderFriend = ({ item }) => (
-    <Card style={styles.friendCard} elevation={0}>
+    <TouchableOpacity style={styles.friendCard} activeOpacity={0.7}>
       <View style={styles.friendContainer}>
-        <View style={styles.friendLeft}>
-          <UserAvatar 
-            user={item}
-            size={60}
-            style={styles.friendAvatar}
-          />
-          <View style={styles.friendInfo}>
-            <View style={styles.nameContainer}>
-              <Text style={styles.friendName}>{item.full_name || item.username}</Text>
-              <VerifiedBadge isVerified={item.is_verified} size={16} />
-            </View>
-            <Text style={styles.friendUsername}>@{item.username}</Text>
+        <UserAvatar 
+          user={item}
+          size={80}
+        />
+        <View style={styles.friendInfo}>
+          <View style={styles.nameContainer}>
+            <Text style={styles.friendName} numberOfLines={1}>
+              {item.full_name || item.username}
+            </Text>
+            <VerifiedBadge isVerified={item.is_verified} size={16} />
           </View>
+          <Text style={styles.friendMutual} numberOfLines={1}>
+            @{item.username}
+          </Text>
         </View>
-        <Button 
-          mode="outlined" 
-          style={styles.friendButton}
-          textColor="#65676b"
-        >
-          Bạn bè
-        </Button>
+        <IconButton
+          icon="dots-horizontal"
+          size={24}
+          iconColor="#65676b"
+          onPress={() => {}}
+          style={styles.moreButton}
+        />
       </View>
-    </Card>
+    </TouchableOpacity>
   );
 
   const renderRequest = ({ item }) => (
-    <Card style={styles.requestCard} elevation={0}>
-      <View style={styles.requestContainer}>
-        <View style={styles.requestLeft}>
-          <UserAvatar 
-            user={item}
-            size={60}
-            style={styles.requestAvatar}
-          />
-          <View style={styles.requestInfo}>
-            <View style={styles.nameContainer}>
-              <Text style={styles.requestName}>{item.full_name || item.username}</Text>
-              <VerifiedBadge isVerified={item.is_verified} size={16} />
-            </View>
-            <Text style={styles.requestUsername}>@{item.username}</Text>
-          </View>
-        </View>
-        <View style={styles.requestButtons}>
-          <Button 
-            mode="contained" 
-            onPress={() => handleRespondRequest(item.request_id, 'accepted')}
-            style={styles.acceptButton}
-            buttonColor="#1877f2"
-            compact
-          >
-            Confirm
-          </Button>
-          <Button 
-            mode="outlined" 
-            onPress={() => handleRespondRequest(item.request_id, 'rejected')}
-            style={styles.rejectButton}
-            textColor="#65676b"
-            compact
-          >
-            Delete
-          </Button>
-        </View>
+    <View style={styles.requestCard}>
+      <View style={styles.requestTop}>
+        <UserAvatar 
+          user={item}
+          size={80}
+        />
+        <IconButton
+          icon="close"
+          size={20}
+          iconColor="#65676b"
+          onPress={() => handleRespondRequest(item.request_id, 'rejected')}
+          style={styles.closeButton}
+        />
       </View>
-    </Card>
+      <View style={styles.requestInfo}>
+        <View style={styles.nameContainer}>
+          <Text style={styles.requestName} numberOfLines={1}>
+            {item.full_name || item.username}
+          </Text>
+          <VerifiedBadge isVerified={item.is_verified} size={16} />
+        </View>
+        <Text style={styles.mutualFriends} numberOfLines={1}>
+          @{item.username}
+        </Text>
+      </View>
+      <View style={styles.requestButtons}>
+        <Button 
+          mode="contained" 
+          onPress={() => handleRespondRequest(item.request_id, 'accepted')}
+          style={styles.acceptButton}
+          buttonColor="#1877f2"
+          labelStyle={styles.buttonLabel}
+        >
+          Xác nhận
+        </Button>
+        <Button 
+          mode="outlined" 
+          onPress={() => handleRespondRequest(item.request_id, 'rejected')}
+          style={styles.deleteButton}
+          textColor="#050505"
+          labelStyle={styles.buttonLabel}
+        >
+          Xóa
+        </Button>
+      </View>
+    </View>
+  );
+
+  const renderSuggestions = () => (
+    <View style={styles.suggestionsContainer}>
+      <View style={styles.emptyContainer}>
+        <IconButton
+          icon="account-multiple-outline"
+          size={64}
+          iconColor="#bcc0c4"
+        />
+        <Text style={styles.emptyText}>Gợi ý kết bạn</Text>
+        <Text style={styles.emptySubText}>Chức năng đang phát triển</Text>
+      </View>
+    </View>
+  );
+
+  const renderAllFriends = () => (
+    <FlatList
+      data={friends}
+      renderItem={renderFriend}
+      keyExtractor={(item) => item.id?.toString() || item.user_id?.toString()}
+      numColumns={2}
+      columnWrapperStyle={styles.friendsRow}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={['#1877f2']}
+          tintColor="#1877f2"
+        />
+      }
+      ListEmptyComponent={
+        <View style={styles.emptyContainer}>
+          <IconButton
+            icon="account-multiple-outline"
+            size={64}
+            iconColor="#bcc0c4"
+          />
+          <Text style={styles.emptyText}>Chưa có bạn bè</Text>
+        </View>
+      }
+      contentContainerStyle={friends.length === 0 ? styles.emptyList : styles.listContent}
+    />
+  );
+
+  const renderRequests = () => (
+    <ScrollView
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={['#1877f2']}
+          tintColor="#1877f2"
+        />
+      }
+      contentContainerStyle={requests.length === 0 ? styles.emptyList : styles.requestsContent}
+    >
+      {requests.length > 0 ? (
+        <>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Lời mời kết bạn</Text>
+            <Text style={styles.sectionCount}>{requests.length}</Text>
+          </View>
+          <View style={styles.requestsGrid}>
+            {requests.map((item) => (
+              <View key={item.user_id?.toString() || item.id?.toString()}>
+                {renderRequest({ item })}
+              </View>
+            ))}
+          </View>
+        </>
+      ) : (
+        <View style={styles.emptyContainer}>
+          <IconButton
+            icon="account-alert-outline"
+            size={64}
+            iconColor="#bcc0c4"
+          />
+          <Text style={styles.emptyText}>Không có lời mời kết bạn</Text>
+        </View>
+      )}
+    </ScrollView>
   );
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Bạn bè</Text>
+        <View style={styles.headerIcons}>
+          <IconButton
+            icon="magnify"
+            size={24}
+            iconColor="#050505"
+            onPress={() => {}}
+          />
+        </View>
+      </View>
+
       <View style={styles.tabsContainer}>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'suggestions' && styles.activeTab]}
+          onPress={() => setActiveTab('suggestions')}
+        >
+          <Text style={[styles.tabText, activeTab === 'suggestions' && styles.activeTabText]}>
+            Gợi ý
+          </Text>
+        </TouchableOpacity>
+        
         <TouchableOpacity
           style={[styles.tab, activeTab === 'friends' && styles.activeTab]}
           onPress={() => setActiveTab('friends')}
         >
           <Text style={[styles.tabText, activeTab === 'friends' && styles.activeTabText]}>
-            Bạn bè
+            Tất cả bạn bè
           </Text>
-          {friends.length > 0 && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{friends.length}</Text>
-            </View>
-          )}
         </TouchableOpacity>
         
         <TouchableOpacity
@@ -137,7 +252,7 @@ const FriendsScreen = () => {
           onPress={() => setActiveTab('requests')}
         >
           <Text style={[styles.tabText, activeTab === 'requests' && styles.activeTabText]}>
-            Yêu cầu
+            Lời mời
           </Text>
           {requests.length > 0 && (
             <View style={styles.badge}>
@@ -146,22 +261,10 @@ const FriendsScreen = () => {
           )}
         </TouchableOpacity>
       </View>
-      
-      <Divider style={styles.headerDivider} />
 
-      <FlatList
-        data={activeTab === 'friends' ? friends : requests}
-        renderItem={activeTab === 'friends' ? renderFriend : renderRequest}
-        keyExtractor={(item) => item.id?.toString() || item.user_id?.toString()}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>
-              {activeTab === 'friends' ? 'No friends yet' : 'Không có yêu cầu nào'}
-            </Text>
-          </View>
-        }
-        contentContainerStyle={styles.listContent}
-      />
+      {activeTab === 'suggestions' && renderSuggestions()}
+      {activeTab === 'friends' && renderAllFriends()}
+      {activeTab === 'requests' && renderRequests()}
     </View>
   );
 };
@@ -171,10 +274,29 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f0f2f5',
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e4e6eb',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#050505',
+  },
+  headerIcons: {
+    flexDirection: 'row',
+  },
   tabsContainer: {
     flexDirection: 'row',
     backgroundColor: '#fff',
-    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingTop: 8,
   },
   tab: {
     flex: 1,
@@ -182,10 +304,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
-    position: 'relative',
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
   },
   activeTab: {
-    borderBottomWidth: 3,
     borderBottomColor: '#1877f2',
   },
   tabText: {
@@ -198,128 +320,166 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   badge: {
-    backgroundColor: '#e7f3ff',
+    backgroundColor: '#ff3b30',
     borderRadius: 10,
     paddingHorizontal: 6,
     paddingVertical: 2,
     marginLeft: 6,
+    minWidth: 20,
+    alignItems: 'center',
   },
   badgeText: {
-    color: '#1877f2',
+    color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',
   },
-  headerDivider: {
-    height: 1,
-    backgroundColor: '#e4e6eb',
-  },
   listContent: {
-    flexGrow: 1,
+    padding: 8,
     paddingBottom: 16,
+  },
+  friendsRow: {
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
   },
   friendCard: {
     backgroundColor: '#fff',
-    marginHorizontal: 12,
-    marginTop: 12,
-    borderRadius: 16,
-    shadowColor: '#667eea',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    margin: 4,
+    borderRadius: 8,
+    flex: 1,
+    maxWidth: '48%',
+    borderWidth: 1,
+    borderColor: '#e4e6eb',
   },
   friendContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     padding: 12,
-  },
-  friendLeft: {
-    flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
-  },
-  friendAvatar: {
-    backgroundColor: '#1877f2',
   },
   friendInfo: {
-    marginLeft: 12,
-    flex: 1,
+    marginTop: 8,
+    width: '100%',
+    alignItems: 'center',
   },
   nameContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
   },
   friendName: {
-    fontSize: 16,
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#050505',
+    textAlign: 'center',
+  },
+  friendMutual: {
+    fontSize: 13,
+    color: '#65676b',
+    textAlign: 'center',
+  },
+  moreButton: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
+  },
+  sectionTitle: {
+    fontSize: 17,
     fontWeight: '600',
     color: '#050505',
   },
-  friendUsername: {
-    fontSize: 14,
+  sectionCount: {
+    fontSize: 15,
     color: '#65676b',
-    marginTop: 2,
   },
-  friendButton: {
-    borderColor: '#ccd0d5',
+  requestsContent: {
+    paddingBottom: 16,
+  },
+  requestsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 8,
+    backgroundColor: '#fff',
   },
   requestCard: {
     backgroundColor: '#fff',
-    marginHorizontal: 12,
-    marginTop: 12,
-    borderRadius: 16,
-    shadowColor: '#667eea',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  requestContainer: {
+    margin: 4,
+    borderRadius: 8,
+    width: '48%',
+    borderWidth: 1,
+    borderColor: '#e4e6eb',
     padding: 12,
   },
-  requestLeft: {
-    flexDirection: 'row',
+  requestTop: {
+    position: 'relative',
     alignItems: 'center',
-    marginBottom: 12,
   },
-  requestAvatar: {
-    backgroundColor: '#1877f2',
+  closeButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
   },
   requestInfo: {
-    marginLeft: 12,
-    flex: 1,
+    marginTop: 8,
+    alignItems: 'center',
   },
   requestName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: '#050505',
+    textAlign: 'center',
   },
-  requestUsername: {
-    fontSize: 14,
+  mutualFriends: {
+    fontSize: 13,
     color: '#65676b',
     marginTop: 2,
+    textAlign: 'center',
   },
   requestButtons: {
-    flexDirection: 'row',
+    marginTop: 12,
     gap: 8,
   },
   acceptButton: {
-    flex: 1,
-    borderRadius: 10,
+    borderRadius: 6,
   },
-  rejectButton: {
-    flex: 1,
+  deleteButton: {
     borderRadius: 6,
     borderColor: '#ccd0d5',
+    backgroundColor: '#e4e6eb',
+  },
+  buttonLabel: {
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  suggestionsContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
   },
   emptyContainer: {
-    padding: 32,
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 100,
+  },
+  emptyList: {
+    flexGrow: 1,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#65676b',
-    textAlign: 'center',
+    marginTop: 12,
+    fontWeight: '500',
+  },
+  emptySubText: {
+    fontSize: 15,
+    color: '#8a8d91',
+    marginTop: 4,
   },
 });
 

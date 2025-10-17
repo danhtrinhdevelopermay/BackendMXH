@@ -137,7 +137,7 @@ const NotificationsScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Thông báo</Text>
+        <Text style={styles.headerTitle}>Thông báo đến</Text>
         {notifications.some(n => !n.is_read) && (
           <TouchableOpacity onPress={handleMarkAllAsRead}>
             <Text style={styles.markAllButton}>Đánh dấu đã đọc tất cả</Text>
