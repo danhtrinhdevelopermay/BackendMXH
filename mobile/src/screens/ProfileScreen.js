@@ -28,25 +28,20 @@ const ProfileScreen = ({ route, navigation }) => {
 
   const fetchUserData = async () => {
     try {
-      if (isOwnProfile) {
-        setProfileUser(currentUser);
-        const [postsResponse, statsResponse] = await Promise.all([
-          postAPI.getUserPosts(currentUser.id),
-          userAPI.getUserStats(currentUser.id)
-        ]);
-        setPosts(postsResponse.data);
-        setStats(statsResponse.data);
-      } else {
-        const [userResponse, postsResponse, statsResponse] = await Promise.all([
-          userAPI.getUserById(userId),
-          postAPI.getUserPosts(userId),
-          userAPI.getUserStats(userId)
-        ]);
-        setProfileUser(userResponse.data);
+      const targetUserId = isOwnProfile ? currentUser.id : userId;
+      
+      const [userResponse, postsResponse, statsResponse] = await Promise.all([
+        userAPI.getUserById(targetUserId),
+        postAPI.getUserPosts(targetUserId),
+        userAPI.getUserStats(targetUserId)
+      ]);
+      
+      setProfileUser(userResponse.data);
+      if (!isOwnProfile) {
         setFriendshipStatus(userResponse.data.friendship_status);
-        setPosts(postsResponse.data);
-        setStats(statsResponse.data);
       }
+      setPosts(postsResponse.data);
+      setStats(statsResponse.data);
     } catch (error) {
       showAlert('Lỗi', 'Không thể tải thông tin người dùng', 'error');
     } finally {
