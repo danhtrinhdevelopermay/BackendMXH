@@ -74,7 +74,13 @@ export async function registerForPushNotificationsAsync() {
         console.log('Push token registered successfully');
       }
     } catch (error) {
-      console.error('Error registering push token:', error);
+      if (error.response?.status === 500) {
+        console.log('⚠️ Push token registration failed (server error). Notifications may not work until this is fixed.');
+      } else if (error.message?.includes('expo-notifications')) {
+        console.log('ℹ️ Push notifications are not fully supported in Expo Go. Use a development build for full functionality.');
+      } else {
+        console.log('⚠️ Could not register push token:', error.message || 'Unknown error');
+      }
     }
   } else {
     console.log('Must use physical device for Push Notifications');
@@ -101,7 +107,7 @@ export async function unregisterPushToken(token) {
       console.log('Push token unregistered successfully');
     }
   } catch (error) {
-    console.error('Error unregistering push token:', error);
+    console.log('⚠️ Could not unregister push token:', error.message || 'Unknown error');
   }
 }
 
