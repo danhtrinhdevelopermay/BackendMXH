@@ -67,3 +67,24 @@ The backend is a RESTful API built with Node.js and Express, following an MVC-li
 
 ### Deployment
 - **Replit**: Current backend deployment.
+
+## Common Issues and Solutions
+
+### Mobile App Cannot Connect to Backend
+**Symptom:** Mobile app reports errors when trying to fetch user information or other data from the backend.
+
+**Root Cause:** The Replit backend URL changes when the project is stopped and restarted. The mobile app's API URL in `mobile/app.json` becomes outdated and points to a non-existent server.
+
+**Solution:**
+1. Check the current Replit domain: Run `env | grep REPLIT_DOMAINS`
+2. Update the `apiUrl` in `mobile/app.json` under the `extra` section to: `https://{current-replit-domain}`
+3. Restart the Expo Mobile App workflow to apply the changes
+
+**Example:**
+```json
+"extra": {
+  "apiUrl": "https://5c208f1b-55f0-400e-86d7-1ca2009b154f-00-2k5xv9y8izfbn.sisko.replit.dev"
+}
+```
+
+Last API URL Update: October 17, 2025 - Updated to `https://5c208f1b-55f0-400e-86d7-1ca2009b154f-00-2k5xv9y8izfbn.sisko.replit.dev`
