@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { Avatar, Button, Text, Card, IconButton } from 'react-native-paper';
+import { View, FlatList, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
+import { Avatar, Text, IconButton } from 'react-native-paper';
 import { notificationAPI } from '../api/api';
 import { useAlert } from '../context/AlertContext';
+import UserAvatar from '../components/UserAvatar';
 
 const NotificationsScreen = () => {
   const { showAlert } = useAlert();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchNotifications = async () => {
     try {
       const response = await notificationAPI.getNotifications();
       setNotifications(response.data);
     } catch (error) {
-      showAlert('Error', 'Failed to fetch notifications', 'error');
+      showAlert('Lỗi', 'Không thể tải thông báo', 'error');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -24,21 +27,28 @@ const NotificationsScreen = () => {
     fetchNotifications();
   }, []);
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchNotifications();
+  };
+
   const handleMarkAsRead = async (id) => {
     try {
       await notificationAPI.markAsRead(id);
-      fetchNotifications();
+      setNotifications(prev => 
+        prev.map(n => n.id === id ? { ...n, is_read: true } : n)
+      );
     } catch (error) {
-      showAlert('Error', 'Failed to mark as read', 'error');
+      showAlert('Lỗi', 'Không thể đánh dấu đã đọc', 'error');
     }
   };
 
   const handleMarkAllAsRead = async () => {
     try {
       await notificationAPI.markAllAsRead();
-      fetchNotifications();
+      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
     } catch (error) {
-      showAlert('Error', 'Failed to mark all as read', 'error');
+      showAlert('Lỗi', 'Không thể đánh dấu tất cả đã đọc', 'error');
     }
   };
 
@@ -47,8 +57,9 @@ const NotificationsScreen = () => {
       case 'friend_request': return 'account-plus';
       case 'friend_accept': return 'account-check';
       case 'comment': return 'comment';
-      case 'reaction': return 'thumb-up';
+      case 'reaction': return 'heart';
       case 'message': return 'message';
+      case 'message_reaction': return 'emoticon-happy';
       default: return 'bell';
     }
   };
@@ -63,64 +74,94 @@ const NotificationsScreen = () => {
       case 'reaction':
         return '#f33e58';
       case 'message':
+      case 'message_reaction':
         return '#9b59b6';
       default:
         return '#65676b';
     }
   };
 
+  const getTimeAgo = (timestamp) => {
+    const now = new Date();
+    const notificationTime = new Date(timestamp);
+    const diffInSeconds = Math.floor((now - notificationTime) / 1000);
+    
+    if (diffInSeconds < 60) return 'Vừa xong';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} phút`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} giờ`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} ngày`;
+    return `${Math.floor(diffInSeconds / 604800)} tuần`;
+  };
+
   const renderNotification = ({ item }) => (
-    <Card 
-      style={[styles.notificationCard, !item.is_read && styles.unreadCard]} 
-      elevation={0}
+    <TouchableOpacity 
+      style={[styles.notificationItem, !item.is_read && styles.unreadItem]}
+      onPress={() => handleMarkAsRead(item.id)}
+      activeOpacity={0.7}
     >
-      <View style={styles.notificationContainer}>
-        <Avatar.Icon 
-          size={56} 
-          icon={getNotificationIcon(item.type)}
-          style={[styles.notificationIcon, { backgroundColor: getNotificationColor(item.type) }]}
+      <View style={styles.avatarContainer}>
+        <UserAvatar 
+          userId={item.sender_id}
+          size={56}
         />
-        <View style={styles.notificationContent}>
-          <Text style={styles.notificationTitle}>
-            <Text style={styles.username}>{item.username || 'Someone'}</Text>{' '}
-            <Text style={styles.notificationText}>{item.content}</Text>
-          </Text>
-        </View>
-        {!item.is_read && (
+        <View style={[styles.iconBadge, { backgroundColor: getNotificationColor(item.type) }]}>
           <IconButton
-            icon="check"
-            size={20}
-            onPress={() => handleMarkAsRead(item.id)}
-            iconColor="#1877f2"
+            icon={getNotificationIcon(item.type)}
+            size={16}
+            iconColor="#fff"
+            style={styles.badgeIcon}
           />
-        )}
+        </View>
       </View>
-    </Card>
+      
+      <View style={styles.contentContainer}>
+        <Text style={styles.notificationText}>
+          <Text style={styles.username}>{item.username || 'Ai đó'}</Text>{' '}
+          <Text style={styles.message}>{item.content}</Text>
+        </Text>
+        <Text style={styles.timeText}>{getTimeAgo(item.created_at)}</Text>
+      </View>
+
+      {!item.is_read && (
+        <View style={styles.unreadDot} />
+      )}
+    </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      {notifications.some(n => !n.is_read) && (
-        <View style={styles.headerContainer}>
-          <Button 
-            mode="text" 
-            onPress={handleMarkAllAsRead} 
-            textColor="#1877f2"
-          >
-            Xóa Tất Cả
-          </Button>
-        </View>
-      )}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Thông báo</Text>
+        {notifications.some(n => !n.is_read) && (
+          <TouchableOpacity onPress={handleMarkAllAsRead}>
+            <Text style={styles.markAllButton}>Đánh dấu đã đọc tất cả</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      
       <FlatList
         data={notifications}
         renderItem={renderNotification}
         keyExtractor={(item) => item.id.toString()}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#1877f2']}
+            tintColor="#1877f2"
+          />
+        }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No notifications</Text>
+            <IconButton
+              icon="bell-outline"
+              size={64}
+              iconColor="#bcc0c4"
+            />
+            <Text style={styles.emptyText}>Chưa có thông báo</Text>
           </View>
         }
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={notifications.length === 0 ? styles.emptyList : null}
       />
     </View>
   );
@@ -129,70 +170,100 @@ const NotificationsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f2f5',
-  },
-  headerContainer: {
     backgroundColor: '#fff',
-    alignItems: 'flex-end',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#e4e6eb',
-  },
-  listContent: {
-    flexGrow: 1,
-    paddingTop: 12,
-    paddingBottom: 16,
-  },
-  notificationCard: {
     backgroundColor: '#fff',
-    marginHorizontal: 12,
-    marginBottom: 10,
-    borderRadius: 16,
-    shadowColor: '#667eea',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 2,
   },
-  unreadCard: {
-    backgroundColor: '#f0f8ff',
-    borderLeftWidth: 4,
-    borderLeftColor: '#667eea',
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#050505',
   },
-  notificationContainer: {
+  markAllButton: {
+    fontSize: 15,
+    color: '#1877f2',
+    fontWeight: '500',
+  },
+  notificationItem: {
     flexDirection: 'row',
     padding: 12,
     alignItems: 'center',
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e4e6eb',
   },
-  notificationIcon: {
-    backgroundColor: '#1877f2',
+  unreadItem: {
+    backgroundColor: '#e7f3ff',
   },
-  notificationContent: {
+  avatarContainer: {
+    position: 'relative',
+    marginRight: 12,
+  },
+  iconBadge: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  badgeIcon: {
+    margin: 0,
+    padding: 0,
+  },
+  contentContainer: {
     flex: 1,
-    marginLeft: 12,
+    justifyContent: 'center',
   },
-  notificationTitle: {
+  notificationText: {
     fontSize: 15,
     lineHeight: 20,
+    color: '#050505',
   },
   username: {
     fontWeight: '600',
     color: '#050505',
   },
-  notificationText: {
+  message: {
     color: '#050505',
+  },
+  timeText: {
+    fontSize: 13,
+    color: '#65676b',
+    marginTop: 2,
+  },
+  unreadDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#1877f2',
+    marginLeft: 8,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 32,
+    paddingVertical: 100,
+  },
+  emptyList: {
+    flexGrow: 1,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#65676b',
-    textAlign: 'center',
+    marginTop: 12,
   },
 });
 
