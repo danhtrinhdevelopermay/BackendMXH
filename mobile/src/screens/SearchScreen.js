@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Button } from 'react-native-paper';
 import { friendshipAPI, postAPI } from '../api/api';
-import Constants from 'expo-constants';
+import { useAlert } from '../context/AlertContext';
+import UserAvatar from '../components/UserAvatar';
 import VerifiedBadge from '../components/VerifiedBadge';
+import Constants from 'expo-constants';
 
 const SearchScreen = ({ navigation }) => {
+  const { showAlert } = useAlert();
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('users');
+  const [activeTab, setActiveTab] = useState('all');
   const [users, setUsers] = useState([]);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [sentRequests, setSentRequests] = useState(new Set());
 
   useEffect(() => {
     if (searchQuery.trim().length > 0) {
@@ -24,10 +29,11 @@ const SearchScreen = ({ navigation }) => {
   const searchData = async () => {
     setLoading(true);
     try {
-      if (activeTab === 'users') {
+      if (activeTab === 'all' || activeTab === 'users') {
         const response = await friendshipAPI.searchUsers(searchQuery);
         setUsers(response.data);
-      } else {
+      }
+      if (activeTab === 'all' || activeTab === 'posts') {
         const response = await postAPI.searchPosts(searchQuery);
         setPosts(response.data);
       }
@@ -38,30 +44,48 @@ const SearchScreen = ({ navigation }) => {
     }
   };
 
+  const handleSendFriendRequest = async (userId) => {
+    try {
+      await friendshipAPI.sendFriendRequest({ addressee_id: userId });
+      setSentRequests(prev => new Set([...prev, userId]));
+      showAlert('Thành công', 'Đã gửi lời mời kết bạn', 'success');
+    } catch (error) {
+      showAlert('Lỗi', 'Không thể gửi lời mời kết bạn', 'error');
+    }
+  };
+
   const renderUser = ({ item }) => (
-    <TouchableOpacity 
-      style={styles.userItem}
-      onPress={() => navigation.navigate('Profile', { userId: item.id })}
-    >
-      <View style={styles.userInfo}>
-        {item.avatar_url ? (
-          <Image source={{ uri: item.avatar_url }} style={styles.avatar} />
-        ) : (
-          <View style={[styles.avatar, styles.avatarPlaceholder]}>
-            <Ionicons name="person" size={24} color="#65676b" />
-          </View>
-        )}
+    <View style={styles.userItem}>
+      <TouchableOpacity 
+        style={styles.userContent}
+        onPress={() => navigation.navigate('Profile', { userId: item.id })}
+        activeOpacity={0.7}
+      >
+        <UserAvatar 
+          user={item}
+          size={60}
+        />
         <View style={styles.userDetails}>
           <View style={styles.userNameContainer}>
-            <Text style={styles.userName}>{item.full_name}</Text>
+            <Text style={styles.userName} numberOfLines={1}>{item.full_name || item.username}</Text>
             <VerifiedBadge isVerified={item.is_verified} size={16} />
           </View>
-          <Text style={styles.username}>@{item.username}</Text>
+          <Text style={styles.username} numberOfLines={1}>@{item.username}</Text>
           {item.bio && <Text style={styles.bio} numberOfLines={1}>{item.bio}</Text>}
         </View>
-      </View>
-      <Ionicons name="chevron-forward" size={20} color="#65676b" />
-    </TouchableOpacity>
+      </TouchableOpacity>
+      <Button
+        mode="contained"
+        onPress={() => handleSendFriendRequest(item.id)}
+        style={styles.addFriendButton}
+        buttonColor="#1877f2"
+        labelStyle={styles.addFriendLabel}
+        disabled={sentRequests.has(item.id)}
+        compact
+      >
+        {sentRequests.has(item.id) ? 'Đã gửi' : 'Thêm bạn bè'}
+      </Button>
+    </View>
   );
 
   const renderPost = ({ item }) => {
@@ -71,32 +95,34 @@ const SearchScreen = ({ navigation }) => {
     return (
       <TouchableOpacity 
         style={styles.postItem}
-        onPress={() => navigation.navigate('Home')}
+        onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
+        activeOpacity={0.7}
       >
         <View style={styles.postHeader}>
           <TouchableOpacity 
             style={styles.postAuthorInfo}
             onPress={() => navigation.navigate('Profile', { userId: item.user_id })}
           >
-            {item.avatar_url ? (
-              <Image source={{ uri: item.avatar_url }} style={styles.postAvatar} />
-            ) : (
-              <View style={[styles.postAvatar, styles.avatarPlaceholder]}>
-                <Ionicons name="person" size={16} color="#65676b" />
-              </View>
-            )}
-            <View>
+            <UserAvatar 
+              user={{ id: item.user_id, avatar_url: item.avatar_url }}
+              size={40}
+            />
+            <View style={styles.postAuthorDetails}>
               <View style={styles.postAuthorNameContainer}>
                 <Text style={styles.postAuthorName}>{item.author_name}</Text>
                 <VerifiedBadge isVerified={item.is_verified} size={14} />
               </View>
-              <Text style={styles.postTime}>{new Date(item.created_at).toLocaleDateString()}</Text>
+              <Text style={styles.postTime}>{new Date(item.created_at).toLocaleDateString('vi-VN')}</Text>
             </View>
           </TouchableOpacity>
         </View>
         {item.content && <Text style={styles.postContent} numberOfLines={3}>{item.content}</Text>}
         {mediaUrl && item.media_type?.startsWith('image/') && (
-          <Image source={{ uri: mediaUrl }} style={styles.postImage} />
+          <UserAvatar 
+            user={{ avatar_url: mediaUrl }}
+            size={200}
+            style={styles.postImage}
+          />
         )}
       </TouchableOpacity>
     );
@@ -104,15 +130,22 @@ const SearchScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer}>
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={24} color="#050505" />
+        </TouchableOpacity>
         <View style={styles.searchInputContainer}>
           <Ionicons name="search" size={20} color="#65676b" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Tìm kiếm người dùng hoặc bài viết..."
+            placeholder="Tìm kiếm trên Facebook"
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoFocus
+            placeholderTextColor="#65676b"
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
@@ -122,47 +155,69 @@ const SearchScreen = ({ navigation }) => {
         </View>
       </View>
 
-      <View style={styles.tabContainer}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filtersContainer}>
         <TouchableOpacity 
-          style={[styles.tab, activeTab === 'users' && styles.activeTab]}
+          style={[styles.filterChip, activeTab === 'all' && styles.activeFilterChip]}
+          onPress={() => setActiveTab('all')}
+        >
+          <Text style={[styles.filterText, activeTab === 'all' && styles.activeFilterText]}>Tất cả</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.filterChip, activeTab === 'users' && styles.activeFilterChip]}
           onPress={() => setActiveTab('users')}
         >
-          <Text style={[styles.tabText, activeTab === 'users' && styles.activeTabText]}>Người dùng</Text>
+          <Text style={[styles.filterText, activeTab === 'users' && styles.activeFilterText]}>Mọi người</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={[styles.tab, activeTab === 'posts' && styles.activeTab]}
+          style={[styles.filterChip, activeTab === 'posts' && styles.activeFilterChip]}
           onPress={() => setActiveTab('posts')}
         >
-          <Text style={[styles.tabText, activeTab === 'posts' && styles.activeTabText]}>Bài viết</Text>
+          <Text style={[styles.filterText, activeTab === 'posts' && styles.activeFilterText]}>Bài viết</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
 
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#1877f2" />
         </View>
       ) : (
-        <FlatList
-          data={activeTab === 'users' ? users : posts}
-          renderItem={activeTab === 'users' ? renderUser : renderPost}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={styles.listContainer}
-          ListEmptyComponent={
-            searchQuery.trim().length > 0 ? (
-              <View style={styles.emptyContainer}>
-                <Ionicons name="search-outline" size={64} color="#e4e6eb" />
-                <Text style={styles.emptyText}>
-                  {activeTab === 'users' ? 'Không tìm thấy người dùng' : 'Không tìm thấy bài viết'}
-                </Text>
-              </View>
-            ) : (
-              <View style={styles.emptyContainer}>
-                <Ionicons name="search-outline" size={64} color="#e4e6eb" />
-                <Text style={styles.emptyText}>Nhập từ khóa để tìm kiếm</Text>
-              </View>
-            )
-          }
-        />
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {searchQuery.trim().length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Ionicons name="search-outline" size={80} color="#bcc0c4" />
+              <Text style={styles.emptyTitle}>Tìm kiếm trên Facebook</Text>
+              <Text style={styles.emptyText}>Tìm kiếm bạn bè, bài viết và nhiều hơn nữa</Text>
+            </View>
+          ) : (
+            <>
+              {(activeTab === 'all' || activeTab === 'users') && users.length > 0 && (
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Mọi người</Text>
+                  {users.map((item) => (
+                    <View key={item.id}>{renderUser({ item })}</View>
+                  ))}
+                </View>
+              )}
+              
+              {(activeTab === 'all' || activeTab === 'posts') && posts.length > 0 && (
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Bài viết</Text>
+                  {posts.map((item) => (
+                    <View key={item.id}>{renderPost({ item })}</View>
+                  ))}
+                </View>
+              )}
+
+              {users.length === 0 && posts.length === 0 && (
+                <View style={styles.emptyContainer}>
+                  <Ionicons name="search-outline" size={80} color="#bcc0c4" />
+                  <Text style={styles.emptyTitle}>Không tìm thấy kết quả</Text>
+                  <Text style={styles.emptyText}>Hãy thử tìm kiếm với từ khóa khác</Text>
+                </View>
+              )}
+            </>
+          )}
+        </ScrollView>
       )}
     </View>
   );
@@ -171,15 +226,23 @@ const SearchScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f2f5',
-  },
-  searchContainer: {
     backgroundColor: '#fff',
-    padding: 12,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e4e6eb',
+    gap: 12,
+  },
+  backButton: {
+    padding: 4,
   },
   searchInputContainer: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f0f2f5',
@@ -195,72 +258,65 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#050505',
   },
-  tabContainer: {
-    flexDirection: 'row',
+  filtersContainer: {
     backgroundColor: '#fff',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#e4e6eb',
   },
-  tab: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
+  filterChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#e4e6eb',
+    marginRight: 8,
   },
-  activeTab: {
-    borderBottomColor: '#1877f2',
+  activeFilterChip: {
+    backgroundColor: '#e7f3ff',
   },
-  tabText: {
+  filterText: {
     fontSize: 15,
     fontWeight: '600',
     color: '#65676b',
   },
-  activeTabText: {
+  activeFilterText: {
     color: '#1877f2',
   },
-  listContainer: {
+  scrollContent: {
     flexGrow: 1,
-    paddingTop: 12,
     paddingBottom: 16,
   },
+  section: {
+    marginTop: 12,
+  },
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: '#050505',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
   userItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: '#fff',
-    padding: 14,
-    marginHorizontal: 12,
-    marginBottom: 10,
-    borderRadius: 16,
-    shadowColor: '#667eea',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e4e6eb',
   },
-  userInfo: {
+  userContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 12,
-  },
-  avatarPlaceholder: {
-    backgroundColor: '#f0f2f5',
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginBottom: 8,
   },
   userDetails: {
     flex: 1,
+    marginLeft: 12,
   },
   userNameContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 2,
   },
   userName: {
     fontSize: 16,
@@ -270,79 +326,86 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 14,
     color: '#65676b',
-    marginTop: 2,
   },
   bio: {
     fontSize: 13,
     color: '#65676b',
     marginTop: 2,
   },
+  addFriendButton: {
+    alignSelf: 'flex-start',
+    borderRadius: 6,
+  },
+  addFriendLabel: {
+    fontSize: 15,
+    fontWeight: '600',
+  },
   postItem: {
     backgroundColor: '#fff',
-    padding: 14,
-    marginHorizontal: 12,
-    marginBottom: 10,
-    borderRadius: 16,
-    shadowColor: '#667eea',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e4e6eb',
   },
   postHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   postAuthorInfo: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  postAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    marginRight: 8,
+  postAuthorDetails: {
+    marginLeft: 12,
   },
   postAuthorNameContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 2,
   },
   postAuthorName: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
     color: '#050505',
   },
   postTime: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#65676b',
   },
   postContent: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#050505',
-    marginBottom: 8,
+    lineHeight: 20,
+    marginBottom: 12,
   },
   postImage: {
     width: '100%',
     height: 200,
     borderRadius: 8,
-    backgroundColor: '#f0f2f5',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#fff',
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 100,
+    paddingTop: 120,
+    paddingHorizontal: 32,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#050505',
+    marginTop: 16,
+    marginBottom: 8,
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#65676b',
-    marginTop: 16,
+    textAlign: 'center',
   },
 });
 
