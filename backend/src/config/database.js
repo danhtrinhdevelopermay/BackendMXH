@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { Pool } = require('pg');
 
 // Neon database configuration (optional)
@@ -15,6 +16,7 @@ try {
 }
 
 if (!process.env.DATABASE_URL) {
+  console.error('Available environment variables:', Object.keys(process.env).filter(k => k.includes('DATABASE')));
   throw new Error(
     "DATABASE_URL must be set. Did you forget to provision a database?",
   );

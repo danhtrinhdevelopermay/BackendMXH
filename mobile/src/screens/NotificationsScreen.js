@@ -14,9 +14,15 @@ const NotificationsScreen = () => {
   const fetchNotifications = async () => {
     try {
       const response = await notificationAPI.getNotifications();
-      setNotifications(response.data);
+      if (response && response.data) {
+        setNotifications(response.data);
+      }
     } catch (error) {
-      showAlert('Lỗi', 'Không thể tải thông báo', 'error');
+      console.log('Failed to fetch notifications:', error?.message || error);
+      setNotifications([]);
+      if (!loading) {
+        showAlert('Lỗi', 'Không thể kết nối đến server. Vui lòng thử lại sau.', 'error');
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);

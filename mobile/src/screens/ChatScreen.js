@@ -69,9 +69,12 @@ const ChatScreen = ({ route, navigation }) => {
   const fetchMessages = async () => {
     try {
       const response = await messageAPI.getMessages(userId);
-      setMessages(response.data.reverse());
+      if (response && response.data && Array.isArray(response.data)) {
+        setMessages(response.data.reverse());
+      }
     } catch (error) {
-      console.error('Failed to fetch messages');
+      console.error('Failed to fetch messages:', error?.message || error);
+      setMessages([]);
     }
   };
 
@@ -125,7 +128,8 @@ const ChatScreen = ({ route, navigation }) => {
       
       fetchMessages();
     } catch (error) {
-      console.error('Failed to send message');
+      console.error('Failed to send message:', error?.message || error);
+      showAlert('Lỗi', 'Không thể gửi tin nhắn. Vui lòng kiểm tra kết nối.', 'error');
     } finally {
       setLoading(false);
     }
