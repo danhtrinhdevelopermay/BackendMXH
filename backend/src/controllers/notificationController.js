@@ -5,7 +5,7 @@ const getNotifications = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT n.id, n.user_id, n.type, n.content, n.related_user_id, n.post_id, n.is_read, n.created_at,
+      `SELECT n.id, n.user_id, n.type, n.content, n.related_user_id, n.related_post_id, n.is_read, n.created_at,
        u.username, u.full_name, u.avatar_url,
        CASE 
          WHEN n.related_user_id IS NOT NULL THEN COALESCE(u.full_name, u.username) || ' ' || n.content
