@@ -49,21 +49,33 @@ const login = async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const result = await pool.query(
+    const results = await pool.queryBoth(
       'SELECT * FROM users WHERE username = $1 OR email = $1',
       [username]
     );
 
-    if (result.rows.length === 0) {
+    let user = null;
+    let dbSource = null;
+
+    if (results.primary && results.primary.rows.length > 0) {
+      user = results.primary.rows[0];
+      dbSource = 'primary';
+    } else if (results.secondary && results.secondary.rows.length > 0) {
+      user = results.secondary.rows[0];
+      dbSource = 'secondary';
+    }
+
+    if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const user = result.rows[0];
     const validPassword = await bcrypt.compare(password, user.password_hash);
 
     if (!validPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+
+    console.log(`✅ User ${username} logged in from ${dbSource} database`);
 
     const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '7d' });
 
