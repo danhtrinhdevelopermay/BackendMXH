@@ -1,8 +1,4 @@
-const { neonConfig } = require('@neondatabase/serverless');
 const { Pool } = require('pg');
-
-neonConfig.useSecureWebSocket = false;
-neonConfig.pipelineConnect = false;
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
