@@ -30,6 +30,7 @@ import VoiceCallScreen from '../screens/VoiceCallScreen';
 import PostDetailScreen from '../screens/PostDetailScreen';
 import CreateStoryScreen from '../screens/CreateStoryScreen';
 import ViewStoryScreen from '../screens/ViewStoryScreen';
+import CreateThoughtScreen from '../screens/CreateThoughtScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -485,6 +486,15 @@ const NavigationWrapper = () => {
               options={{ 
                 headerShown: false,
                 ...fadeTransition,
+              }} 
+            />
+            <Stack.Screen 
+              name="CreateThought" 
+              component={CreateThoughtScreen} 
+              options={{ 
+                headerShown: false,
+                ...modalTransition,
+                presentation: 'modal',
               }} 
             />
           </>

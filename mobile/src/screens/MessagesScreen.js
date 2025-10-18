@@ -9,7 +9,6 @@ import { useAlert } from '../context/AlertContext';
 import { AuthContext } from '../context/AuthContext';
 import UserAvatar from '../components/UserAvatar';
 import ThoughtsBar from '../components/ThoughtsBar';
-import CreateThoughtModal from '../components/CreateThoughtModal';
 
 const MessagesScreen = ({ navigation }) => {
   const { showAlert } = useAlert();
@@ -18,7 +17,6 @@ const MessagesScreen = ({ navigation }) => {
   const [conversations, setConversations] = useState([]);
   const [thoughts, setThoughts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [modalVisible, setModalVisible] = useState(false);
   const [currentUserThought, setCurrentUserThought] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -51,31 +49,26 @@ const MessagesScreen = ({ navigation }) => {
     
     fetchConversations();
     fetchThoughts();
+    
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchThoughts();
+    });
+    
     const interval = setInterval(() => {
       fetchConversations();
       fetchThoughts();
     }, 5000);
-    return () => clearInterval(interval);
-  }, [user]);
+    
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
+  }, [user, navigation]);
 
   const handleCreateThought = () => {
-    setModalVisible(true);
-  };
-
-  const handleSaveThought = async (thoughtData) => {
-    try {
-      if (thoughtData === null) {
-        await thoughtAPI.deleteThought();
-        showAlert('Thành công', 'Đã xóa suy nghĩ', 'success');
-      } else {
-        await thoughtAPI.createOrUpdateThought(thoughtData);
-        showAlert('Thành công', 'Đã lưu suy nghĩ', 'success');
-      }
-      fetchThoughts();
-      setModalVisible(false);
-    } catch (error) {
-      showAlert('Lỗi', 'Không thể lưu suy nghĩ', 'error');
-    }
+    navigation.navigate('CreateThought', { 
+      initialThought: currentUserThought 
+    });
   };
 
   const formatTime = (timestamp) => {
@@ -224,13 +217,6 @@ const MessagesScreen = ({ navigation }) => {
         }
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-      />
-      
-      <CreateThoughtModal
-        visible={modalVisible}
-        onDismiss={() => setModalVisible(false)}
-        onSave={handleSaveThought}
-        initialThought={currentUserThought}
       />
     </View>
   );
