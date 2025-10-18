@@ -5,7 +5,12 @@ const getNotifications = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT n.*, u.username, u.full_name, u.avatar_url 
+      `SELECT n.id, n.user_id, n.type, n.content, n.related_user_id, n.post_id, n.is_read, n.created_at,
+       u.username, u.full_name, u.avatar_url,
+       CASE 
+         WHEN n.related_user_id IS NOT NULL THEN COALESCE(u.full_name, u.username) || ' ' || n.content
+         ELSE n.content
+       END as message
        FROM notifications n 
        LEFT JOIN users u ON n.related_user_id = u.id 
        WHERE n.user_id = $1 
@@ -14,7 +19,7 @@ const getNotifications = async (req, res) => {
       [user_id]
     );
 
-    res.json(result.rows);
+    res.json({ notifications: result.rows });
   } catch (error) {
     console.error('Get notifications error:', error);
     res.status(500).json({ error: 'Server error' });

@@ -40,7 +40,7 @@ const getConversations = async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT DISTINCT ON (other_user_id) 
-       other_user_id, username, full_name, avatar_url, 
+       other_user_id as id, username, full_name, avatar_url, 
        last_message, last_message_time, is_read
        FROM (
          SELECT 
@@ -59,7 +59,7 @@ const getConversations = async (req, res) => {
       [user_id]
     );
 
-    res.json(result.rows);
+    res.json({ conversations: result.rows });
   } catch (error) {
     console.error('Get conversations error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -88,7 +88,7 @@ const getMessages = async (req, res) => {
       [userId, current_user_id]
     );
 
-    res.json(result.rows);
+    res.json({ messages: result.rows });
   } catch (error) {
     console.error('Get messages error:', error);
     res.status(500).json({ error: 'Server error' });
