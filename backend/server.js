@@ -37,9 +37,7 @@ const upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 }
 });
 
-app.get('/', (req, res) => {
-  res.json({ message: 'Social Media API is running' });
-});
+app.use(express.static(path.join(__dirname, '../web')));
 
 app.get('/health', (req, res) => {
   res.json({ 
@@ -270,6 +268,14 @@ io.on('connection', (socket) => {
       }
     }
   });
+});
+
+app.use((req, res) => {
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(path.join(__dirname, '../web/index.html'));
+  } else {
+    res.status(404).json({ error: 'API endpoint not found' });
+  }
 });
 
 server.listen(PORT, '0.0.0.0', () => {
