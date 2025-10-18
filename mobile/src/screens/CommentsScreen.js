@@ -67,7 +67,7 @@ const CommentsScreen = ({ route }) => {
   );
 
   return (
-    <BlurView intensity={95} tint="light" style={styles.blurContainer}>
+    <BlurView intensity={80} tint="systemMaterialLight" style={styles.blurContainer}>
       <KeyboardAvoidingView 
         style={styles.container} 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
