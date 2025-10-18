@@ -430,7 +430,8 @@ const NavigationWrapper = () => {
               options={{ 
                 headerShown: true, 
                 title: 'Bài viết',
-                ...slideFromRightTransition,
+                ...modalTransition,
+                presentation: 'modal',
               }} 
             />
             <Stack.Screen 
