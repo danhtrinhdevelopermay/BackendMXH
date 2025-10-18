@@ -1,5 +1,19 @@
 const { Pool } = require('pg');
 
+// Neon database configuration (optional)
+// Only use neonConfig if @neondatabase/serverless is installed
+let neonConfig;
+try {
+  neonConfig = require('@neondatabase/serverless').neonConfig;
+  if (neonConfig) {
+    neonConfig.useSecureWebSocket = false;
+    neonConfig.pipelineConnect = false;
+    console.log('✅ Neon serverless config loaded');
+  }
+} catch (err) {
+  console.log('ℹ️ Using standard PostgreSQL connection (Neon config not available)');
+}
+
 if (!process.env.DATABASE_URL) {
   throw new Error(
     "DATABASE_URL must be set. Did you forget to provision a database?",
