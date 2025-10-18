@@ -61,7 +61,7 @@ const getComments = async (req, res) => {
   const { postId } = req.params;
 
   try {
-    const result = await pool.query(
+    const result = await pool.queryAll(
       `SELECT c.*, u.username, u.full_name, u.avatar_url 
        FROM comments c 
        JOIN users u ON c.user_id = u.id 

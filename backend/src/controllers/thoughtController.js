@@ -25,7 +25,7 @@ const getAllThoughts = async (req, res) => {
   const user_id = req.user.id;
 
   try {
-    const result = await pool.query(
+    const result = await pool.queryAll(
       `SELECT t.*, u.username, u.full_name, u.avatar_url
        FROM user_thoughts t
        JOIN users u ON t.user_id = u.id
@@ -52,7 +52,7 @@ const getUserThought = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const result = await pool.query(
+    const result = await pool.queryAll(
       `SELECT t.*, u.username, u.full_name, u.avatar_url
        FROM user_thoughts t
        JOIN users u ON t.user_id = u.id

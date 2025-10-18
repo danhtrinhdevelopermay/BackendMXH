@@ -4,7 +4,7 @@ const getNotifications = async (req, res) => {
   const user_id = req.user.id;
 
   try {
-    const result = await pool.query(
+    const result = await pool.queryAll(
       `SELECT n.*, u.username, u.full_name, u.avatar_url 
        FROM notifications n 
        LEFT JOIN users u ON n.related_user_id = u.id 

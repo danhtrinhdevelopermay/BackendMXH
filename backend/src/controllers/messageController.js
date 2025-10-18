@@ -38,7 +38,7 @@ const getConversations = async (req, res) => {
   const user_id = req.user.id;
 
   try {
-    const result = await pool.query(
+    const result = await pool.queryAll(
       `SELECT DISTINCT ON (other_user_id) 
        other_user_id, username, full_name, avatar_url, 
        last_message, last_message_time, is_read
@@ -71,7 +71,7 @@ const getMessages = async (req, res) => {
   const current_user_id = req.user.id;
 
   try {
-    const result = await pool.query(
+    const result = await pool.queryAll(
       `SELECT m.*, 
        sender.username as sender_username, sender.avatar_url as sender_avatar,
        receiver.username as receiver_username, receiver.avatar_url as receiver_avatar

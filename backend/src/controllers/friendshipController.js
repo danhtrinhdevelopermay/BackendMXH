@@ -95,7 +95,7 @@ const getFriends = async (req, res) => {
   const user_id = req.user.id;
 
   try {
-    const result = await pool.query(
+    const result = await pool.queryAll(
       `SELECT u.id, u.username, u.full_name, u.avatar_url, u.bio, u.is_verified 
        FROM users u 
        JOIN friendships f ON (f.requester_id = u.id OR f.addressee_id = u.id) 
@@ -116,7 +116,7 @@ const getFriendRequests = async (req, res) => {
   const user_id = req.user.id;
 
   try {
-    const result = await pool.query(
+    const result = await pool.queryAll(
       `SELECT f.id as request_id, u.id as user_id, u.username, u.full_name, u.avatar_url, u.is_verified, f.created_at 
        FROM friendships f 
        JOIN users u ON f.requester_id = u.id 
@@ -137,7 +137,7 @@ const searchUsers = async (req, res) => {
   const user_id = req.user.id;
 
   try {
-    const result = await pool.query(
+    const result = await pool.queryAll(
       `SELECT id, username, full_name, avatar_url, bio, is_verified 
        FROM users 
        WHERE (username ILIKE $1 OR full_name ILIKE $1) AND id != $2 
@@ -156,7 +156,7 @@ const getSuggestedFriends = async (req, res) => {
   const user_id = req.user.id;
 
   try {
-    const result = await pool.query(
+    const result = await pool.queryAll(
       `WITH user_friends AS (
         SELECT CASE 
           WHEN requester_id = $1 THEN addressee_id 

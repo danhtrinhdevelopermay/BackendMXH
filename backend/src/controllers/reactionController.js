@@ -100,7 +100,7 @@ const getReactions = async (req, res) => {
 
   try {
     const [reactionsResult, summaryResult] = await Promise.all([
-      pool.query(
+      pool.queryAll(
         `SELECT r.*, u.username, u.full_name, u.avatar_url, u.is_verified
          FROM reactions r 
          JOIN users u ON r.user_id = u.id 
@@ -108,7 +108,7 @@ const getReactions = async (req, res) => {
          ORDER BY r.created_at DESC`,
         [postId]
       ),
-      pool.query(
+      pool.queryAll(
         `SELECT reaction_type, COUNT(*) as count
          FROM reactions
          WHERE post_id = $1

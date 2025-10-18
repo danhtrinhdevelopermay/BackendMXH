@@ -70,7 +70,7 @@ const getNewsFeed = async (req, res) => {
       return res.json(cachedData);
     }
 
-    const result = await pool.query(
+    const result = await pool.queryAll(
       `WITH friend_ids AS (
          SELECT CASE 
            WHEN requester_id = $1 THEN addressee_id 
@@ -141,7 +141,7 @@ const getUserPosts = async (req, res) => {
       return res.json(cachedData);
     }
 
-    const result = await pool.query(
+    const result = await pool.queryAll(
       `WITH visible_posts AS (
          SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.privacy, p.created_at, p.updated_at
          FROM posts p
@@ -224,7 +224,7 @@ const searchPosts = async (req, res) => {
   const user_id = req.user.id;
 
   try {
-    const result = await pool.query(
+    const result = await pool.queryAll(
       `SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.privacy, p.created_at, p.updated_at,
        u.username, u.full_name as author_name, u.avatar_url,
        (SELECT COUNT(*) FROM reactions WHERE post_id = p.id) as reaction_count,

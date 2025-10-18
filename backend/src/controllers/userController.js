@@ -5,7 +5,7 @@ const getUserById = async (req, res) => {
   const currentUserId = req.user.id;
 
   try {
-    const userResult = await pool.query(
+    const userResult = await pool.queryAll(
       'SELECT id, username, email, full_name, avatar_url, bio, is_verified, created_at FROM users WHERE id = $1',
       [userId]
     );
@@ -16,7 +16,7 @@ const getUserById = async (req, res) => {
 
     const user = userResult.rows[0];
 
-    const friendshipResult = await pool.query(
+    const friendshipResult = await pool.queryAll(
       `SELECT id, status, requester_id, addressee_id 
        FROM friendships 
        WHERE (requester_id = $1 AND addressee_id = $2) 
@@ -58,13 +58,13 @@ const getUserStats = async (req, res) => {
 
   try {
     const [postsResult, friendsResult, photosResult] = await Promise.all([
-      pool.query('SELECT COUNT(*) FROM posts WHERE user_id = $1', [userId]),
-      pool.query(
+      pool.queryAll('SELECT COUNT(*) FROM posts WHERE user_id = $1', [userId]),
+      pool.queryAll(
         `SELECT COUNT(*) FROM friendships 
          WHERE status = 'accepted' AND (requester_id = $1 OR addressee_id = $1)`,
         [userId]
       ),
-      pool.query(
+      pool.queryAll(
         'SELECT COUNT(*) FROM posts WHERE user_id = $1 AND media_url IS NOT NULL',
         [userId]
       )

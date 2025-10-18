@@ -62,7 +62,7 @@ const getAllStories = async (req, res) => {
   const current_user_id = req.user.id;
 
   try {
-    const result = await pool.query(
+    const result = await pool.queryAll(
       `SELECT DISTINCT ON (s.user_id) s.*, u.username, u.full_name, u.avatar_url,
        (SELECT COUNT(*) FROM stories WHERE user_id = s.user_id AND expires_at > NOW()) as story_count
        FROM stories s
@@ -87,7 +87,7 @@ const getUserStories = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const result = await pool.query(
+    const result = await pool.queryAll(
       `SELECT s.*, u.username, u.full_name, u.avatar_url
        FROM stories s
        JOIN users u ON s.user_id = u.id
