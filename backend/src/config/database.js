@@ -136,6 +136,39 @@ class DualDatabasePool {
     return results;
   }
 
+  async queryAll(text, params) {
+    const results = await this.queryBoth(text, params);
+    const allRows = [];
+    
+    if (results.primary && results.primary.rows) {
+      allRows.push(...results.primary.rows);
+    }
+    
+    if (results.secondary && results.secondary.rows) {
+      allRows.push(...results.secondary.rows);
+    }
+    
+    const uniqueRows = [];
+    const seenIds = new Set();
+    
+    for (const row of allRows) {
+      if (row.id && !seenIds.has(row.id)) {
+        seenIds.add(row.id);
+        uniqueRows.push(row);
+      } else if (!row.id) {
+        uniqueRows.push(row);
+      }
+    }
+    
+    if (uniqueRows.length > 0 && uniqueRows[0].created_at) {
+      uniqueRows.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    } else if (uniqueRows.length > 0 && uniqueRows[0].updated_at) {
+      uniqueRows.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+    }
+    
+    return { rows: uniqueRows, rowCount: uniqueRows.length };
+  }
+
   async end() {
     await this.primary.end();
     if (this.secondary) {
