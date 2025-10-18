@@ -95,8 +95,10 @@ function createPostCard(post) {
 }
 
 function renderMedia(url, type) {
-    if (type === 'video') {
+    if (type && type.startsWith('video')) {
         return `<video class="post-video" controls src="${url}"></video>`;
+    } else if (type && type.startsWith('image')) {
+        return `<img class="post-media" src="${url}" alt="Post media">`;
     } else {
         return `<img class="post-media" src="${url}" alt="Post media">`;
     }
