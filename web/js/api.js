@@ -1,4 +1,4 @@
-const API_BASE_URL = window.location.origin;
+const API_BASE_URL = window.APP_CONFIG?.apiUrl || window.location.origin;
 
 class API {
     constructor() {
