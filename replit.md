@@ -1,7 +1,7 @@
 # Layedia - Social Media App
 
 ## Overview
-Layedia is a full-stack social media application, similar to Facebook, designed for mobile platforms using React Native/Expo. Its backend is built with Node.js/Express and PostgreSQL. The application provides essential social networking functionalities such as posts, reactions, comments, friend connections, direct messaging, and real-time notifications. The vision for Layedia is to create a dynamic and engaging platform for users to connect and share, leveraging a modern tech stack for scalability and a rich user experience.
+Layedia (also known as Shatter) is a full-stack social media application, similar to Facebook, available on both mobile and web platforms. The mobile version uses React Native/Expo, while the web version is built with HTML, CSS, and JavaScript. The backend is built with Node.js/Express and PostgreSQL. The application provides essential social networking functionalities such as posts, reactions, comments, friend connections, direct messaging, and real-time notifications. The vision is to create a dynamic and engaging platform for users to connect and share, leveraging a modern tech stack for scalability and a rich user experience.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -80,3 +80,60 @@ The backend is a RESTful API built with Node.js and Express, following an MVC-li
 
 ### Deployment
 - **Replit**: Current backend deployment.
+
+## Web Application (NEW)
+
+### Overview
+A fully functional web version of Shatter built with vanilla HTML, CSS, and JavaScript. The web app shares the same backend API as the mobile app and provides a desktop-optimized experience.
+
+### Architecture
+- **Frontend**: Pure HTML5, CSS3, JavaScript (no frameworks)
+- **Design**: Material Design with signature blue-purple gradient (#667eea → #764ba2)
+- **API Integration**: Connects to the same Node.js/Express backend as the mobile app
+- **Deployment**: Served as static files directly from the backend server
+
+### Key Features
+- **Authentication**: Login and registration with JWT token management
+- **News Feed**: View, create, like, and comment on posts (text, images, videos)
+- **Friends**: Friend requests, search users, manage friendships
+- **Messages**: Direct messaging with real-time updates (polling every 3 seconds)
+- **Notifications**: Real-time notifications for friend requests, comments, and reactions
+- **Profile**: Personal profile with avatar, cover photo, bio, and post history
+- **Responsive UI**: Optimized for desktop and tablet screens
+- **Toast Notifications**: User feedback for all actions
+- **Modal Dialogs**: Clean modal interfaces for post creation and profile editing
+
+### File Structure
+```
+web/
+├── index.html          # Main SPA entry point
+├── css/
+│   └── styles.css     # Complete styling with gradient theme
+├── js/
+│   ├── api.js         # API client and request handling
+│   ├── auth.js        # Authentication logic
+│   ├── posts.js       # Posts, reactions, comments
+│   ├── friends.js     # Friend management
+│   ├── messages.js    # Direct messaging
+│   ├── notifications.js # Notification system
+│   ├── profile.js     # Profile management
+│   └── app.js         # Main app initialization and navigation
+└── README.md          # Web app documentation
+```
+
+### Server Integration
+The backend server (backend/server.js) has been enhanced to:
+1. Serve static files from the `web/` directory
+2. Handle SPA routing with a fallback to index.html for non-API routes
+3. Maintain all existing API endpoints for both mobile and web clients
+
+### Access
+- Web app is accessible at the same URL as the backend: `http://localhost:5000` (development)
+- Production: Same domain as the Replit deployment
+
+### Technical Highlights
+- **No build step required**: Pure vanilla JavaScript
+- **Shared backend**: Both mobile and web use the same API
+- **Local Storage**: JWT tokens and user session persistence
+- **Security**: XSS prevention, input sanitization, secure token storage
+- **Real-time Updates**: Polling-based updates for messages and notifications
