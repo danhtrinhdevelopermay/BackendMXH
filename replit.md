@@ -1,7 +1,7 @@
 # Layedia - Social Media App
 
 ## Overview
-Layedia is a full-stack social media application, similar to Facebook, designed for mobile platforms using React Native/Expo. Its backend is built with Node.js/Express and PostgreSQL. The application provides essential social networking functionalities such as posts, reactions, comments, friend connections, direct messaging, and real-time notifications. The vision for Layedia is to create a dynamic and engaging platform for users to connect and share, leveraging a modern tech stack for scalability and a rich user experience.
+Layedia is a full-stack social media application, similar to Facebook, available on both mobile and web platforms. The mobile app is built with React Native/Expo, the web version uses Expo Web (React Native Web), and the backend is powered by Node.js/Express with PostgreSQL. The application provides essential social networking functionalities such as posts, reactions, comments, friend connections, direct messaging, and real-time notifications. The vision for Layedia is to create a dynamic and engaging platform for users to connect and share, leveraging a modern tech stack for scalability and a rich user experience.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -79,4 +79,56 @@ The backend is a RESTful API built with Node.js and Express, following an MVC-li
   - **Axios**: HTTP client for keep-alive pings in Anti-Spindown system.
 
 ### Deployment
-- **Replit**: Current backend deployment.
+- **Backend**: Deployed on Render.com (https://backendmxh-1.onrender.com)
+- **Mobile**: Expo app (Android/iOS via Expo Go)
+- **Web**: Can be deployed to Render.com or any static hosting service
+
+## Web Platform Architecture
+
+### Web Application (web/)
+A separate web version created from the mobile codebase, optimized for browser deployment. Built with Expo Web using Metro bundler and React Native Web.
+
+**Directory Structure:**
+```
+web/
+├── src/              # Shared source code from mobile
+│   ├── api/          # API calls with web-compatible storage
+│   ├── components/   # React components
+│   ├── context/      # React Context (Auth, Alert)
+│   ├── hooks/        # Custom hooks
+│   ├── navigation/   # React Navigation
+│   ├── screens/      # App screens
+│   ├── services/     # Socket.IO, web-safe notifications
+│   └── utils/        # Storage wrapper (localStorage for web)
+├── assets/           # Images, icons
+├── dist/             # Built static files for deployment
+├── App.js            # Root component
+├── app.json          # Expo configuration
+├── package.json      # Dependencies
+├── render.yaml       # Render deployment config
+└── DEPLOY_RENDER.md  # Deployment guide
+```
+
+**Web-Specific Adaptations:**
+- **Storage**: Uses `localStorage` instead of `expo-secure-store` via a platform-aware wrapper (`src/utils/storage.js`)
+- **Notifications**: Push notifications disabled on web (mobile-only feature)
+- **Build System**: Metro bundler with `expo export --platform web` command
+- **Deployment**: Static files served via `serve` package on port 5000
+
+**Key Features on Web:**
+- ✅ User authentication and profiles
+- ✅ News feed with posts, reactions, comments
+- ✅ Real-time messaging via Socket.IO
+- ✅ Stories
+- ✅ User thoughts/notes
+- ✅ Friend management and search
+- ⚠️ Push notifications (not supported on web)
+- ⚠️ Image/video upload (uses web file picker)
+
+**Commands:**
+- Development: `npm start` (runs Expo dev server)
+- Build: `npx expo export --platform web` (generates dist/)
+- Serve: `npx serve dist -l 5000` (serves static files)
+
+**Deployment to Render:**
+See `web/DEPLOY_RENDER.md` for detailed deployment instructions.
