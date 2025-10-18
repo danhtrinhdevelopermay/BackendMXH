@@ -37,6 +37,15 @@ const CreatePostScreen = ({ navigation }) => {
 
     if (!result.canceled) {
       const asset = result.assets[0];
+      
+      if (asset.fileSize) {
+        const fileSizeMB = asset.fileSize / (1024 * 1024);
+        if (fileSizeMB > 5) {
+          showAlert('Lỗi', 'Kích thước file không được vượt quá 5MB', 'error');
+          return;
+        }
+      }
+      
       setMediaUri(asset.uri);
       setMediaType(asset.type);
     }

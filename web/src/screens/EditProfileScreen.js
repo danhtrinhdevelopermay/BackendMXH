@@ -34,10 +34,20 @@ const EditProfileScreen = ({ navigation }) => {
     });
 
     if (!result.canceled) {
+      const asset = result.assets[0];
+      
+      if (asset.fileSize) {
+        const fileSizeMB = asset.fileSize / (1024 * 1024);
+        if (fileSizeMB > 5) {
+          showAlert('Lỗi', 'Kích thước ảnh không được vượt quá 5MB', 'error');
+          return;
+        }
+      }
+      
       if (type === 'avatar') {
-        setAvatarUri(result.assets[0].uri);
+        setAvatarUri(asset.uri);
       } else {
-        setCoverUri(result.assets[0].uri);
+        setCoverUri(asset.uri);
       }
     }
   };

@@ -34,8 +34,18 @@ const CreateStoryScreen = ({ navigation }) => {
     });
 
     if (!result.canceled) {
-      setMedia(result.assets[0].uri);
-      setMediaType(result.assets[0].type || type);
+      const asset = result.assets[0];
+      
+      if (asset.fileSize) {
+        const fileSizeMB = asset.fileSize / (1024 * 1024);
+        if (fileSizeMB > 5) {
+          showAlert('Lỗi', 'Kích thước file không được vượt quá 5MB', 'error');
+          return;
+        }
+      }
+      
+      setMedia(asset.uri);
+      setMediaType(asset.type || type);
     }
   };
 
