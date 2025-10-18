@@ -14,12 +14,15 @@ const register = async (req, res) => {
   const { username, email, password, full_name } = req.body;
 
   try {
-    const userExists = await pool.query(
+    const existsResults = await pool.queryBoth(
       'SELECT * FROM users WHERE username = $1 OR email = $2',
       [username, email]
     );
 
-    if (userExists.rows.length > 0) {
+    const existsInPrimary = existsResults.primary && existsResults.primary.rows.length > 0;
+    const existsInSecondary = existsResults.secondary && existsResults.secondary.rows.length > 0;
+
+    if (existsInPrimary || existsInSecondary) {
       return res.status(400).json({ error: 'Username or email already exists' });
     }
 
