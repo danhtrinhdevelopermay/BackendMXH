@@ -15,7 +15,7 @@ The mobile application uses React Native with Expo SDK. Navigation is handled by
 - **Navigation:** Separate flows for authenticated and unauthenticated users, with a Bottom Tab Navigator for main authenticated sections (Home, Friends, Messages, Notifications, Profile). Modals are used for actions like creating posts, chatting, and editing profiles.
 - **Smooth Page Transitions:** Advanced animation system with multiple transition types:
   - **Slide transitions:** Horizontal slide-from-right for standard navigation (Profile, Search, Chat, etc.)
-  - **Modal transitions:** Vertical slide-up animation for modal screens (CreatePost, PostDetail, Comments, VoiceCall, CreateStory) using forModalPresentationIOS with spring-based animation and swipe-to-dismiss gestures
+  - **Modal transitions:** Vertical slide-up animation for modal screens (CreatePost, PostDetail, Comments, VoiceCall, CreateStory, CreateThought) using forModalPresentationIOS with spring-based animation and swipe-to-dismiss gestures
   - **Fade transitions:** Smooth fade effects for MainTabs, ViewStory, and auth screens
   - **Tab animations:** Enhanced tab switching with scale, fade, and vertical slide effects
   - **Icon animations:** Tab bar icons feature spring-based scale and rotation animations on focus
