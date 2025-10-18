@@ -25,11 +25,14 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 
     try {
         const data = await api.login(username, password);
+        console.log('Login successful, data:', data);
         showToast('Đăng nhập thành công!', 'success');
         localStorage.setItem('userId', data.user.id);
         localStorage.setItem('username', data.user.username);
+        console.log('Calling showMainApp()');
         showMainApp();
     } catch (error) {
+        console.error('Login error:', error);
         showToast(error.message || 'Đăng nhập thất bại', 'error');
     }
 });
@@ -54,8 +57,10 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 });
 
 function showMainApp() {
+    console.log('showMainApp called');
     authContainer.style.display = 'none';
     mainContainer.style.display = 'block';
+    console.log('Main container display:', mainContainer.style.display);
     initApp();
 }
 
@@ -66,7 +71,9 @@ function showAuthScreen() {
 
 function checkAuth() {
     const token = localStorage.getItem('token');
+    console.log('checkAuth - token:', token ? 'exists' : 'none');
     if (token) {
+        api.setToken(token);
         showMainApp();
     } else {
         showAuthScreen();

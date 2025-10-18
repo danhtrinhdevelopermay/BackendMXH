@@ -14,6 +14,7 @@ async function loadFeed() {
 
     try {
         const data = await api.getFeed();
+        console.log('Feed data received:', data);
         currentPosts = data.posts || [];
         
         if (currentPosts.length === 0) {
@@ -31,6 +32,7 @@ async function loadFeed() {
             feedContainer.appendChild(createPostCard(post));
         });
     } catch (error) {
+        console.error('Feed error:', error);
         feedContainer.innerHTML = '<div class="empty-state"><p>Không thể tải bài viết</p></div>';
         showToast('Không thể tải bài viết', 'error');
     }

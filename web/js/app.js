@@ -1,6 +1,10 @@
 let currentPage = 'home';
 
 function initApp() {
+    console.log('App initialized');
+    
+    document.getElementById('nav-home').classList.add('active');
+    
     loadProfile();
     loadFeed();
     loadNotifications();

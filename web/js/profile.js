@@ -3,10 +3,12 @@ let currentProfile = null;
 async function loadProfile() {
     try {
         const data = await api.getProfile();
+        console.log('Profile data received:', data);
         currentProfile = data.user;
         displayProfile(currentProfile);
         await loadUserPosts(currentProfile.id);
     } catch (error) {
+        console.error('Profile error:', error);
         showToast('Không thể tải trang cá nhân', 'error');
     }
 }
