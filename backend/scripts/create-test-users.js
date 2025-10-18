@@ -80,20 +80,17 @@ async function createUsers() {
       try {
         // Tạo user
         const userResult = await client.query(
-          'INSERT INTO users (username, email, password, full_name) VALUES ($1, $2, $3, $4) RETURNING id',
+          'INSERT INTO users (username, email, password_hash, full_name) VALUES ($1, $2, $3, $4) RETURNING id',
           [username, email, hashedPassword, name]
         );
         
         const newUserId = userResult.rows[0].id;
         createdCount++;
         
-        // Tạo friendship (user1_id < user2_id theo convention)
-        const user1 = Math.min(mainUserId, newUserId);
-        const user2 = Math.max(mainUserId, newUserId);
-        
+        // Tạo friendship (requester là user mới, addressee là user chính)
         await client.query(
-          'INSERT INTO friendships (user1_id, user2_id, status) VALUES ($1, $2, $3)',
-          [user1, user2, 'accepted']
+          'INSERT INTO friendships (requester_id, addressee_id, status) VALUES ($1, $2, $3)',
+          [newUserId, mainUserId, 'accepted']
         );
         
         friendshipCount++;
@@ -116,20 +113,17 @@ async function createUsers() {
       try {
         // Tạo user
         const userResult = await client.query(
-          'INSERT INTO users (username, email, password, full_name) VALUES ($1, $2, $3, $4) RETURNING id',
+          'INSERT INTO users (username, email, password_hash, full_name) VALUES ($1, $2, $3, $4) RETURNING id',
           [username, email, hashedPassword, name]
         );
         
         const newUserId = userResult.rows[0].id;
         createdCount++;
         
-        // Tạo friendship
-        const user1 = Math.min(mainUserId, newUserId);
-        const user2 = Math.max(mainUserId, newUserId);
-        
+        // Tạo friendship (requester là user mới, addressee là user chính)
         await client.query(
-          'INSERT INTO friendships (user1_id, user2_id, status) VALUES ($1, $2, $3)',
-          [user1, user2, 'accepted']
+          'INSERT INTO friendships (requester_id, addressee_id, status) VALUES ($1, $2, $3)',
+          [newUserId, mainUserId, 'accepted']
         );
         
         friendshipCount++;
@@ -149,7 +143,7 @@ async function createUsers() {
     
     // Verify
     const friendCount = await client.query(
-      'SELECT COUNT(*) FROM friendships WHERE (user1_id = $1 OR user2_id = $1) AND status = $2',
+      'SELECT COUNT(*) FROM friendships WHERE (requester_id = $1 OR addressee_id = $1) AND status = $2',
       [mainUserId, 'accepted']
     );
     
