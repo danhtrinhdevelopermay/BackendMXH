@@ -9,7 +9,7 @@ import { AuthContext } from '../context/AuthContext';
 import { useIncomingCall } from '../hooks/useIncomingCall';
 import IncomingCallModal from '../components/IncomingCallModal';
 import { registerForPushNotificationsAsync, setupNotificationListeners, unregisterPushToken } from '../services/notificationService';
-import { postAPI, storyAPI, notificationAPI, friendshipAPI, thoughtAPI, messageAPI } from '../api/api';
+import { postsAPI, storiesAPI, notificationsAPI, friendshipAPI, thoughtsAPI, messagesAPI } from '../api/api';
 
 import { useIsFocused } from '@react-navigation/native';
 import SplashScreen from '../screens/SplashScreen';
@@ -348,13 +348,13 @@ const NavigationWrapper = () => {
   const preloadData = async () => {
     try {
       const loadPromises = [
-        postAPI.getNewsFeed().catch(() => ({ data: [] })),
-        storyAPI.getAllStories().catch(() => ({ data: [] })),
-        notificationAPI.getNotifications().catch(() => ({ data: [] })),
+        postsAPI.getFeed().catch(() => ({ data: [] })),
+        storiesAPI.getStories().catch(() => ({ data: [] })),
+        notificationsAPI.getNotifications().catch(() => ({ data: [] })),
         friendshipAPI.getFriendRequests().catch(() => ({ data: [] })),
         friendshipAPI.getSuggestedFriends().catch(() => ({ data: [] })),
-        thoughtAPI.getAllThoughts().catch(() => ({ data: [] })),
-        messageAPI.getConversations().catch(() => ({ data: [] })),
+        thoughtsAPI.getThoughts().catch(() => ({ data: [] })),
+        messagesAPI.getConversations().catch(() => ({ data: [] })),
       ];
 
       await Promise.all(loadPromises);

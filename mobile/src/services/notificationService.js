@@ -133,8 +133,8 @@ export function setupNotificationListeners(navigation) {
 
   return {
     remove: () => {
-      notificationListener.remove();
-      responseListener.remove();
+      Notifications.removeNotificationSubscription(notificationListener);
+      Notifications.removeNotificationSubscription(responseListener);
     }
   };
 }

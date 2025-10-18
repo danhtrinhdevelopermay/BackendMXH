@@ -1,22 +1,10 @@
-require('dotenv').config();
+const { neonConfig } = require('@neondatabase/serverless');
 const { Pool } = require('pg');
 
-// Neon database configuration (optional)
-// Only use neonConfig if @neondatabase/serverless is installed
-let neonConfig;
-try {
-  neonConfig = require('@neondatabase/serverless').neonConfig;
-  if (neonConfig) {
-    neonConfig.useSecureWebSocket = false;
-    neonConfig.pipelineConnect = false;
-    console.log('✅ Neon serverless config loaded');
-  }
-} catch (err) {
-  console.log('ℹ️ Using standard PostgreSQL connection (Neon config not available)');
-}
+neonConfig.useSecureWebSocket = false;
+neonConfig.pipelineConnect = false;
 
 if (!process.env.DATABASE_URL) {
-  console.error('Available environment variables:', Object.keys(process.env).filter(k => k.includes('DATABASE')));
   throw new Error(
     "DATABASE_URL must be set. Did you forget to provision a database?",
   );

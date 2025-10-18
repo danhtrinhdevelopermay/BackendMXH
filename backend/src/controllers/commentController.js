@@ -70,7 +70,7 @@ const getComments = async (req, res) => {
       [postId]
     );
 
-    res.json({ comments: result.rows });
+    res.json(result.rows);
   } catch (error) {
     console.error('Get comments error:', error);
     res.status(500).json({ error: 'Server error' });

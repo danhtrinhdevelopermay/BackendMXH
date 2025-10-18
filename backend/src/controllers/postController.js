@@ -121,9 +121,8 @@ const getNewsFeed = async (req, res) => {
       [user_id, limit, offset]
     );
 
-    const responseData = { posts: result.rows };
-    cacheService.set(cacheKey, responseData, 180);
-    res.json(responseData);
+    cacheService.set(cacheKey, result.rows, 180);
+    res.json(result.rows);
   } catch (error) {
     console.error('Get news feed error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -188,9 +187,8 @@ const getUserPosts = async (req, res) => {
       [userId, currentUserId]
     );
 
-    const responseData = { posts: result.rows };
-    cacheService.set(cacheKey, responseData, 180);
-    res.json(responseData);
+    cacheService.set(cacheKey, result.rows, 180);
+    res.json(result.rows);
   } catch (error) {
     console.error('Get user posts error:', error);
     res.status(500).json({ error: 'Server error' });

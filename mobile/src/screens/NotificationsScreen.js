@@ -14,15 +14,9 @@ const NotificationsScreen = () => {
   const fetchNotifications = async () => {
     try {
       const response = await notificationAPI.getNotifications();
-      if (response && response.data) {
-        setNotifications(response.data);
-      }
+      setNotifications(response.data);
     } catch (error) {
-      console.log('Failed to fetch notifications:', error?.message || error);
-      setNotifications([]);
-      if (!loading) {
-        showAlert('Lỗi', 'Không thể kết nối đến server. Vui lòng thử lại sau.', 'error');
-      }
+      showAlert('Lỗi', 'Không thể tải thông báo', 'error');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -144,7 +138,7 @@ const NotificationsScreen = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Thông báo đến</Text>
-        {notifications && notifications.length > 0 && notifications.some(n => !n.is_read) && (
+        {notifications.some(n => !n.is_read) && (
           <TouchableOpacity onPress={handleMarkAllAsRead}>
             <Text style={styles.markAllButton}>Đánh dấu đã đọc tất cả</Text>
           </TouchableOpacity>

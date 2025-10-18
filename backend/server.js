@@ -23,30 +23,7 @@ const cloudinary = require('./src/config/cloudinary');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// CORS configuration for production
-const allowedOrigins = [
-  'https://backendmxh-1.onrender.com',
-  'http://localhost:3000',
-  'http://localhost:5000',
-  process.env.WEB_APP_URL
-].filter(Boolean);
-
-app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
-      callback(null, true);
-    } else {
-      callback(null, true); // Allow all for now, tighten in production
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -60,16 +37,8 @@ const upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 }
 });
 
-// Serve static files from web directory
-app.use(express.static(path.join(__dirname, '../web')));
-
-// Config endpoint for web app
-app.get('/config.js', (req, res) => {
-  const config = {
-    apiUrl: process.env.WEB_API_URL || ''
-  };
-  res.setHeader('Content-Type', 'application/javascript');
-  res.send(`window.APP_CONFIG = ${JSON.stringify(config)};`);
+app.get('/', (req, res) => {
+  res.json({ message: 'Social Media API is running' });
 });
 
 app.get('/health', (req, res) => {
@@ -206,16 +175,6 @@ app.get('/api/cover/:userId', async (req, res) => {
     console.error('Get cover error:', error);
     res.status(500).json({ error: 'Failed to get cover' });
   }
-});
-
-// SPA fallback - serve index.html for non-API routes
-app.use((req, res, next) => {
-  // Skip API routes
-  if (req.path.startsWith('/api/') || req.path === '/health' || req.path === '/config.js') {
-    return next();
-  }
-  // Serve index.html for all other routes
-  res.sendFile(path.join(__dirname, '../web/index.html'));
 });
 
 app.use((err, req, res, next) => {

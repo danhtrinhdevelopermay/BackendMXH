@@ -25,12 +25,9 @@ const MessagesScreen = ({ navigation }) => {
   const fetchConversations = async () => {
     try {
       const response = await messageAPI.getConversations();
-      if (response && response.data) {
-        setConversations(response.data);
-      }
+      setConversations(response.data);
     } catch (error) {
-      console.log('Failed to fetch messages:', error?.message || error);
-      setConversations([]);
+      console.log('Failed to fetch messages');
     } finally {
       setLoading(false);
     }
@@ -41,14 +38,11 @@ const MessagesScreen = ({ navigation }) => {
     
     try {
       const response = await thoughtAPI.getAllThoughts();
-      if (response && response.data) {
-        setThoughts(response.data);
-        const userThought = response.data.find(t => t.user_id === user.id);
-        setCurrentUserThought(userThought || null);
-      }
+      setThoughts(response.data);
+      const userThought = response.data.find(t => t.user_id === user.id);
+      setCurrentUserThought(userThought || null);
     } catch (error) {
-      console.log('Failed to fetch thoughts:', error?.message || error);
-      setThoughts([]);
+      console.log('Failed to fetch thoughts:', error);
     }
   };
 

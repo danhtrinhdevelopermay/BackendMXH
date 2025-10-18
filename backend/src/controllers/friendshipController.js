@@ -105,7 +105,7 @@ const getFriends = async (req, res) => {
       [user_id]
     );
 
-    res.json({ friends: result.rows });
+    res.json(result.rows);
   } catch (error) {
     console.error('Get friends error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -125,7 +125,7 @@ const getFriendRequests = async (req, res) => {
       [user_id]
     );
 
-    res.json({ requests: result.rows });
+    res.json(result.rows);
   } catch (error) {
     console.error('Get friend requests error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -145,7 +145,7 @@ const searchUsers = async (req, res) => {
       [`%${query}%`, user_id]
     );
 
-    res.json({ users: result.rows });
+    res.json(result.rows);
   } catch (error) {
     console.error('Search users error:', error);
     res.status(500).json({ error: 'Server error' });
