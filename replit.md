@@ -118,12 +118,12 @@ web/
 **Key Features on Web:**
 - ✅ User authentication and profiles
 - ✅ News feed with posts, reactions, comments
-- ✅ Real-time messaging via Socket.IO
 - ✅ Stories
-- ✅ User thoughts/notes
 - ✅ Friend management and search
-- ⚠️ Push notifications (not supported on web)
-- ⚠️ Image/video upload (uses web file picker)
+- ✅ Image/video upload (max 5MB per file)
+- ❌ Messaging/Chat (not available on web)
+- ❌ Voice calls (not available on web)
+- ❌ Push notifications (not supported on web)
 
 **Commands:**
 - Development: `npm start` (runs Expo dev server)

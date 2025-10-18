@@ -71,16 +71,16 @@ Render sẽ tự động build và deploy ứng dụng. Quá trình này có th�
 - Đăng nhập / Đăng ký
 - Newsfeed
 - Đăng bài, bình luận, reactions
-- Tin nhắn realtime (Socket.IO)
 - Tìm kiếm người dùng
 - Profile management
 - Stories
-- Thoughts
+- Upload ảnh/video (giới hạn 5MB)
 
 ### ⚠️ Giới hạn trên web:
 - **Push Notifications**: Không hoạt động (chỉ hỗ trợ trên mobile)
-- **Voice Calls**: Có thể gặp vấn đề với permissions (chưa test đầy đủ)
-- **Image Upload**: Có thể khác so với mobile (sử dụng web file picker)
+- **Tin nhắn (Messages/Chat)**: Tính năng này không có trên phiên bản web
+- **Voice Calls**: Không có trên phiên bản web
+- **File Upload**: Giới hạn tối đa 5MB cho ảnh và video
 
 ## Điều chỉnh kỹ thuật
 
