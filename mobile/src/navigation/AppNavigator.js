@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { TouchableOpacity, Animated } from 'react-native';
+import { TouchableOpacity, Animated, Easing } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, CardStyleInterpolators, TransitionPresets } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -33,6 +33,77 @@ import ViewStoryScreen from '../screens/ViewStoryScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+
+const screenTransitionConfig = {
+  animation: 'spring',
+  config: {
+    stiffness: 1000,
+    damping: 500,
+    mass: 3,
+    overshootClamping: true,
+    restDisplacementThreshold: 0.01,
+    restSpeedThreshold: 0.01,
+  },
+};
+
+const fadeTransition = {
+  gestureDirection: 'horizontal',
+  transitionSpec: {
+    open: {
+      animation: 'timing',
+      config: {
+        duration: 300,
+        easing: Easing.out(Easing.poly(4)),
+      },
+    },
+    close: {
+      animation: 'timing',
+      config: {
+        duration: 250,
+        easing: Easing.in(Easing.poly(4)),
+      },
+    },
+  },
+  cardStyleInterpolator: CardStyleInterpolators.forFadeFromBottomAndroid,
+};
+
+const slideFromRightTransition = {
+  gestureDirection: 'horizontal',
+  transitionSpec: {
+    open: screenTransitionConfig,
+    close: screenTransitionConfig,
+  },
+  cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+};
+
+const modalTransition = {
+  gestureDirection: 'vertical',
+  transitionSpec: {
+    open: {
+      animation: 'spring',
+      config: {
+        stiffness: 1000,
+        damping: 500,
+        mass: 3,
+        overshootClamping: true,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 0.01,
+      },
+    },
+    close: {
+      animation: 'spring',
+      config: {
+        stiffness: 1000,
+        damping: 500,
+        mass: 3,
+        overshootClamping: true,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 0.01,
+      },
+    },
+  },
+  cardStyleInterpolator: CardStyleInterpolators.forModalPresentationIOS,
+};
 
 const TabBarIcon = ({ focused, iconName, color, size }) => {
   const scale = useRef(new Animated.Value(focused ? 1 : 0.9)).current;
@@ -273,27 +344,136 @@ const NavigationWrapper = () => {
     <>
       <Stack.Navigator 
         ref={navigationRef}
-        screenOptions={{ headerShown: false }}
+        screenOptions={{
+          headerShown: false,
+          ...slideFromRightTransition,
+          gestureEnabled: true,
+          gestureResponseDistance: 50,
+        }}
       >
         {user ? (
           <>
-            <Stack.Screen name="MainTabs" component={HomeTabs} />
-            <Stack.Screen name="Search" component={SearchScreen} options={{ headerShown: true, title: 'Tìm kiếm' }} />
-            <Stack.Screen name="Profile" component={ProfileScreen} options={{ headerShown: true, title: 'Hồ sơ' }} />
-            <Stack.Screen name="CreatePost" component={CreatePostScreen} options={{ headerShown: true, title: 'Tạo bài viết' }} />
-            <Stack.Screen name="PostDetail" component={PostDetailScreen} options={{ headerShown: true, title: 'Bài viết' }} />
-            <Stack.Screen name="Chat" component={ChatScreen} options={{ headerShown: true }} />
-            <Stack.Screen name="Comments" component={CommentsScreen} options={{ headerShown: true, title: 'Comments' }} />
-            <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: true, title: 'Chỉnh sửa hồ sơ' }} />
-            <Stack.Screen name="VoiceCall" component={VoiceCallScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="CreateStory" component={CreateStoryScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="ViewStory" component={ViewStoryScreen} options={{ headerShown: false }} />
+            <Stack.Screen 
+              name="MainTabs" 
+              component={HomeTabs}
+              options={{
+                ...fadeTransition,
+              }}
+            />
+            <Stack.Screen 
+              name="Search" 
+              component={SearchScreen} 
+              options={{ 
+                headerShown: true, 
+                title: 'Tìm kiếm',
+                ...slideFromRightTransition,
+              }} 
+            />
+            <Stack.Screen 
+              name="Profile" 
+              component={ProfileScreen} 
+              options={{ 
+                headerShown: true, 
+                title: 'Hồ sơ',
+                ...slideFromRightTransition,
+              }} 
+            />
+            <Stack.Screen 
+              name="CreatePost" 
+              component={CreatePostScreen} 
+              options={{ 
+                headerShown: true, 
+                title: 'Tạo bài viết',
+                ...modalTransition,
+                presentation: 'modal',
+              }} 
+            />
+            <Stack.Screen 
+              name="PostDetail" 
+              component={PostDetailScreen} 
+              options={{ 
+                headerShown: true, 
+                title: 'Bài viết',
+                ...slideFromRightTransition,
+              }} 
+            />
+            <Stack.Screen 
+              name="Chat" 
+              component={ChatScreen} 
+              options={{ 
+                headerShown: true,
+                ...slideFromRightTransition,
+              }} 
+            />
+            <Stack.Screen 
+              name="Comments" 
+              component={CommentsScreen} 
+              options={{ 
+                headerShown: true, 
+                title: 'Comments',
+                ...modalTransition,
+                presentation: 'modal',
+              }} 
+            />
+            <Stack.Screen 
+              name="EditProfile" 
+              component={EditProfileScreen} 
+              options={{ 
+                headerShown: true, 
+                title: 'Chỉnh sửa hồ sơ',
+                ...slideFromRightTransition,
+              }} 
+            />
+            <Stack.Screen 
+              name="VoiceCall" 
+              component={VoiceCallScreen} 
+              options={{ 
+                headerShown: false,
+                ...modalTransition,
+                presentation: 'modal',
+              }} 
+            />
+            <Stack.Screen 
+              name="CreateStory" 
+              component={CreateStoryScreen} 
+              options={{ 
+                headerShown: false,
+                ...modalTransition,
+                presentation: 'modal',
+              }} 
+            />
+            <Stack.Screen 
+              name="ViewStory" 
+              component={ViewStoryScreen} 
+              options={{ 
+                headerShown: false,
+                ...fadeTransition,
+              }} 
+            />
           </>
         ) : (
           <>
-            <Stack.Screen name="Welcome" component={WelcomeScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen 
+              name="Welcome" 
+              component={WelcomeScreen}
+              options={{
+                ...fadeTransition,
+              }}
+            />
+            <Stack.Screen 
+              name="Login" 
+              component={LoginScreen}
+              options={{
+                ...slideFromRightTransition,
+              }}
+            />
+            <Stack.Screen 
+              name="Register" 
+              component={RegisterScreen}
+              options={{
+                ...slideFromRightTransition,
+              }}
+            />
           </>
         )}
       </Stack.Navigator>
