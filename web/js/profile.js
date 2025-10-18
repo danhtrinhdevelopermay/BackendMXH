@@ -6,10 +6,24 @@ async function loadProfile() {
         console.log('Profile data received:', data);
         currentProfile = data.user;
         displayProfile(currentProfile);
-        await loadUserPosts(currentProfile.id);
+        await Promise.all([
+            loadUserPosts(currentProfile.id),
+            loadUserStats(currentProfile.id)
+        ]);
     } catch (error) {
         console.error('Profile error:', error);
         showToast('Không thể tải trang cá nhân', 'error');
+    }
+}
+
+async function loadUserStats(userId) {
+    try {
+        const stats = await api.getUserStats(userId);
+        document.getElementById('stat-posts').textContent = stats.posts_count || 0;
+        document.getElementById('stat-friends').textContent = stats.friends_count || 0;
+        document.getElementById('stat-photos').textContent = stats.photos_count || 0;
+    } catch (error) {
+        console.error('Stats error:', error);
     }
 }
 

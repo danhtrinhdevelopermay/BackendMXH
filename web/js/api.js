@@ -79,6 +79,10 @@ class API {
         return this.request(`/api/users/${userId}`);
     }
 
+    async getUserStats(userId) {
+        return this.request(`/api/users/${userId}/stats`);
+    }
+
     async getFeed(page = 1) {
         return this.request(`/api/posts/feed?page=${page}`);
     }
