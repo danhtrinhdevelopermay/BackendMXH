@@ -60,25 +60,16 @@ const upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 }
 });
 
-app.get('/', (req, res) => {
-  res.json({ 
-    message: 'Shatter Backend API',
-    version: '1.0.0',
-    status: 'running',
-    endpoints: {
-      health: '/health',
-      auth: '/api/auth/*',
-      posts: '/api/posts/*',
-      comments: '/api/comments/*',
-      reactions: '/api/reactions/*',
-      friendships: '/api/friendships/*',
-      messages: '/api/messages/*',
-      notifications: '/api/notifications/*',
-      users: '/api/users/*',
-      thoughts: '/api/thoughts/*',
-      stories: '/api/stories/*'
-    }
-  });
+// Serve static files from web directory
+app.use(express.static(path.join(__dirname, '../web')));
+
+// Config endpoint for web app
+app.get('/config.js', (req, res) => {
+  const config = {
+    apiUrl: process.env.WEB_API_URL || ''
+  };
+  res.setHeader('Content-Type', 'application/javascript');
+  res.send(`window.APP_CONFIG = ${JSON.stringify(config)};`);
 });
 
 app.get('/health', (req, res) => {
@@ -215,6 +206,16 @@ app.get('/api/cover/:userId', async (req, res) => {
     console.error('Get cover error:', error);
     res.status(500).json({ error: 'Failed to get cover' });
   }
+});
+
+// SPA fallback - serve index.html for non-API routes
+app.use((req, res, next) => {
+  // Skip API routes
+  if (req.path.startsWith('/api/') || req.path === '/health' || req.path === '/config.js') {
+    return next();
+  }
+  // Serve index.html for all other routes
+  res.sendFile(path.join(__dirname, '../web/index.html'));
 });
 
 app.use((err, req, res, next) => {
