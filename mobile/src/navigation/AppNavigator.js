@@ -106,19 +106,40 @@ const modalTransition = {
 };
 
 const TabBarIcon = ({ focused, iconName, color, size }) => {
-  const scale = useRef(new Animated.Value(focused ? 1 : 0.9)).current;
+  const scale = useRef(new Animated.Value(focused ? 1 : 0.85)).current;
+  const rotate = useRef(new Animated.Value(focused ? 1 : 0)).current;
 
   useEffect(() => {
-    Animated.spring(scale, {
-      toValue: focused ? 1 : 0.9,
-      friction: 5,
-      tension: 100,
-      useNativeDriver: true,
-    }).start();
+    Animated.parallel([
+      Animated.spring(scale, {
+        toValue: focused ? 1.1 : 0.85,
+        friction: 3,
+        tension: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(rotate, {
+        toValue: focused ? 1 : 0,
+        duration: 200,
+        easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+        useNativeDriver: true,
+      }),
+    ]).start();
   }, [focused]);
 
+  const rotateInterpolate = rotate.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
   return (
-    <Animated.View style={{ transform: [{ scale }] }}>
+    <Animated.View 
+      style={{ 
+        transform: [
+          { scale },
+          { rotate: focused ? rotateInterpolate : '0deg' }
+        ] 
+      }}
+    >
       <Ionicons name={iconName} size={size} color={color} />
     </Animated.View>
   );
@@ -128,23 +149,35 @@ const withTabAnimation = (Component) => {
   return (props) => {
     const isFocused = useIsFocused();
     const fadeAnim = useRef(new Animated.Value(0)).current;
-    const translateX = useRef(new Animated.Value(30)).current;
+    const translateY = useRef(new Animated.Value(20)).current;
+    const scale = useRef(new Animated.Value(0.95)).current;
 
     useEffect(() => {
       if (isFocused) {
         Animated.parallel([
           Animated.timing(fadeAnim, {
             toValue: 1,
-            duration: 300,
+            duration: 350,
+            easing: Easing.bezier(0.4, 0.0, 0.2, 1),
             useNativeDriver: true,
           }),
-          Animated.spring(translateX, {
+          Animated.spring(translateY, {
             toValue: 0,
-            friction: 8,
+            friction: 9,
+            tension: 50,
+            useNativeDriver: true,
+          }),
+          Animated.spring(scale, {
+            toValue: 1,
+            friction: 7,
             tension: 40,
             useNativeDriver: true,
           }),
         ]).start();
+      } else {
+        fadeAnim.setValue(0);
+        translateY.setValue(20);
+        scale.setValue(0.95);
       }
     }, [isFocused]);
 
@@ -153,7 +186,10 @@ const withTabAnimation = (Component) => {
         style={{ 
           flex: 1, 
           opacity: fadeAnim,
-          transform: [{ translateX }]
+          transform: [
+            { translateY },
+            { scale }
+          ]
         }}
       >
         <Component {...props} />
