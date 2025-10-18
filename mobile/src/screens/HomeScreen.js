@@ -279,7 +279,14 @@ const HomeScreen = ({ navigation }) => {
           )}
         </View>
 
-        {item.content && <Text style={styles.postContent}>{item.content}</Text>}
+        {item.content && (
+          <TouchableOpacity 
+            activeOpacity={0.9}
+            onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
+          >
+            <Text style={styles.postContent}>{item.content}</Text>
+          </TouchableOpacity>
+        )}
         
         {item.media_type && item.media_url && (() => {
           const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
@@ -327,11 +334,16 @@ const HomeScreen = ({ navigation }) => {
                   />
                 </TouchableOpacity>
               ) : (
-                <Card.Cover 
-                  source={{ uri: mediaUrl }} 
-                  style={styles.postMedia}
-                  onError={handleMediaError}
-                />
+                <TouchableOpacity 
+                  activeOpacity={1}
+                  onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
+                >
+                  <Card.Cover 
+                    source={{ uri: mediaUrl }} 
+                    style={styles.postMedia}
+                    onError={handleMediaError}
+                  />
+                </TouchableOpacity>
               )}
             </View>
           );
