@@ -1,0 +1,218 @@
+import React, { useEffect, useRef } from 'react';
+import { Modal, View, StyleSheet, Animated, Dimensions, Easing } from 'react-native';
+import { Text, Button } from 'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { useAlert } from '../context/AlertContext';
+
+const { width } = Dimensions.get('window');
+
+const CustomAlert = () => {
+  const { alert, hideAlert } = useAlert();
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const blurIntensity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (alert.visible) {
+      Animated.parallel([
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 6,
+          tension: 65,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: 250,
+          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
+          useNativeDriver: true,
+        }),
+        Animated.timing(blurIntensity, {
+          toValue: 1,
+          duration: 300,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: false,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.spring(scaleAnim, {
+          toValue: 0.8,
+          friction: 8,
+          tension: 100,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 0,
+          duration: 200,
+          easing: Easing.in(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(blurIntensity, {
+          toValue: 0,
+          duration: 200,
+          easing: Easing.in(Easing.cubic),
+          useNativeDriver: false,
+        }),
+      ]).start();
+    }
+  }, [alert.visible]);
+
+  const animatedBlurIntensity = blurIntensity.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 95],
+  });
+
+  const getIconConfig = () => {
+    switch (alert.type) {
+      case 'success':
+        return { name: 'checkmark-circle', color: '#4caf50' };
+      case 'error':
+        return { name: 'close-circle', color: '#f44336' };
+      case 'warning':
+        return { name: 'warning', color: '#ff9800' };
+      default:
+        return { name: 'information-circle', color: '#2196f3' };
+    }
+  };
+
+  const iconConfig = getIconConfig();
+
+  const handleButtonPress = (onPress) => {
+    hideAlert();
+    if (onPress) {
+      setTimeout(() => onPress(), 100);
+    }
+  };
+
+  const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
+
+  return (
+    <Modal
+      transparent
+      visible={alert.visible}
+      animationType="none"
+      onRequestClose={hideAlert}
+      statusBarTranslucent
+    >
+      <AnimatedBlurView 
+        intensity={animatedBlurIntensity}
+        tint="dark" 
+        style={styles.overlay}
+      >
+        <Animated.View style={[styles.backdrop, { opacity: opacityAnim }]}>
+          <Animated.View
+          style={[
+            styles.alertContainer,
+            {
+              transform: [{ scale: scaleAnim }],
+            },
+          ]}
+        >
+          <View style={styles.iconContainer}>
+            <Ionicons name={iconConfig.name} size={60} color={iconConfig.color} />
+          </View>
+
+          {alert.title ? (
+            <Text style={styles.title}>{alert.title}</Text>
+          ) : null}
+
+          {alert.message ? (
+            <Text style={styles.message}>{alert.message}</Text>
+          ) : null}
+
+          <View style={styles.buttonContainer}>
+            {alert.buttons.map((button, index) => (
+              <Button
+                key={index}
+                mode={button.style === 'cancel' ? 'outlined' : 'contained'}
+                onPress={() => handleButtonPress(button.onPress)}
+                style={[
+                  styles.button,
+                  alert.buttons.length > 1 && index < alert.buttons.length - 1 && styles.buttonMargin,
+                ]}
+                buttonColor={
+                  button.style === 'destructive'
+                    ? '#f44336'
+                    : button.style === 'cancel'
+                    ? 'transparent'
+                    : '#1877f2'
+                }
+                textColor={
+                  button.style === 'cancel'
+                    ? '#1877f2'
+                    : '#fff'
+                }
+              >
+                {button.text}
+              </Button>
+            ))}
+          </View>
+          </Animated.View>
+        </Animated.View>
+      </AnimatedBlurView>
+    </Modal>
+  );
+};
+
+const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backdrop: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
+  alertContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 24,
+    width: width * 0.85,
+    maxWidth: 400,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  iconContainer: {
+    marginBottom: 16,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#050505',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  message: {
+    fontSize: 16,
+    color: '#65676b',
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 22,
+  },
+  buttonContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  button: {
+    flex: 1,
+    borderRadius: 10,
+  },
+  buttonMargin: {
+    marginRight: 8,
+  },
+});
+
+export default CustomAlert;
