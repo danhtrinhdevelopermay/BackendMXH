@@ -2,6 +2,8 @@ const { Pool, neonConfig } = require('@neondatabase/serverless');
 const ws = require('ws');
 
 neonConfig.webSocketConstructor = ws;
+neonConfig.poolQueryViaFetch = true;
+neonConfig.fetchConnectionCache = true;
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -13,7 +15,7 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
+  connectionTimeoutMillis: 60000,
 });
 
 pool.on('error', (err) => {
