@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: shatter-web
+    env: node
+    plan: free
+    buildCommand: npm install && npx expo export:web
+    startCommand: npx serve web-build -l $PORT
+    envVars:
+      - key: NODE_ENV
+        value: production
