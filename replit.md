@@ -52,7 +52,7 @@ The backend is a RESTful API built with Node.js and Express, following an MVC-li
 **Key Backend Features:**
 - **Media Storage:** Cloudinary is used for cloud-based storage and delivery of images and videos, with URLs stored in the PostgreSQL database.
 - **Privacy & Visibility:** Posts support `public` and `friends` privacy settings, with filtering applied across all relevant API endpoints.
-- **Anti-Spindown System:** Automatic keep-alive mechanism for Render.com deployment that pings `/health` endpoint every 14 minutes to prevent free-tier spindown. Activates automatically when `RENDER_EXTERNAL_URL` environment variable is detected. Includes dedicated health check endpoint with server status and uptime information.
+- **Anti-Spindown System (Backend):** Automatic keep-alive mechanism for Render.com deployment that pings `/health` endpoint every 14 minutes to prevent free-tier spindown. Activates automatically when `RENDER_EXTERNAL_URL` environment variable is detected. Can also ping the web app if `WEB_APP_URL` environment variable is set. Includes dedicated health check endpoint with server status and uptime information.
 - **Dual Database System:** The backend supports both primary and secondary PostgreSQL databases for redundancy and high availability:
   - **Write Operations (INSERT, UPDATE, DELETE):** Data is written to the primary database first. If the primary database fails or is unavailable, writes automatically fail over to the secondary database. No duplicate writes occur.
   - **Read Operations (SELECT):** All read queries fetch data from BOTH databases simultaneously and merge the results, ensuring complete data visibility regardless of which database holds the data.
@@ -119,6 +119,7 @@ web/
 - **Notifications**: Push notifications disabled on web (mobile-only feature)
 - **Build System**: Metro bundler with `expo export --platform web` command
 - **Deployment**: Static files served via `serve` package on port 5000
+- **Anti-Spindown System (Web)**: Automatic keep-alive mechanism in `App.js` that pings itself every 14 minutes when deployed on Render.com. Activates only when hostname includes 'onrender.com'. Uses browser's `fetch` API with HEAD method to minimize bandwidth usage.
 
 **Key Features on Web:**
 - ✅ User authentication and profiles
