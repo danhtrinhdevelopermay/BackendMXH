@@ -9,7 +9,7 @@ import { AuthContext } from '../context/AuthContext';
 import { useIncomingCall } from '../hooks/useIncomingCall';
 import IncomingCallModal from '../components/IncomingCallModal';
 import { registerForPushNotificationsAsync, setupNotificationListeners, unregisterPushToken } from '../services/notificationService';
-import { postsAPI, storiesAPI, notificationsAPI, friendshipAPI, thoughtsAPI, messagesAPI } from '../api/api';
+import { postsAPI, storiesAPI, notificationsAPI, friendshipAPI, thoughtsAPI } from '../api/api';
 
 import { useIsFocused } from '@react-navigation/native';
 import SplashScreen from '../screens/SplashScreen';
@@ -19,14 +19,11 @@ import RegisterScreen from '../screens/RegisterScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import FriendsScreen from '../screens/FriendsScreen';
-import MessagesScreen from '../screens/MessagesScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import CreatePostScreen from '../screens/CreatePostScreen';
-import ChatScreen from '../screens/ChatScreen';
 import CommentsScreen from '../screens/CommentsScreen';
 import SearchScreen from '../screens/SearchScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
-import VoiceCallScreen from '../screens/VoiceCallScreen';
 import PostDetailScreen from '../screens/PostDetailScreen';
 import CreateStoryScreen from '../screens/CreateStoryScreen';
 import ViewStoryScreen from '../screens/ViewStoryScreen';
@@ -200,7 +197,6 @@ const withTabAnimation = (Component) => {
 
 const AnimatedHome = withTabAnimation(HomeScreen);
 const AnimatedFriends = withTabAnimation(FriendsScreen);
-const AnimatedMessages = withTabAnimation(MessagesScreen);
 const AnimatedNotifications = withTabAnimation(NotificationsScreen);
 const AnimatedProfile = withTabAnimation(ProfileScreen);
 
@@ -214,7 +210,6 @@ const HomeTabs = () => {
           let iconName;
           if (route.name === 'Home') iconName = focused ? 'home' : 'home-outline';
           else if (route.name === 'Bạn bè') iconName = focused ? 'people' : 'people-outline';
-          else if (route.name === 'Tin nhắn') iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
           else if (route.name === 'Thông báo') iconName = focused ? 'notifications' : 'notifications-outline';
           else if (route.name === 'Hồ sơ') iconName = focused ? 'person' : 'person-outline';
           return <TabBarIcon focused={focused} iconName={iconName} color={color} size={size} />;
@@ -284,13 +279,6 @@ const HomeTabs = () => {
         }}
       />
       <Tab.Screen 
-        name="Tin nhắn" 
-        component={AnimatedMessages}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Tab.Screen 
         name="Thông báo" 
         component={AnimatedNotifications}
         options={{
@@ -354,7 +342,6 @@ const NavigationWrapper = () => {
         friendshipAPI.getFriendRequests().catch(() => ({ data: [] })),
         friendshipAPI.getSuggestedFriends().catch(() => ({ data: [] })),
         thoughtsAPI.getThoughts().catch(() => ({ data: [] })),
-        messagesAPI.getConversations().catch(() => ({ data: [] })),
       ];
 
       await Promise.all(loadPromises);
@@ -435,14 +422,6 @@ const NavigationWrapper = () => {
               }} 
             />
             <Stack.Screen 
-              name="Chat" 
-              component={ChatScreen} 
-              options={{ 
-                headerShown: true,
-                ...slideFromRightTransition,
-              }} 
-            />
-            <Stack.Screen 
               name="Comments" 
               component={CommentsScreen} 
               options={{ 
@@ -459,15 +438,6 @@ const NavigationWrapper = () => {
                 headerShown: true, 
                 title: 'Chỉnh sửa hồ sơ',
                 ...slideFromRightTransition,
-              }} 
-            />
-            <Stack.Screen 
-              name="VoiceCall" 
-              component={VoiceCallScreen} 
-              options={{ 
-                headerShown: false,
-                ...modalTransition,
-                presentation: 'modal',
               }} 
             />
             <Stack.Screen 
