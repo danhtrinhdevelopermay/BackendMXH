@@ -17,7 +17,8 @@ app.get('/config.js', (req, res) => {
   res.send(`window.APP_CONFIG = ${JSON.stringify(config)};`);
 });
 
-app.get('*', (req, res) => {
+// SPA fallback - handle all other routes
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
