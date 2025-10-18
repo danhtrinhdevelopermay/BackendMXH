@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { authAPI } from '../api/api';
+import OneSignalService from '../services/OneSignalService';
 
 export const AuthContext = createContext();
 
@@ -11,6 +12,13 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     checkAuth();
   }, []);
+
+  useEffect(() => {
+    // Initialize OneSignal when user is logged in
+    if (user?.id) {
+      OneSignalService.initialize(user.id);
+    }
+  }, [user?.id]);
 
   const checkAuth = async () => {
     try {
@@ -35,6 +43,12 @@ export const AuthProvider = ({ children }) => {
     const response = await authAPI.login({ username, password });
     await SecureStore.setItemAsync('token', response.data.token);
     setUser(response.data.user);
+    
+    // Initialize OneSignal after login
+    if (response.data.user?.id) {
+      await OneSignalService.initialize(response.data.user.id);
+    }
+    
     return response.data;
   };
 
@@ -42,10 +56,19 @@ export const AuthProvider = ({ children }) => {
     const response = await authAPI.register(userData);
     await SecureStore.setItemAsync('token', response.data.token);
     setUser(response.data.user);
+    
+    // Initialize OneSignal after registration
+    if (response.data.user?.id) {
+      await OneSignalService.initialize(response.data.user.id);
+    }
+    
     return response.data;
   };
 
   const logout = async () => {
+    // Clear OneSignal user
+    await OneSignalService.clearExternalUserId();
+    
     await SecureStore.deleteItemAsync('token');
     setUser(null);
   };
