@@ -37,6 +37,27 @@ const upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 }
 });
 
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Shatter Backend API',
+    version: '1.0.0',
+    status: 'running',
+    endpoints: {
+      health: '/health',
+      auth: '/api/auth/*',
+      posts: '/api/posts/*',
+      comments: '/api/comments/*',
+      reactions: '/api/reactions/*',
+      friendships: '/api/friendships/*',
+      messages: '/api/messages/*',
+      notifications: '/api/notifications/*',
+      users: '/api/users/*',
+      thoughts: '/api/thoughts/*',
+      stories: '/api/stories/*'
+    }
+  });
+});
+
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
