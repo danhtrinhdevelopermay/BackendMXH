@@ -21,7 +21,6 @@ The mobile application uses React Native with Expo SDK. Navigation is handled by
   - **Icon animations:** Tab bar icons feature spring-based scale and rotation animations on focus
   - All transitions use native driver for 60fps performance and smooth gestures
 - **Interactive Posts:** Users can tap on post content (text or media) to open the full post detail view with a modal presentation. Videos automatically pause and preserve playback position when transitioning to the detail view.
-- **iOS-Style Gaussian Blur Modals:** All modals feature a Gaussian blur backdrop using `expo-blur` for an enhanced visual aesthetic. This includes CreatePost, PostDetail, Comments, and other modal screens, creating a premium iOS-like experience.
 - **Custom Alert System:** A global, customizable alert system with various types (success, error, warning, info) and animated modal-based UI.
 - **Voice Calling Signaling:** Socket.IO-based signaling layer for real-time call initiation and management, including UI for incoming/outgoing calls. (Note: Audio transmission via WebRTC is not implemented due to Expo Go limitations).
 - **Video Playback:** Videos autoplay in feed with 50% visibility threshold, looping without controls. Tapping a video leads to a detail screen with full controls. Playback position is maintained when navigating between feed and detail views.
