@@ -61,26 +61,75 @@ function navigateToPage(page) {
 
 function setupSearch() {
     const searchInput = document.getElementById('search-input');
+    const searchDropdown = document.getElementById('search-dropdown');
     let searchTimeout;
 
     searchInput.addEventListener('input', (e) => {
         clearTimeout(searchTimeout);
         const query = e.target.value.trim();
         
-        if (query.length < 2) return;
+        if (query.length < 2) {
+            searchDropdown.classList.remove('show');
+            return;
+        }
 
-        searchTimeout = setTimeout(() => {
-            navigateToPage('friends');
-            currentFriendsTab = 'find-friends';
-            document.querySelectorAll('.friends-tabs .tab-btn').forEach(t => t.classList.remove('active'));
-            document.querySelector('.friends-tabs .tab-btn[data-tab="find-friends"]').classList.add('active');
-            loadFindFriends(document.getElementById('friends-content'));
-            setTimeout(() => {
-                document.getElementById('friend-search-input').value = query;
-                searchUsers(query);
-            }, 100);
-        }, 500);
+        searchTimeout = setTimeout(async () => {
+            await performSearch(query);
+        }, 300);
     });
+
+    searchInput.addEventListener('focus', (e) => {
+        if (e.target.value.trim().length >= 2 && searchDropdown.children.length > 0) {
+            searchDropdown.classList.add('show');
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.navbar-search')) {
+            searchDropdown.classList.remove('show');
+        }
+    });
+}
+
+async function performSearch(query) {
+    const searchDropdown = document.getElementById('search-dropdown');
+    searchDropdown.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Đang tìm...</div>';
+    searchDropdown.classList.add('show');
+
+    try {
+        const results = await api.searchUsers(query);
+        displaySearchResults(results.users || []);
+    } catch (error) {
+        searchDropdown.innerHTML = '<div class="search-error">Không thể tìm kiếm</div>';
+    }
+}
+
+function displaySearchResults(users) {
+    const searchDropdown = document.getElementById('search-dropdown');
+    
+    if (users.length === 0) {
+        searchDropdown.innerHTML = '<div class="search-empty">Không tìm thấy kết quả</div>';
+        return;
+    }
+
+    searchDropdown.innerHTML = users.map(user => `
+        <div class="search-result-item" onclick="viewUserProfile(${user.id})">
+            <img src="${user.avatar_url || 'https://via.placeholder.com/40'}" alt="${user.username}" class="search-avatar">
+            <div class="search-user-info">
+                <div class="search-user-name">
+                    ${user.full_name || user.username}
+                    ${user.is_verified ? '<i class="fas fa-check-circle verified-badge"></i>' : ''}
+                </div>
+                <div class="search-user-username">@${user.username}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function viewUserProfile(userId) {
+    document.getElementById('search-dropdown').classList.remove('show');
+    document.getElementById('search-input').value = '';
+    showToast('Xem trang cá nhân người dùng - Tính năng đang phát triển', 'info');
 }
 
 function showToast(message, type = 'info') {
