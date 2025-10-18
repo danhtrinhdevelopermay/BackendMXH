@@ -1,0 +1,36 @@
+{
+  "name": "Shatter - Mạng Xã Hội Chủ Sở Hữu Danh Tính",
+  "short_name": "Shatter",
+  "description": "Kết nối, chia sẻ và khám phá với Shatter - nền tảng mạng xã hội hiện đại",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#6200ee",
+  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "social",
+    "lifestyle"
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png"
+    }
+  ]
+}

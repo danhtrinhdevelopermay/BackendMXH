@@ -1,11 +1,12 @@
 {
   "expo": {
-    "name": "Shatter Web",
+    "name": "Shatter - Mạng Xã Hội Chủ Sở Hữu Danh Tính",
     "slug": "social-media-web",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "description": "Kết nối, chia sẻ và khám phá với Shatter - nền tảng mạng xã hội hiện đại. Đăng bài viết, kết bạn, chia sẻ câu chuyện và nhiều hơn nữa.",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -16,7 +17,12 @@
     ],
     "web": {
       "favicon": "./assets/favicon.png",
-      "bundler": "metro"
+      "bundler": "metro",
+      "name": "Shatter",
+      "shortName": "Shatter",
+      "description": "Mạng xã hội chủ sở hữu danh tính",
+      "themeColor": "#6200ee",
+      "backgroundColor": "#ffffff"
     },
     "extra": {
       "apiUrl": "https://backendmxh-1.onrender.com"
