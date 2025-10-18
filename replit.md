@@ -53,11 +53,16 @@ The backend is a RESTful API built with Node.js and Express, following an MVC-li
 - **Media Storage:** Cloudinary is used for cloud-based storage and delivery of images and videos, with URLs stored in the PostgreSQL database.
 - **Privacy & Visibility:** Posts support `public` and `friends` privacy settings, with filtering applied across all relevant API endpoints.
 - **Anti-Spindown System:** Automatic keep-alive mechanism for Render.com deployment that pings `/health` endpoint every 14 minutes to prevent free-tier spindown. Activates automatically when `RENDER_EXTERNAL_URL` environment variable is detected. Includes dedicated health check endpoint with server status and uptime information.
-- **Dual Database System:** The backend supports both primary and secondary PostgreSQL databases for redundancy. The authentication system (login/register) queries both databases:
-  - Login: Searches for users in the primary database first, then falls back to the secondary database if not found.
-  - Register: Checks for duplicate usernames/emails in both databases before creating new accounts.
-  - Configuration: Uses `DATABASE_URL` (primary) and `DATABASE_URL_SECONDARY` (secondary) environment variables.
-  - DualDatabasePool class manages connections with automatic failover and the new `queryBoth()` method for querying both databases simultaneously.
+- **Dual Database System:** The backend supports both primary and secondary PostgreSQL databases for redundancy and high availability:
+  - **Write Operations (INSERT, UPDATE, DELETE):** Data is written to the primary database first. If the primary database fails or is unavailable, writes automatically fail over to the secondary database. No duplicate writes occur.
+  - **Read Operations (SELECT):** All read queries fetch data from BOTH databases simultaneously and merge the results, ensuring complete data visibility regardless of which database holds the data.
+  - **Configuration:** Uses `DATABASE_URL` (primary) and `DATABASE_URL_SECONDARY` (secondary) environment variables.
+  - **DualDatabasePool class:** Manages connections with three key methods:
+    - `query()`: For write operations with automatic failover
+    - `queryBoth()`: Returns separate results from both databases
+    - `queryAll()`: Merges results from both databases (used for all read operations)
+  - **Data Integrity:** Prevents duplicates by using unique ID detection when merging results
+  - **Automatic Sorting:** Merged results are automatically sorted by `created_at` or `updated_at` timestamps
 
 ## External Dependencies
 
