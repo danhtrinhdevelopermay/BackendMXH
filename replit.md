@@ -13,6 +13,13 @@ The mobile application uses React Native with Expo SDK. Navigation is handled by
 
 **Key Features & Implementations:**
 - **Navigation:** Separate flows for authenticated and unauthenticated users, with a Bottom Tab Navigator for main authenticated sections (Home, Friends, Messages, Notifications, Profile). Modals are used for actions like creating posts, chatting, and editing profiles.
+- **Smooth Page Transitions:** Advanced animation system with multiple transition types:
+  - **Slide transitions:** Horizontal slide-from-right for standard navigation (Profile, Search, Chat, etc.)
+  - **Modal transitions:** Vertical slide-up animation for modal screens (CreatePost, Comments, VoiceCall, CreateStory)
+  - **Fade transitions:** Smooth fade effects for MainTabs, ViewStory, and auth screens
+  - **Tab animations:** Enhanced tab switching with scale, fade, and vertical slide effects
+  - **Icon animations:** Tab bar icons feature spring-based scale and rotation animations on focus
+  - All transitions use native driver for 60fps performance and smooth gestures
 - **Custom Alert System:** A global, customizable alert system with various types (success, error, warning, info) and animated modal-based UI.
 - **Voice Calling Signaling:** Socket.IO-based signaling layer for real-time call initiation and management, including UI for incoming/outgoing calls. (Note: Audio transmission via WebRTC is not implemented due to Expo Go limitations).
 - **Video Playback:** Videos autoplay in feed with 50% visibility threshold, looping without controls. Tapping a video leads to a detail screen with full controls. Playback position is maintained when navigating between feed and detail views.
