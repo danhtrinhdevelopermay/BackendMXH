@@ -277,20 +277,35 @@ server.listen(PORT, '0.0.0.0', () => {
   
   if (process.env.RENDER_EXTERNAL_URL) {
     const axios = require('axios');
-    const url = `${process.env.RENDER_EXTERNAL_URL}/health`;
+    const backendUrl = `${process.env.RENDER_EXTERNAL_URL}/health`;
+    const webAppUrl = process.env.WEB_APP_URL;
     const interval = 14 * 60 * 1000;
     
     console.log(`🔄 Render Anti-Spindown activated`);
-    console.log(`📡 Pinging: ${url} every 14 minutes`);
+    console.log(`📡 Backend: Pinging ${backendUrl} every 14 minutes`);
+    
+    if (webAppUrl) {
+      console.log(`📡 Web App: Pinging ${webAppUrl} every 14 minutes`);
+    }
     
     function keepAlive() {
-      axios.get(url, { timeout: 30000 })
+      axios.get(backendUrl, { timeout: 30000 })
         .then(response => {
-          console.log(`✅ Keep-alive ping successful at ${new Date().toISOString()}`);
+          console.log(`✅ Backend keep-alive ping successful at ${new Date().toISOString()}`);
         })
         .catch(error => {
-          console.error(`❌ Keep-alive error at ${new Date().toISOString()}:`, error.message);
+          console.error(`❌ Backend keep-alive error at ${new Date().toISOString()}:`, error.message);
         });
+      
+      if (webAppUrl) {
+        axios.get(webAppUrl, { timeout: 30000 })
+          .then(response => {
+            console.log(`✅ Web App keep-alive ping successful at ${new Date().toISOString()}`);
+          })
+          .catch(error => {
+            console.error(`❌ Web App keep-alive error at ${new Date().toISOString()}:`, error.message);
+          });
+      }
     }
     
     setInterval(keepAlive, interval);
