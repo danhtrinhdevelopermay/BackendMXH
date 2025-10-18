@@ -116,6 +116,26 @@ class DualDatabasePool {
     }
   }
 
+  async queryBoth(text, params) {
+    const results = { primary: null, secondary: null };
+    
+    try {
+      results.primary = await this.primary.query(text, params);
+    } catch (error) {
+      console.warn('⚠️ Primary database query failed:', error.message);
+    }
+    
+    if (this.secondary) {
+      try {
+        results.secondary = await this.secondary.query(text, params);
+      } catch (error) {
+        console.warn('⚠️ Secondary database query failed:', error.message);
+      }
+    }
+    
+    return results;
+  }
+
   async end() {
     await this.primary.end();
     if (this.secondary) {
