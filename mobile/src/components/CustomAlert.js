@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Modal, View, StyleSheet, Animated, Dimensions } from 'react-native';
+import { Modal, View, StyleSheet, Animated, Dimensions, Easing } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -11,37 +11,58 @@ const CustomAlert = () => {
   const { alert, hideAlert } = useAlert();
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
+  const blurIntensity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (alert.visible) {
       Animated.parallel([
         Animated.spring(scaleAnim, {
           toValue: 1,
-          friction: 8,
-          tension: 40,
+          friction: 6,
+          tension: 65,
           useNativeDriver: true,
         }),
         Animated.timing(opacityAnim, {
           toValue: 1,
-          duration: 200,
+          duration: 250,
+          easing: Easing.bezier(0.4, 0.0, 0.2, 1),
           useNativeDriver: true,
+        }),
+        Animated.timing(blurIntensity, {
+          toValue: 1,
+          duration: 300,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: false,
         }),
       ]).start();
     } else {
       Animated.parallel([
-        Animated.timing(scaleAnim, {
-          toValue: 0,
-          duration: 150,
+        Animated.spring(scaleAnim, {
+          toValue: 0.8,
+          friction: 8,
+          tension: 100,
           useNativeDriver: true,
         }),
         Animated.timing(opacityAnim, {
           toValue: 0,
-          duration: 150,
+          duration: 200,
+          easing: Easing.in(Easing.cubic),
           useNativeDriver: true,
+        }),
+        Animated.timing(blurIntensity, {
+          toValue: 0,
+          duration: 200,
+          easing: Easing.in(Easing.cubic),
+          useNativeDriver: false,
         }),
       ]).start();
     }
   }, [alert.visible]);
+
+  const animatedBlurIntensity = blurIntensity.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 95],
+  });
 
   const getIconConfig = () => {
     switch (alert.type) {
@@ -65,15 +86,22 @@ const CustomAlert = () => {
     }
   };
 
+  const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
+
   return (
     <Modal
       transparent
       visible={alert.visible}
       animationType="none"
       onRequestClose={hideAlert}
+      statusBarTranslucent
     >
-      <BlurView intensity={90} tint="dark" style={styles.overlay}>
-        <Animated.View style={{ opacity: opacityAnim }}>
+      <AnimatedBlurView 
+        intensity={animatedBlurIntensity}
+        tint="dark" 
+        style={styles.overlay}
+      >
+        <Animated.View style={[styles.backdrop, { opacity: opacityAnim }]}>
           <Animated.View
           style={[
             styles.alertContainer,
@@ -123,7 +151,7 @@ const CustomAlert = () => {
           </View>
           </Animated.View>
         </Animated.View>
-      </BlurView>
+      </AnimatedBlurView>
     </Modal>
   );
 };
@@ -133,6 +161,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  backdrop: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
   },
   alertContainer: {
     backgroundColor: '#fff',
