@@ -75,9 +75,18 @@ function createPostCard(post) {
             <span>${commentCount > 0 ? `${commentCount} bình luận` : ''}</span>
         </div>
         <div class="post-actions">
-            <button class="action-btn ${userReaction ? 'active' : ''}" onclick="toggleReaction(${post.id}, '${userReaction || 'like'}')">
-                <i class="fas fa-thumbs-up"></i> ${userReaction ? reactionEmojis[userReaction] : 'Thích'}
-            </button>
+            <div class="reaction-container">
+                <button class="action-btn ${userReaction ? 'active' : ''}" onclick="handleReactionClick(${post.id}, '${userReaction || ''}')">
+                    <i class="fas fa-thumbs-up"></i> ${userReaction ? reactionEmojis[userReaction] : 'Thích'}
+                </button>
+                <div class="reaction-picker" id="reaction-picker-${post.id}">
+                    ${Object.keys(reactionEmojis).map(type => `
+                        <span class="reaction-option" onclick="selectReaction(${post.id}, '${type}')" title="${type}">
+                            ${reactionEmojis[type]}
+                        </span>
+                    `).join('')}
+                </div>
+            </div>
             <button class="action-btn" onclick="toggleComments(${post.id})">
                 <i class="fas fa-comment"></i> Bình luận
             </button>
@@ -104,17 +113,37 @@ function renderMedia(url, type) {
     }
 }
 
-async function toggleReaction(postId, currentReaction) {
+function handleReactionClick(postId, currentReaction) {
+    if (currentReaction && currentReaction !== '') {
+        removeReaction(postId);
+    } else {
+        selectReaction(postId, 'like');
+    }
+}
+
+async function selectReaction(postId, reactionType) {
     try {
-        if (currentReaction && currentReaction !== 'null') {
-            await api.removeReaction(postId);
-        } else {
-            await api.addReaction(postId, 'like');
-        }
+        await api.addReaction(postId, reactionType);
+        await loadFeed();
+        closeAllReactionPickers();
+    } catch (error) {
+        showToast('Không thể thực hiện', 'error');
+    }
+}
+
+async function removeReaction(postId) {
+    try {
+        await api.removeReaction(postId);
         await loadFeed();
     } catch (error) {
         showToast('Không thể thực hiện', 'error');
     }
+}
+
+function closeAllReactionPickers() {
+    document.querySelectorAll('.reaction-picker').forEach(picker => {
+        picker.classList.remove('show');
+    });
 }
 
 async function toggleComments(postId) {
