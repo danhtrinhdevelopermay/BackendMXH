@@ -1,0 +1,50 @@
+2025-10-18T11:29:07.254270258Z 
+2025-10-18T11:29:07.254272638Z Run `npm audit` for details.
+2025-10-18T11:29:08.270852808Z ==> Uploading build...
+2025-10-18T11:29:13.047654Z ==> Uploaded in 3.5s. Compression took 1.3s
+2025-10-18T11:29:13.066134876Z ==> Build successful 🎉
+2025-10-18T11:29:34.594675705Z ==> Deploying...
+2025-10-18T11:29:51.137856304Z     '/opt/render/project/src/backend/src/routes/auth.js',
+2025-10-18T11:29:51.137860055Z     '/opt/render/project/src/backend/server.js'
+2025-10-18T11:29:51.137863964Z   ]
+2025-10-18T11:29:51.137868325Z }
+2025-10-18T11:29:51.137872495Z 
+2025-10-18T11:29:51.137876615Z Node.js v22.16.0
+2025-10-18T11:29:53.269331903Z ==> Exited with status 1
+2025-10-18T11:29:53.497232156Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+2025-10-18T11:29:57.142086114Z ==> Running 'cd backend && npm start'
+2025-10-18T11:29:58.139130627Z 
+2025-10-18T11:29:58.139157688Z > social-media-backend@1.0.0 start
+2025-10-18T11:29:58.139163128Z > node server.js
+2025-10-18T11:29:58.139165908Z 
+2025-10-18T11:29:58.439116626Z [dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+2025-10-18T11:30:00.037505256Z node:internal/modules/cjs/loader:1404
+2025-10-18T11:30:00.037523747Z   throw err;
+2025-10-18T11:30:00.037527457Z   ^
+2025-10-18T11:30:00.037529867Z 
+2025-10-18T11:30:00.037533267Z Error: Cannot find module '@neondatabase/serverless'
+2025-10-18T11:30:00.037535767Z Require stack:
+2025-10-18T11:30:00.037537897Z - /opt/render/project/src/backend/src/config/database.js
+2025-10-18T11:30:00.037540727Z - /opt/render/project/src/backend/src/controllers/authController.js
+2025-10-18T11:30:00.037542827Z - /opt/render/project/src/backend/src/routes/auth.js
+2025-10-18T11:30:00.037544957Z - /opt/render/project/src/backend/server.js
+2025-10-18T11:30:00.037547417Z     at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)
+2025-10-18T11:30:00.037549847Z     at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)
+2025-10-18T11:30:00.037552047Z     at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)
+2025-10-18T11:30:00.037554187Z     at Function._load (node:internal/modules/cjs/loader:1211:37)
+2025-10-18T11:30:00.037556377Z     at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+2025-10-18T11:30:00.037558567Z     at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+2025-10-18T11:30:00.037560687Z     at Module.require (node:internal/modules/cjs/loader:1487:12)
+2025-10-18T11:30:00.037562817Z     at require (node:internal/modules/helpers:135:16)
+2025-10-18T11:30:00.037565667Z     at Object.<anonymous> (/opt/render/project/src/backend/src/config/database.js:1:24)
+2025-10-18T11:30:00.037567857Z     at Module._compile (node:internal/modules/cjs/loader:1730:14) {
+2025-10-18T11:30:00.037570837Z   code: 'MODULE_NOT_FOUND',
+2025-10-18T11:30:00.037576398Z   requireStack: [
+2025-10-18T11:30:00.037579218Z     '/opt/render/project/src/backend/src/config/database.js',
+2025-10-18T11:30:00.037581878Z     '/opt/render/project/src/backend/src/controllers/authController.js',
+2025-10-18T11:30:00.037584408Z     '/opt/render/project/src/backend/src/routes/auth.js',
+2025-10-18T11:30:00.037586448Z     '/opt/render/project/src/backend/server.js'
+2025-10-18T11:30:00.037588558Z   ]
+2025-10-18T11:30:00.037590658Z }
+2025-10-18T11:30:00.037599078Z 
+2025-10-18T11:30:00.037601378Z Node.js v22.16.0
