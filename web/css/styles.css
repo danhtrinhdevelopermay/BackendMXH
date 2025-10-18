@@ -1125,6 +1125,120 @@ body {
     border-left: 4px solid var(--primary-color);
 }
 
+.confirm-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 4000;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirm-overlay.show {
+    display: flex;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.confirm-box {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    animation: scaleIn 0.3s ease;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.confirm-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.confirm-icon i {
+    font-size: 35px;
+    color: white;
+}
+
+.confirm-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.confirm-message {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.confirm-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn-confirm-cancel,
+.btn-confirm-ok {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-confirm-cancel {
+    background: var(--hover-bg);
+    color: var(--text-primary);
+}
+
+.btn-confirm-cancel:hover {
+    background: var(--border-color);
+}
+
+.btn-confirm-ok {
+    background: var(--gradient);
+    color: white;
+}
+
+.btn-confirm-ok:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
 .comments-section {
     margin-top: 15px;
     border-top: 1px solid var(--border-color);

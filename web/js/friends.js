@@ -191,7 +191,12 @@ async function respondToRequest(requestId, action) {
 }
 
 async function unfriendUser(userId) {
-    if (!confirm('Bạn có chắc muốn hủy kết bạn?')) return;
+    const confirmed = await showConfirm(
+        'Hủy kết bạn',
+        'Bạn có chắc chắn muốn hủy kết bạn với người này?'
+    );
+    
+    if (!confirmed) return;
 
     try {
         await api.unfriend(userId);

@@ -153,6 +153,43 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
+function showConfirm(title, message) {
+    return new Promise((resolve) => {
+        const confirmDialog = document.getElementById('confirm-dialog');
+        const confirmTitle = document.getElementById('confirm-title');
+        const confirmMessage = document.getElementById('confirm-message');
+        const btnOk = document.getElementById('btn-confirm-ok');
+        const btnCancel = document.getElementById('btn-confirm-cancel');
+
+        confirmTitle.textContent = title;
+        confirmMessage.textContent = message;
+        confirmDialog.classList.add('show');
+
+        const handleOk = () => {
+            confirmDialog.classList.remove('show');
+            btnOk.removeEventListener('click', handleOk);
+            btnCancel.removeEventListener('click', handleCancel);
+            resolve(true);
+        };
+
+        const handleCancel = () => {
+            confirmDialog.classList.remove('show');
+            btnOk.removeEventListener('click', handleOk);
+            btnCancel.removeEventListener('click', handleCancel);
+            resolve(false);
+        };
+
+        btnOk.addEventListener('click', handleOk);
+        btnCancel.addEventListener('click', handleCancel);
+
+        confirmDialog.addEventListener('click', (e) => {
+            if (e.target.id === 'confirm-dialog') {
+                handleCancel();
+            }
+        });
+    });
+}
+
 function closeModal() {
     document.getElementById('modal-overlay').classList.remove('active');
 }

@@ -205,7 +205,12 @@ async function addComment(postId) {
 }
 
 async function deletePost(postId) {
-    if (!confirm('Bạn có chắc muốn xóa bài viết này?')) return;
+    const confirmed = await showConfirm(
+        'Xóa bài viết',
+        'Bạn có chắc chắn muốn xóa bài viết này? Hành động này không thể hoàn tác.'
+    );
+    
+    if (!confirmed) return;
 
     try {
         await api.deletePost(postId);
