@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { TextInput, IconButton, Avatar, Text, Card } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BlurView } from 'expo-blur';
 import { commentAPI } from '../api/api';
 import { useAlert } from '../context/AlertContext';
 import { AuthContext } from '../context/AuthContext';
@@ -67,65 +66,54 @@ const CommentsScreen = ({ route }) => {
   );
 
   return (
-    <View style={styles.backdrop}>
-      <BlurView intensity={80} tint="systemMaterialLight" style={styles.blurContainer}>
-        <KeyboardAvoidingView 
-          style={styles.container} 
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={90}
-        >
-          <FlatList
-            data={comments}
-            renderItem={renderComment}
-            keyExtractor={(item) => item.id.toString()}
-            ListEmptyComponent={
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>No comments yet. Be the first to comment!</Text>
-              </View>
-            }
-            contentContainerStyle={styles.commentsList}
-          />
-          <View style={[styles.inputContainer, { paddingBottom: Math.max(insets.bottom, 12) }]}>
-            <UserAvatar 
-              user={user}
-              size={32}
-              style={styles.inputAvatar}
-            />
-            <TextInput
-              value={newComment}
-              onChangeText={setNewComment}
-              placeholder="Write a comment..."
-              style={styles.input}
-              mode="outlined"
-              outlineColor="transparent"
-              activeOutlineColor="#1877f2"
-              multiline
-            />
-            <IconButton
-              icon="send"
-              size={24}
-              onPress={handleAddComment}
-              disabled={loading || !newComment.trim()}
-              iconColor="#1877f2"
-            />
+    <KeyboardAvoidingView 
+      style={styles.container} 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={90}
+    >
+      <FlatList
+        data={comments}
+        renderItem={renderComment}
+        keyExtractor={(item) => item.id.toString()}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No comments yet. Be the first to comment!</Text>
           </View>
-        </KeyboardAvoidingView>
-      </BlurView>
-    </View>
+        }
+        contentContainerStyle={styles.commentsList}
+      />
+      <View style={[styles.inputContainer, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+        <UserAvatar 
+          user={user}
+          size={32}
+          style={styles.inputAvatar}
+        />
+        <TextInput
+          value={newComment}
+          onChangeText={setNewComment}
+          placeholder="Write a comment..."
+          style={styles.input}
+          mode="outlined"
+          outlineColor="transparent"
+          activeOutlineColor="#1877f2"
+          multiline
+        />
+        <IconButton
+          icon="send"
+          size={24}
+          onPress={handleAddComment}
+          disabled={loading || !newComment.trim()}
+          iconColor="#1877f2"
+        />
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-  },
-  blurContainer: {
-    flex: 1,
-  },
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: '#f0f2f5',
   },
   commentsList: {
     flexGrow: 1,

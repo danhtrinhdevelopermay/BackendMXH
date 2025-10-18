@@ -103,8 +103,6 @@ const modalTransition = {
     },
   },
   cardStyleInterpolator: CardStyleInterpolators.forModalPresentationIOS,
-  cardStyle: { backgroundColor: 'transparent' },
-  detachPreviousScreen: false,
 };
 
 const TabBarIcon = ({ focused, iconName, color, size }) => {
