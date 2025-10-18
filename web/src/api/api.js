@@ -1,5 +1,5 @@
 import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
+import { getItem } from '../utils/storage';
 import Constants from 'expo-constants';
 
 const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
@@ -14,7 +14,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   async (config) => {
-    const token = await SecureStore.getItemAsync('token');
+    const token = await getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -35,7 +35,7 @@ export const authAPI = {
       type: 'image/jpeg',
       name: 'avatar.jpg',
     });
-    const token = await SecureStore.getItemAsync('token');
+    const token = await getItem('token');
     const response = await axios.post(`${API_URL}/api/avatar`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -51,7 +51,7 @@ export const authAPI = {
       type: 'image/jpeg',
       name: 'cover.jpg',
     });
-    const token = await SecureStore.getItemAsync('token');
+    const token = await getItem('token');
     const response = await axios.post(`${API_URL}/api/cover`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -131,7 +131,7 @@ export const storyAPI = {
       formData.append('caption', caption);
     }
 
-    const token = await SecureStore.getItemAsync('token');
+    const token = await getItem('token');
     const response = await axios.post(`${API_URL}/api/stories`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -156,7 +156,7 @@ export const uploadAPI = {
       name: isVideo ? 'video.mp4' : 'photo.jpg',
     });
 
-    const token = await SecureStore.getItemAsync('token');
+    const token = await getItem('token');
     const response = await axios.post(`${API_URL}/api/upload`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
