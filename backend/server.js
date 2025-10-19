@@ -112,18 +112,23 @@ app.post('/api/upload', authenticateToken, upload.single('media'), async (req, r
       uploadStream.end(req.file.buffer);
     });
 
+    const mediaWidth = uploadResult.width || null;
+    const mediaHeight = uploadResult.height || null;
+
     const result = await pool.query(
-      'INSERT INTO posts (user_id, media_url, media_type) VALUES ($1, $2, $3) RETURNING id',
-      [req.user.id, uploadResult.secure_url, mediaType]
+      'INSERT INTO posts (user_id, media_url, media_type, media_width, media_height) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+      [req.user.id, uploadResult.secure_url, mediaType, mediaWidth, mediaHeight]
     );
 
     const mediaId = result.rows[0].id;
-    console.log(`Media uploaded successfully to Cloudinary with post ID: ${mediaId}`);
+    console.log(`Media uploaded successfully to Cloudinary with post ID: ${mediaId}, dimensions: ${mediaWidth}x${mediaHeight}`);
     
     res.json({ 
       id: mediaId,
       url: uploadResult.secure_url,
-      type: mediaType
+      type: mediaType,
+      width: mediaWidth,
+      height: mediaHeight
     });
   } catch (error) {
     console.error('Upload error:', error);

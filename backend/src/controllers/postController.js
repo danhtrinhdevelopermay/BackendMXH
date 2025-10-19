@@ -37,7 +37,7 @@ const createPost = async (req, res) => {
     const post = result.rows[0];
     
     const postWithUser = await pool.query(
-      `SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.privacy, p.created_at, p.updated_at,
+      `SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.media_width, p.media_height, p.privacy, p.created_at, p.updated_at,
        u.username, u.full_name, u.avatar_url, u.is_verified 
        FROM posts p 
        JOIN users u ON p.user_id = u.id 
@@ -80,7 +80,7 @@ const getNewsFeed = async (req, res) => {
          WHERE status = 'accepted' AND (requester_id = $1 OR addressee_id = $1)
        ),
        visible_posts AS (
-         SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.privacy, p.created_at, p.updated_at
+         SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.media_width, p.media_height, p.privacy, p.created_at, p.updated_at
          FROM posts p
          WHERE (
            p.user_id = $1 
@@ -107,7 +107,7 @@ const getNewsFeed = async (req, res) => {
          FROM reactions
          WHERE user_id = $1 AND post_id IN (SELECT id FROM visible_posts)
        )
-       SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.privacy, p.created_at, p.updated_at,
+       SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.media_width, p.media_height, p.privacy, p.created_at, p.updated_at,
          u.username, u.full_name, u.avatar_url, u.is_verified,
          COALESCE(rc.count, 0) as reaction_count,
          COALESCE(cc.count, 0) as comment_count,
@@ -143,7 +143,7 @@ const getUserPosts = async (req, res) => {
 
     const result = await pool.queryAll(
       `WITH visible_posts AS (
-         SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.privacy, p.created_at, p.updated_at
+         SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.media_width, p.media_height, p.privacy, p.created_at, p.updated_at
          FROM posts p
          WHERE p.user_id = $1 AND (
            $1 = $2
@@ -173,7 +173,7 @@ const getUserPosts = async (req, res) => {
          FROM reactions
          WHERE user_id = $2 AND post_id IN (SELECT id FROM visible_posts)
        )
-       SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.privacy, p.created_at, p.updated_at,
+       SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.media_width, p.media_height, p.privacy, p.created_at, p.updated_at,
          u.username, u.full_name, u.avatar_url, u.is_verified,
          COALESCE(rc.count, 0) as reaction_count,
          COALESCE(cc.count, 0) as comment_count,
@@ -225,7 +225,7 @@ const searchPosts = async (req, res) => {
 
   try {
     const result = await pool.queryAll(
-      `SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.privacy, p.created_at, p.updated_at,
+      `SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.media_width, p.media_height, p.privacy, p.created_at, p.updated_at,
        u.username, u.full_name as author_name, u.avatar_url,
        (SELECT COUNT(*) FROM reactions WHERE post_id = p.id) as reaction_count,
        (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count
