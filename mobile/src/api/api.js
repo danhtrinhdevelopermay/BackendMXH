@@ -171,4 +171,9 @@ export const uploadAPI = {
   },
 };
 
+export const streakAPI = {
+  getStreak: (userId) => api.get(`/streaks/${userId}`),
+  getUserStreaks: () => api.get('/streaks'),
+};
+
 export default api;

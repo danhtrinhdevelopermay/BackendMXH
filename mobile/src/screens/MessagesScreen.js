@@ -9,6 +9,7 @@ import { useAlert } from '../context/AlertContext';
 import { AuthContext } from '../context/AuthContext';
 import UserAvatar from '../components/UserAvatar';
 import ThoughtsBar from '../components/ThoughtsBar';
+import StreakIcon from '../components/StreakIcon';
 
 const MessagesScreen = ({ navigation }) => {
   const { showAlert } = useAlert();
@@ -117,9 +118,12 @@ const MessagesScreen = ({ navigation }) => {
         
         <View style={styles.conversationContent}>
           <View style={styles.topRow}>
-            <Text style={[styles.userName, isUnread && styles.unreadName]} numberOfLines={1}>
-              {item.full_name || item.username}
-            </Text>
+            <View style={styles.nameRow}>
+              <Text style={[styles.userName, isUnread && styles.unreadName]} numberOfLines={1}>
+                {item.full_name || item.username}
+              </Text>
+              {item.streak_count > 0 && <StreakIcon count={item.streak_count} size="small" />}
+            </View>
             {isUnread && <View style={styles.unreadBadge} />}
           </View>
           
@@ -326,12 +330,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 4,
   },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 8,
+  },
   userName: {
     fontSize: 15,
     fontWeight: '500',
     color: '#050505',
-    flex: 1,
-    marginRight: 8,
+    marginRight: 4,
   },
   unreadName: {
     fontWeight: '600',
