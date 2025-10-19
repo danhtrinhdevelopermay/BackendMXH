@@ -591,6 +591,7 @@ const styles = StyleSheet.create({
   messageRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
+    maxWidth: '85%',
   },
   messageAvatar: {
     marginRight: 6,
@@ -604,14 +605,16 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    maxWidth: '75%',
+    maxWidth: 280,
+    minWidth: 50,
   },
   myBubble: {
     backgroundColor: '#0084FF',
     borderRadius: 18,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    maxWidth: '75%',
+    maxWidth: 280,
+    minWidth: 50,
   },
   theirText: {
     fontSize: 15,
