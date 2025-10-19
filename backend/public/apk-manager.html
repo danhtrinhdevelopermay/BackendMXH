@@ -341,7 +341,7 @@
     <div id="alert" class="alert"></div>
 
     <div class="upload-section">
-      <h2>⬆️ Upload APK Mới</h2>
+      <h2>➕ Thêm Phiên Bản APK Mới</h2>
       <form id="uploadForm">
         <div class="form-group">
           <label>Tên phiên bản (VD: 1.0.0) *</label>
@@ -357,6 +357,22 @@
         </div>
 
         <div class="form-group">
+          <label>Link tải xuống APK *</label>
+          <input type="url" id="apkUrl" placeholder="https://example.com/app.apk" required>
+          <small style="color: #999; display: block; margin-top: 5px;">
+            Link phải trực tiếp tải xuống file APK khi người dùng truy cập
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Kích thước file (MB - không bắt buộc)</label>
+          <input type="number" id="fileSize" placeholder="50" step="0.01">
+          <small style="color: #999; display: block; margin-top: 5px;">
+            Nhập kích thước file APK nếu biết (để hiển thị cho người dùng)
+          </small>
+        </div>
+
+        <div class="form-group">
           <label>Nội dung cập nhật</label>
           <textarea id="releaseNotes" placeholder="- Sửa lỗi...&#10;- Thêm tính năng mới...&#10;- Cải thiện hiệu suất..."></textarea>
         </div>
@@ -368,19 +384,8 @@
           </label>
         </div>
 
-        <div class="form-group">
-          <label>File APK *</label>
-          <div class="file-input-wrapper">
-            <input type="file" id="apkFile" accept=".apk" required>
-            <label for="apkFile" class="file-input-label" id="fileLabel">
-              <span>📁 Chọn file APK</span>
-              <span id="fileName"></span>
-            </label>
-          </div>
-        </div>
-
         <button type="submit" class="btn btn-primary" id="uploadBtn">
-          <span>⬆️ Upload APK</span>
+          <span>✅ Thêm Phiên Bản</span>
         </button>
       </form>
     </div>
@@ -408,51 +413,40 @@
       }, 5000);
     };
 
-    document.getElementById('apkFile').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      const label = document.getElementById('fileLabel');
-      const fileName = document.getElementById('fileName');
-      
-      if (file) {
-        fileName.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-        label.classList.add('has-file');
-      } else {
-        fileName.textContent = '';
-        label.classList.remove('has-file');
-      }
-    });
-
     document.getElementById('uploadForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
       const uploadBtn = document.getElementById('uploadBtn');
-      const formData = new FormData();
+      const fileSizeInput = document.getElementById('fileSize').value;
+      const fileSizeBytes = fileSizeInput ? Math.round(parseFloat(fileSizeInput) * 1024 * 1024) : null;
       
-      formData.append('version_name', document.getElementById('versionName').value);
-      formData.append('version_code', document.getElementById('versionCode').value);
-      formData.append('release_notes', document.getElementById('releaseNotes').value);
-      formData.append('is_force_update', document.getElementById('forceUpdate').checked);
-      formData.append('apk', document.getElementById('apkFile').files[0]);
+      const payload = {
+        version_name: document.getElementById('versionName').value,
+        version_code: document.getElementById('versionCode').value,
+        apk_url: document.getElementById('apkUrl').value,
+        file_size: fileSizeBytes,
+        release_notes: document.getElementById('releaseNotes').value,
+        is_force_update: document.getElementById('forceUpdate').checked
+      };
 
       uploadBtn.disabled = true;
-      uploadBtn.innerHTML = '<span>⏳ Đang upload...</span>';
+      uploadBtn.innerHTML = '<span>⏳ Đang xử lý...</span>';
 
       try {
         const response = await fetch(`${API_URL}/api/app-versions/upload`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${authToken}`
+            'Authorization': `Bearer ${authToken}`,
+            'Content-Type': 'application/json'
           },
-          body: formData
+          body: JSON.stringify(payload)
         });
 
         const data = await response.json();
 
         if (data.success) {
-          showAlert('✅ Upload APK thành công!', 'success');
+          showAlert('✅ Thêm phiên bản APK thành công!', 'success');
           document.getElementById('uploadForm').reset();
-          document.getElementById('fileLabel').classList.remove('has-file');
-          document.getElementById('fileName').textContent = '';
           loadVersions();
         } else {
           showAlert('❌ ' + data.error, 'error');
@@ -461,7 +455,7 @@
         showAlert('❌ Lỗi: ' + error.message, 'error');
       } finally {
         uploadBtn.disabled = false;
-        uploadBtn.innerHTML = '<span>⬆️ Upload APK</span>';
+        uploadBtn.innerHTML = '<span>✅ Thêm Phiên Bản</span>';
       }
     });
 
@@ -494,7 +488,7 @@
                   </div>
                   <div class="version-meta">
                     Code: ${v.version_code} • 
-                    Kích thước: ${(v.file_size / 1024 / 1024).toFixed(2)} MB • 
+                    ${v.file_size ? `Kích thước: ${(v.file_size / 1024 / 1024).toFixed(2)} MB • ` : ''}
                     Tải lên: ${new Date(v.created_at).toLocaleDateString('vi-VN')} bởi ${v.uploaded_by_name || 'Admin'}
                   </div>
                 </div>
