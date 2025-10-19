@@ -29,12 +29,16 @@
         "backgroundColor": "#000000"
       },
       "package": "com.shatter.app",
+      "versionCode": 1,
       "permissions": [
         "CAMERA",
         "RECORD_AUDIO",
         "MODIFY_AUDIO_SETTINGS",
         "INTERNET",
-        "ACCESS_NETWORK_STATE"
+        "ACCESS_NETWORK_STATE",
+        "REQUEST_INSTALL_PACKAGES",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE"
       ]
     },
     "web": {

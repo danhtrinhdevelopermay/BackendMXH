@@ -18,6 +18,7 @@
     "dotenv": "^17.2.3",
     "expo-av": "^16.0.7",
     "expo-device": "^8.0.9",
+    "expo-intent-launcher": "^13.0.7",
     "expo-notifications": "^0.32.12",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",

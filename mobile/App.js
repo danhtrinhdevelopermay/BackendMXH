@@ -4,6 +4,7 @@ import { AuthProvider } from './src/context/AuthContext';
 import { AlertProvider } from './src/context/AlertContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import CustomAlert from './src/components/CustomAlert';
+import UpdateChecker from './src/components/UpdateChecker';
 import Constants from 'expo-constants';
 
 let OneSignal;
@@ -58,6 +59,7 @@ export default function App() {
         <AuthProvider>
           <AppNavigator />
           <CustomAlert />
+          <UpdateChecker />
         </AuthProvider>
       </AlertProvider>
     </PaperProvider>
