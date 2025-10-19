@@ -145,6 +145,16 @@ const PostDetailScreen = ({ route, navigation }) => {
   const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
   const mediaUrl = post.media_url || `${API_URL}/api/media/${post.id}`;
   const isVideo = post.media_type?.startsWith('video/');
+  
+  const aspectRatio = (post.media_width && post.media_height) 
+    ? post.media_width / post.media_height 
+    : 16/9;
+  
+  const mediaStyle = {
+    width: '100%',
+    aspectRatio: aspectRatio,
+    backgroundColor: '#000',
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -205,7 +215,7 @@ const PostDetailScreen = ({ route, navigation }) => {
                   <Video
                     ref={videoRef}
                     source={{ uri: mediaUrl }}
-                    style={styles.postMedia}
+                    style={mediaStyle}
                     useNativeControls
                     resizeMode="contain"
                     isLooping
@@ -217,7 +227,7 @@ const PostDetailScreen = ({ route, navigation }) => {
                     }}
                   />
                 ) : (
-                  <View style={[styles.postMedia, styles.errorContainer]}>
+                  <View style={[mediaStyle, styles.errorContainer]}>
                     <Ionicons name="videocam-off" size={48} color="#8e8e93" />
                     <Text style={styles.errorText}>Không thể tải video</Text>
                   </View>
@@ -226,14 +236,14 @@ const PostDetailScreen = ({ route, navigation }) => {
             ) : (
               <>
                 {imageLoading && !imageError && (
-                  <View style={[styles.postMedia, styles.loadingContainer]}>
+                  <View style={[mediaStyle, styles.loadingContainer]}>
                     <ActivityIndicator size="large" color="#667eea" />
                   </View>
                 )}
                 {!imageError ? (
                   <Card.Cover 
                     source={{ uri: mediaUrl }} 
-                    style={[styles.postMedia, imageLoading && { display: 'none' }]}
+                    style={[mediaStyle, imageLoading && { display: 'none' }]}
                     onLoad={() => setImageLoading(false)}
                     onError={() => {
                       setImageLoading(false);
@@ -241,7 +251,7 @@ const PostDetailScreen = ({ route, navigation }) => {
                     }}
                   />
                 ) : (
-                  <View style={[styles.postMedia, styles.errorContainer]}>
+                  <View style={[mediaStyle, styles.errorContainer]}>
                     <Ionicons name="image-off" size={48} color="#8e8e93" />
                     <Text style={styles.errorText}>Không thể tải ảnh</Text>
                   </View>
