@@ -97,7 +97,7 @@ router.get('/check/:currentVersionCode', async (req, res) => {
   }
 });
 
-router.post('/upload', authenticateToken, upload.single('apk'), async (req, res) => {
+router.post('/upload', upload.single('apk'), async (req, res) => {
   try {
     const { version_name, version_code, release_notes, is_force_update } = req.body;
     
@@ -155,7 +155,7 @@ router.post('/upload', authenticateToken, upload.single('apk'), async (req, res)
       `INSERT INTO app_versions (version_name, version_code, apk_url, file_size, release_notes, is_force_update, uploaded_by, cloudinary_public_id)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
-      [version_name, parseInt(version_code), apkUrl, fileSize, release_notes, is_force_update === 'true', req.user.id, cloudinaryPublicId]
+      [version_name, parseInt(version_code), apkUrl, fileSize, release_notes, is_force_update === 'true', null, cloudinaryPublicId]
     );
 
     res.json({
@@ -172,7 +172,7 @@ router.post('/upload', authenticateToken, upload.single('apk'), async (req, res)
   }
 });
 
-router.get('/list', authenticateToken, async (req, res) => {
+router.get('/list', async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT v.*, u.full_name as uploaded_by_name 
@@ -194,7 +194,7 @@ router.get('/list', authenticateToken, async (req, res) => {
   }
 });
 
-router.delete('/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
     const versionId = req.params.id;
     
