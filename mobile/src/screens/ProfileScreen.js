@@ -5,10 +5,11 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Video } from 'expo-av';
 import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
-import { postAPI, userAPI, friendshipAPI, messageAPI } from '../api/api';
+import { postAPI, userAPI, friendshipAPI, messageAPI, streakAPI } from '../api/api';
 import Constants from 'expo-constants';
 import UserAvatar from '../components/UserAvatar';
 import VerifiedBadge from '../components/VerifiedBadge';
+import StreakIcon from '../components/StreakIcon';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 
 const ProfileScreen = ({ route, navigation }) => {
@@ -22,6 +23,7 @@ const ProfileScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [friendshipStatus, setFriendshipStatus] = useState(null);
   const [stats, setStats] = useState({ posts_count: 0, friends_count: 0, photos_count: 0 });
+  const [streaks, setStreaks] = useState([]);
   
   const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
 
@@ -29,12 +31,14 @@ const ProfileScreen = ({ route, navigation }) => {
     try {
       if (isOwnProfile) {
         setProfileUser(currentUser);
-        const [postsResponse, statsResponse] = await Promise.all([
+        const [postsResponse, statsResponse, streaksResponse] = await Promise.all([
           postAPI.getUserPosts(currentUser.id),
-          userAPI.getUserStats(currentUser.id)
+          userAPI.getUserStats(currentUser.id),
+          streakAPI.getUserStreaks()
         ]);
         setPosts(postsResponse.data);
         setStats(statsResponse.data);
+        setStreaks(streaksResponse.data || []);
       } else {
         const [userResponse, postsResponse, statsResponse] = await Promise.all([
           userAPI.getUserById(userId),
@@ -244,6 +248,48 @@ const ProfileScreen = ({ route, navigation }) => {
           </View>
         </View>
       </View>
+
+      {/* Streak Milestones Section */}
+      {isOwnProfile && streaks.length > 0 && (
+        <View style={styles.streaksContainer}>
+          <View style={styles.streaksHeader}>
+            <Text style={styles.streaksIcon}>🔥</Text>
+            <Text style={styles.streaksTitle}>Streaks</Text>
+          </View>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            style={styles.streaksList}
+            contentContainerStyle={styles.streaksContent}
+          >
+            {streaks.map((streak) => (
+              <TouchableOpacity
+                key={streak.other_user_id}
+                style={styles.streakCard}
+                onPress={() => navigation.navigate('Chat', {
+                  userId: streak.other_user_id,
+                  userName: streak.user?.full_name || streak.user?.username,
+                  userAvatar: streak.user?.avatar_url
+                })}
+              >
+                <UserAvatar 
+                  user={streak.user}
+                  userId={streak.other_user_id}
+                  size={48}
+                />
+                <View style={styles.streakInfo}>
+                  <Text style={styles.streakName} numberOfLines={1}>
+                    {streak.user?.full_name || streak.user?.username}
+                  </Text>
+                  <View style={styles.streakBadge}>
+                    <StreakIcon count={streak.streak_count} size="small" />
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      )}
 
       {/* Posts Header */}
       <View style={styles.postsHeader}>
@@ -505,6 +551,59 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 15,
     color: '#536471',
+  },
+  streaksContainer: {
+    backgroundColor: '#fff',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eff3f4',
+  },
+  streaksHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
+  streaksIcon: {
+    fontSize: 20,
+    marginRight: 6,
+  },
+  streaksTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#0f1419',
+  },
+  streaksList: {
+    paddingLeft: 16,
+  },
+  streaksContent: {
+    paddingRight: 16,
+  },
+  streakCard: {
+    alignItems: 'center',
+    marginRight: 16,
+    backgroundColor: '#f7f9f9',
+    borderRadius: 12,
+    padding: 12,
+    minWidth: 80,
+    borderWidth: 1,
+    borderColor: '#eff3f4',
+  },
+  streakInfo: {
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  streakName: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#0f1419',
+    marginBottom: 4,
+    textAlign: 'center',
+    maxWidth: 80,
+  },
+  streakBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   postsHeader: {
     borderTopWidth: 1,
