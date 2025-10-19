@@ -1,0 +1,33 @@
+Starting Metro Bundler
+Android node_modules/expo/AppEntry.js ▓▓▓░░░░░░░░░░░░░ 22.9% (105/308)
+Android node_modules/expo/AppEntry.js ▓▓▓▓▓▓░░░░░░░░░░ 39.8% (431/683)
+Android node_modules/expo/AppEntry.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 73.6% ( 894/1042)
+WARN  Attempted to import the module "/home/expo/workingdir/build/mobile/node_modules/react-native-webrtc/node_modules/event-target-shim/index" which is not listed in the "exports" of "/home/expo/workingdir/build/mobile/node_modules/react-native-webrtc/node_modules/event-target-shim" under the requested subpath "./index". Falling back to file-based resolution. Consider updating the call site or asking the package maintainer(s) to expose this API.
+Android node_modules/expo/AppEntry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 95.5% (1320/1351)
+Android Bundling failed 13850ms node_modules/expo/AppEntry.js (1433 modules)
+Error: Unable to resolve module expo-intent-launcher from /home/expo/workingdir/build/mobile/src/components/UpdateModal.js: expo-intent-launcher could not be found within the project or in these directories:
+  node_modules
+[0m [90m 12 |[39m } [36mfrom[39m [32m'react-native'[39m[33m;[39m
+ [90m 13 |[39m [36mimport[39m [33m*[39m [36mas[39m [33mFileSystem[39m [36mfrom[39m [32m'expo-file-system'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 14 |[39m [36mimport[39m [33m*[39m [36mas[39m [33mIntentLauncher[39m [36mfrom[39m [32m'expo-intent-launcher'[39m[33m;[39m
+ [90m    |[39m                                  [31m[1m^[22m[39m
+ [90m 15 |[39m [36mimport[39m [33mConstants[39m [36mfrom[39m [32m'expo-constants'[39m[33m;[39m
+ [90m 16 |[39m
+ [90m 17 |[39m [36mconst[39m { width } [33m=[39m [33mDimensions[39m[33m.[39m[36mget[39m([32m'window'[39m)[33m;[39m[0m
+
+Import stack:
+
+ src/components/UpdateModal.js
+ | import "expo-intent-launcher"
+
+ src/components/UpdateChecker.js
+ | import "./UpdateModal"
+
+ App.js
+ | import "./src/components/UpdateChecker"
+
+ node_modules/expo/AppEntry.js
+ | import "../../App"
+
+ 
+ | import "/home/expo/workingdir/build/mobile/node_modules/expo/AppEntry.js"
