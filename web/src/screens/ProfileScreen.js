@@ -283,21 +283,16 @@ const ProfileScreen = ({ route, navigation }) => {
         return (
           <View style={styles.mediaContainer}>
             {isVideo ? (
-              <TouchableOpacity 
-                activeOpacity={1}
-                onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
-              >
                 <Video
                   source={{ uri: mediaUrl }}
                   style={styles.postMedia}
                   resizeMode="contain"
                   useNativeControls
-                  shouldPlay={true}
+                  shouldPlay={false}
                   isLooping
                   isMuted={false}
                   onError={(error) => console.log('Video error:', error)}
                 />
-              </TouchableOpacity>
             ) : (
               <TouchableOpacity 
                 activeOpacity={1}
@@ -575,8 +570,7 @@ const styles = StyleSheet.create({
   },
   postMedia: {
     width: '100%',
-    minHeight: 300,
-    maxHeight: 600,
+    height: 400,
     backgroundColor: '#000',
   },
   postActions: {

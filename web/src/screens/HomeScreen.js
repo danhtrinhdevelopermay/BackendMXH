@@ -311,29 +311,24 @@ const HomeScreen = ({ navigation }) => {
           return (
             <View style={styles.mediaContainer}>
               {isVideo ? (
-                <TouchableOpacity 
-                  activeOpacity={1}
-                  onPress={() => handleVideoPress(item.id)}
-                >
-                  <Video
-                    ref={(ref) => {
-                      if (ref) {
-                        videoRefs.current[item.id] = ref;
-                      }
-                    }}
-                    source={{ uri: mediaUrl }}
-                    style={styles.postMedia}
-                    resizeMode="contain"
-                    useNativeControls
-                    shouldPlay={isVisible}
-                    isLooping
-                    isMuted={false}
-                    onError={(error) => {
-                      console.log('Video error:', error);
-                      handleMediaError();
-                    }}
-                  />
-                </TouchableOpacity>
+                <Video
+                  ref={(ref) => {
+                    if (ref) {
+                      videoRefs.current[item.id] = ref;
+                    }
+                  }}
+                  source={{ uri: mediaUrl }}
+                  style={styles.postMedia}
+                  resizeMode="contain"
+                  useNativeControls
+                  shouldPlay={isVisible}
+                  isLooping
+                  isMuted={false}
+                  onError={(error) => {
+                    console.log('Video error:', error);
+                    handleMediaError();
+                  }}
+                />
               ) : (
                 <TouchableOpacity 
                   activeOpacity={1}
@@ -623,13 +618,14 @@ const styles = StyleSheet.create({
   },
   mediaContainer: {
     marginTop: 8,
-    overflow: 'hidden',
+    width: '100%',
+    backgroundColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   postMedia: {
     width: '100%',
-    minHeight: 300,
-    maxHeight: 600,
-    aspectRatio: 'auto',
+    height: 400,
     backgroundColor: '#000',
   },
   mediaErrorContainer: {
