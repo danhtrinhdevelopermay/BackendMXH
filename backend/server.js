@@ -172,6 +172,12 @@ app.get('/api/avatar/:userId', async (req, res) => {
       return res.status(404).json({ error: 'Avatar not found' });
     }
 
+    res.set({
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    
     res.redirect(result.rows[0].avatar_url);
   } catch (error) {
     console.error('Get avatar error:', error);
