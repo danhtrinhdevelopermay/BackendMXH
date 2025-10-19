@@ -27,6 +27,7 @@ The mobile application uses React Native with Expo SDK. Navigation is handled by
 - **User Thoughts/Notes:** A "thoughts" bar in the Messages screen allows users to share short notes (max 100 characters) with optional emojis, visible to friends and updating in real-time.
 - **Post Reactions:** Single-tap for 'like'/'unlike', long-press for a full reaction menu (6 types). Visual feedback indicates current reaction.
 - **Message Reactions:** Long-press on any message to display a reaction menu with 6 emoji options (👍, ❤️, 😆, 😮, 😢, 😡). Reactions are displayed on messages and synced in real-time. Includes push notifications when someone reacts to your message.
+- **Messaging Streaks:** TikTok-style streak system that tracks consecutive days of mutual messaging between users. Features animated fire icon 🔥 with count display, shown next to usernames in the Messages screen. Streaks are automatically maintained when both users exchange messages within 24 hours. Milestone streaks (≥10 days) are displayed in a scrollable card view on the user's Profile screen with animated badges.
 - **iOS-Style Gaussian Blur Modals:** All modals feature a Gaussian blur backdrop using `expo-blur` for an enhanced visual aesthetic.
 - **Verified Badge:** Displays correctly for verified users across Friends list, requests, and search results.
 
@@ -42,6 +43,8 @@ The backend is a RESTful API built with Node.js and Express, following an MVC-li
 - `/api/friendships`: Friend request and management.
 - `/api/messages`: Direct messaging.
 - `/api/message-reactions`: Message reaction system (add, remove, get reactions).
+- `/api/streaks/:userId`: Get streak with specific user.
+- `/api/streaks`: Get all user's milestone streaks (for profile display).
 - `/api/notifications`: Notification feed and status.
 - `/api/thoughts`: User thoughts/notes management.
 - `/api/upload`: Media upload.
@@ -68,7 +71,7 @@ The backend is a RESTful API built with Node.js and Express, following an MVC-li
 
 ### Database
 - **PostgreSQL**: The primary relational database, hosted on Neon.
-  - Schema includes tables for users, posts, comments, reactions, friendships, messages, message_reactions, notifications, user_thoughts, stories, and push_tokens.
+  - Schema includes tables for users, posts, comments, reactions, friendships, messages, message_reactions, message_streaks, notifications, user_thoughts, stories, and push_tokens.
 
 ### Third-Party Services & APIs
 - **Expo Services**:
