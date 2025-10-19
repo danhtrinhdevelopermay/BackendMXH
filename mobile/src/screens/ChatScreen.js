@@ -69,7 +69,7 @@ const ChatScreen = ({ route, navigation }) => {
   const fetchMessages = async () => {
     try {
       const response = await messageAPI.getMessages(userId);
-      setMessages(response.data.reverse());
+      setMessages(response.data);
     } catch (error) {
       console.error('Failed to fetch messages');
     }
@@ -225,12 +225,12 @@ const ChatScreen = ({ route, navigation }) => {
   };
 
   const shouldShowDateSeparator = (currentIndex) => {
-    if (currentIndex === messages.length - 1) return true;
+    if (currentIndex === 0) return true;
     
     const currentDate = new Date(messages[currentIndex].created_at).toDateString();
-    const nextDate = new Date(messages[currentIndex + 1].created_at).toDateString();
+    const prevDate = new Date(messages[currentIndex - 1].created_at).toDateString();
     
-    return currentDate !== nextDate;
+    return currentDate !== prevDate;
   };
 
   const reactions = [
