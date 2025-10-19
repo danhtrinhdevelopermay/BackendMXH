@@ -48,11 +48,29 @@
       "apiUrl": "https://backendmxh-1.onrender.com",
       "oneSignalAppId": "${ONESIGNAL_APP_ID}",
       "eas": {
-        "projectId": "f73d306d-0996-48e5-a0ba-9c111a978e93",
+        "projectId": "9ed0779e-765f-4684-8aa2-a4a2241e2eab",
         "build": {
           "experimental": {
             "ios": {
               "appExtensions": [
+                {
+                  "targetName": "OneSignalNotificationServiceExtension",
+                  "bundleIdentifier": "com.shatter.app.OneSignalNotificationServiceExtension",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.com.shatter.app.onesignal"
+                    ]
+                  }
+                },
+                {
+                  "targetName": "OneSignalNotificationServiceExtension",
+                  "bundleIdentifier": "com.shatter.app.OneSignalNotificationServiceExtension",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.com.shatter.app.onesignal"
+                    ]
+                  }
+                },
                 {
                   "targetName": "OneSignalNotificationServiceExtension",
                   "bundleIdentifier": "com.shatter.app.OneSignalNotificationServiceExtension",
