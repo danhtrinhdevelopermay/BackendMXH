@@ -1,0 +1,25 @@
+# robots.txt for Shatter Landing Page
+
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://shatterlandingpage.onrender.com/sitemap.xml
+
+# Disallow sensitive pages
+Disallow: /api/
+Disallow: /admin/
+Disallow: /*.json$
+
+# Crawl-delay for bots
+Crawl-delay: 1
+
+# Specific bot rules
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /

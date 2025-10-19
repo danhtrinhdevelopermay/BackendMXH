@@ -1,0 +1,55 @@
+{
+  "name": "Shatter - Mạng Xã Hội Thế Hệ Mới",
+  "short_name": "Shatter",
+  "description": "Nền tảng mạng xã hội hiện đại với story, chat real-time, streak tracking",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["social", "lifestyle"],
+  "screenshots": [
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshot-desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Tải Ứng Dụng",
+      "short_name": "Download",
+      "description": "Tải ứng dụng Shatter",
+      "url": "/#download",
+      "icons": [
+        {
+          "src": "/download-icon.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "author": "Danh Trình",
+  "lang": "vi-VN"
+}
