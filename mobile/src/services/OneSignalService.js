@@ -1,9 +1,24 @@
-import OneSignal from 'react-native-onesignal';
+let OneSignal;
+try {
+  OneSignal = require('react-native-onesignal').default;
+} catch (e) {
+  console.log('OneSignal not available - running in Expo Go');
+}
+
 import { authAPI } from '../api/api';
 
 class OneSignalService {
+  static isAvailable() {
+    return OneSignal !== undefined && OneSignal !== null;
+  }
+
   static async initialize(userId) {
-    if (!userId) return;
+    if (!userId || !this.isAvailable()) {
+      if (!this.isAvailable()) {
+        console.log('OneSignal not available - skipping initialization');
+      }
+      return;
+    }
 
     try {
       // Set external user ID for OneSignal
@@ -26,6 +41,8 @@ class OneSignalService {
   }
 
   static async clearExternalUserId() {
+    if (!this.isAvailable()) return;
+
     try {
       OneSignal.removeExternalUserId();
     } catch (error) {
@@ -34,34 +51,43 @@ class OneSignalService {
   }
 
   static setupNotificationHandlers(navigation) {
-    // Handle notification opened (user tapped on notification)
-    OneSignal.setNotificationOpenedHandler((notification) => {
-      console.log('OneSignal notification opened:', notification);
-      const data = notification.notification.additionalData;
-      
-      if (data && navigation) {
-        // Navigate based on notification data
-        if (data.screen === 'Chat' && data.userId) {
-          navigation.navigate('Chat', { 
-            userId: data.userId,
-            userName: data.userName 
-          });
-        } else if (data.screen === 'PostDetail' && data.postId) {
-          navigation.navigate('PostDetail', { postId: data.postId });
-        } else if (data.screen === 'Notifications') {
-          navigation.navigate('Notifications');
-        }
-      }
-    });
+    if (!this.isAvailable()) {
+      console.log('OneSignal not available - skipping notification handlers setup');
+      return;
+    }
 
-    // Handle notification received in foreground
-    OneSignal.setNotificationWillShowInForegroundHandler((notificationReceivedEvent) => {
-      console.log('OneSignal notification received:', notificationReceivedEvent);
-      const notification = notificationReceivedEvent.getNotification();
-      
-      // Display the notification
-      notificationReceivedEvent.complete(notification);
-    });
+    try {
+      // Handle notification opened (user tapped on notification)
+      OneSignal.setNotificationOpenedHandler((notification) => {
+        console.log('OneSignal notification opened:', notification);
+        const data = notification.notification.additionalData;
+        
+        if (data && navigation) {
+          // Navigate based on notification data
+          if (data.screen === 'Chat' && data.userId) {
+            navigation.navigate('Chat', { 
+              userId: data.userId,
+              userName: data.userName 
+            });
+          } else if (data.screen === 'PostDetail' && data.postId) {
+            navigation.navigate('PostDetail', { postId: data.postId });
+          } else if (data.screen === 'Notifications') {
+            navigation.navigate('Notifications');
+          }
+        }
+      });
+
+      // Handle notification received in foreground
+      OneSignal.setNotificationWillShowInForegroundHandler((notificationReceivedEvent) => {
+        console.log('OneSignal notification received:', notificationReceivedEvent);
+        const notification = notificationReceivedEvent.getNotification();
+        
+        // Display the notification
+        notificationReceivedEvent.complete(notification);
+      });
+    } catch (error) {
+      console.error('OneSignal notification handlers setup error:', error);
+    }
   }
 }
 

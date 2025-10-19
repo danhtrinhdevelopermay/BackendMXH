@@ -4,36 +4,51 @@ import { AuthProvider } from './src/context/AuthContext';
 import { AlertProvider } from './src/context/AlertContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import CustomAlert from './src/components/CustomAlert';
-import OneSignal from 'react-native-onesignal';
 import Constants from 'expo-constants';
+
+let OneSignal;
+try {
+  OneSignal = require('react-native-onesignal').default;
+} catch (e) {
+  console.log('OneSignal not available - running in Expo Go or development mode');
+}
 
 export default function App() {
   useEffect(() => {
-    // Initialize OneSignal
-    const appId = Constants.expoConfig?.extra?.oneSignalAppId;
-    if (appId) {
-      OneSignal.setAppId(appId);
-      
-      // Request permission for push notifications
-      OneSignal.promptForPushNotificationsWithUserResponse((response) => {
-        console.log('OneSignal push permission:', response);
-      });
+    // Initialize OneSignal only if available (not in Expo Go)
+    if (!OneSignal) {
+      console.log('OneSignal is not available - push notifications disabled');
+      return;
+    }
 
-      // Handle notification opened
-      OneSignal.setNotificationOpenedHandler((notification) => {
-        console.log('OneSignal notification opened:', notification);
-        const data = notification.notification.additionalData;
-        // You can navigate to specific screens based on data
-        // For example: navigation.navigate(data.screen, data.params);
-      });
+    try {
+      const appId = Constants.expoConfig?.extra?.oneSignalAppId;
+      if (appId) {
+        OneSignal.setAppId(appId);
+        
+        // Request permission for push notifications
+        OneSignal.promptForPushNotificationsWithUserResponse((response) => {
+          console.log('OneSignal push permission:', response);
+        });
 
-      // Handle notification received (foreground)
-      OneSignal.setNotificationWillShowInForegroundHandler((notificationReceivedEvent) => {
-        console.log('OneSignal notification received:', notificationReceivedEvent);
-        const notification = notificationReceivedEvent.getNotification();
-        // Show notification in foreground
-        notificationReceivedEvent.complete(notification);
-      });
+        // Handle notification opened
+        OneSignal.setNotificationOpenedHandler((notification) => {
+          console.log('OneSignal notification opened:', notification);
+          const data = notification.notification.additionalData;
+          // You can navigate to specific screens based on data
+          // For example: navigation.navigate(data.screen, data.params);
+        });
+
+        // Handle notification received (foreground)
+        OneSignal.setNotificationWillShowInForegroundHandler((notificationReceivedEvent) => {
+          console.log('OneSignal notification received:', notificationReceivedEvent);
+          const notification = notificationReceivedEvent.getNotification();
+          // Show notification in foreground
+          notificationReceivedEvent.complete(notification);
+        });
+      }
+    } catch (error) {
+      console.error('OneSignal initialization error:', error);
     }
   }, []);
 
