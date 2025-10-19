@@ -34,7 +34,11 @@ const register = async (req, res) => {
     );
 
     const user = result.rows[0];
-    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ 
+      id: user.id, 
+      username: user.username,
+      dbSource: 'primary'
+    }, JWT_SECRET, { expiresIn: '7d' });
 
     res.status(201).json({ user, token });
   } catch (error) {
@@ -80,7 +84,11 @@ const login = async (req, res) => {
 
     console.log(`✅ User ${username} logged in from ${dbSource} database`);
 
-    const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ 
+      id: user.id, 
+      username: user.username,
+      dbSource: dbSource
+    }, JWT_SECRET, { expiresIn: '7d' });
 
     const { password_hash, ...userWithoutPassword } = user;
     res.json({ user: userWithoutPassword, token });
@@ -92,10 +100,20 @@ const login = async (req, res) => {
 
 const getProfile = async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT id, username, email, full_name, avatar_url, bio, is_verified, created_at FROM users WHERE id = $1',
-      [req.user.id]
-    );
+    const dbSource = req.user.dbSource || 'primary';
+    let result;
+    
+    if (dbSource === 'primary') {
+      result = await pool.primary.query(
+        'SELECT id, username, email, full_name, avatar_url, bio, is_verified, created_at FROM users WHERE id = $1',
+        [req.user.id]
+      );
+    } else {
+      result = await pool.secondary.query(
+        'SELECT id, username, email, full_name, avatar_url, bio, is_verified, created_at FROM users WHERE id = $1',
+        [req.user.id]
+      );
+    }
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
@@ -111,12 +129,22 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
   const { full_name, bio } = req.body;
   const userId = req.user.id;
+  const dbSource = req.user.dbSource || 'primary';
 
   try {
-    const result = await pool.query(
-      'UPDATE users SET full_name = $1, bio = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id, username, email, full_name, avatar_url, bio, is_verified, created_at',
-      [full_name, bio, userId]
-    );
+    let result;
+    
+    if (dbSource === 'primary') {
+      result = await pool.primary.query(
+        'UPDATE users SET full_name = $1, bio = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id, username, email, full_name, avatar_url, bio, is_verified, created_at',
+        [full_name, bio, userId]
+      );
+    } else {
+      result = await pool.secondary.query(
+        'UPDATE users SET full_name = $1, bio = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id, username, email, full_name, avatar_url, bio, is_verified, created_at',
+        [full_name, bio, userId]
+      );
+    }
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
@@ -131,6 +159,7 @@ const updateProfile = async (req, res) => {
 
 const updateAvatar = async (req, res) => {
   const userId = req.user.id;
+  const dbSource = req.user.dbSource || 'primary';
 
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
@@ -153,10 +182,19 @@ const updateAvatar = async (req, res) => {
       uploadStream.end(req.file.buffer);
     });
 
-    const result = await pool.query(
-      'UPDATE users SET avatar_url = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id',
-      [uploadResult.secure_url, userId]
-    );
+    let result;
+    
+    if (dbSource === 'primary') {
+      result = await pool.primary.query(
+        'UPDATE users SET avatar_url = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id',
+        [uploadResult.secure_url, userId]
+      );
+    } else {
+      result = await pool.secondary.query(
+        'UPDATE users SET avatar_url = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id',
+        [uploadResult.secure_url, userId]
+      );
+    }
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
@@ -174,6 +212,7 @@ const updateAvatar = async (req, res) => {
 
 const updateCover = async (req, res) => {
   const userId = req.user.id;
+  const dbSource = req.user.dbSource || 'primary';
 
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
@@ -196,10 +235,19 @@ const updateCover = async (req, res) => {
       uploadStream.end(req.file.buffer);
     });
 
-    const result = await pool.query(
-      'UPDATE users SET cover_url = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id',
-      [uploadResult.secure_url, userId]
-    );
+    let result;
+    
+    if (dbSource === 'primary') {
+      result = await pool.primary.query(
+        'UPDATE users SET cover_url = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id',
+        [uploadResult.secure_url, userId]
+      );
+    } else {
+      result = await pool.secondary.query(
+        'UPDATE users SET cover_url = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id',
+        [uploadResult.secure_url, userId]
+      );
+    }
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });

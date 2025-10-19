@@ -6,6 +6,26 @@ Layedia is a full-stack social media application, similar to Facebook, available
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Recent Critical Fixes
+
+### ⚠️ Database User Conflict Fix (October 19, 2025)
+**Problem:** Users with the same ID in primary and secondary databases were causing authentication conflicts. When a user logged in from one database, reloading the app would sometimes show a different user with the same ID from the other database.
+
+**Root Cause:** 
+- Login queries both databases but JWT token didn't store which database the user came from
+- Profile retrieval (on app reload) could query a different database than the one used during login
+- This caused the wrong user to be loaded if both databases had users with the same ID
+
+**Solution Applied:**
+- Added `dbSource` field to JWT tokens to track which database the user authenticated from
+- Modified all user-related API endpoints (getProfile, updateProfile, updateAvatar, updateCover) to query the correct database based on the token's dbSource
+- Users must re-login to get new tokens with dbSource tracking
+
+**Files Modified:**
+- `backend/src/controllers/authController.js`: All authentication and profile endpoints updated
+
+See `FIX_DATABASE_USER_CONFLICT.md` for detailed technical documentation.
+
 ## System Architecture
 
 ### Frontend Architecture (React Native + Expo)
