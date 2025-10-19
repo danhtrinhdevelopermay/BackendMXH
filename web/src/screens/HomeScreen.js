@@ -325,7 +325,7 @@ const HomeScreen = ({ navigation }) => {
                     style={styles.postMedia}
                     resizeMode="contain"
                     useNativeControls
-                    shouldPlay={false}
+                    shouldPlay={isVisible}
                     isLooping
                     isMuted={false}
                     onError={(error) => {
@@ -627,7 +627,9 @@ const styles = StyleSheet.create({
   },
   postMedia: {
     width: '100%',
-    height: 300,
+    minHeight: 300,
+    maxHeight: 600,
+    aspectRatio: 'auto',
     backgroundColor: '#000',
   },
   mediaErrorContainer: {

@@ -292,7 +292,7 @@ const ProfileScreen = ({ route, navigation }) => {
                   style={styles.postMedia}
                   resizeMode="contain"
                   useNativeControls
-                  shouldPlay={false}
+                  shouldPlay={true}
                   isLooping
                   isMuted={false}
                   onError={(error) => console.log('Video error:', error)}
@@ -575,7 +575,8 @@ const styles = StyleSheet.create({
   },
   postMedia: {
     width: '100%',
-    height: 280,
+    minHeight: 300,
+    maxHeight: 600,
     backgroundColor: '#000',
   },
   postActions: {
