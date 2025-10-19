@@ -101,55 +101,158 @@ const updateStreak = async (senderId, receiverId) => {
     const { user_id_1, user_id_2 } = orderUserIds(senderId, receiverId);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    
+    // Determine which user is sending
+    const isSenderUser1 = senderId === user_id_1;
 
     // Check if streak exists
     const existingStreak = await pool.queryAll(
-      `SELECT streak_count, last_interaction_date 
+      `SELECT streak_count, last_interaction_date, user1_last_message_date, user2_last_message_date
        FROM message_streaks 
        WHERE user_id_1 = $1 AND user_id_2 = $2`,
       [user_id_1, user_id_2]
     );
 
     if (existingStreak.rows.length === 0) {
-      // Create new streak
+      // Create new streak - only sender has messaged today
+      const updateColumn = isSenderUser1 ? 'user1_last_message_date' : 'user2_last_message_date';
       await pool.query(
-        `INSERT INTO message_streaks (user_id_1, user_id_2, streak_count, last_interaction_date)
-         VALUES ($1, $2, 1, CURRENT_DATE)`,
+        `INSERT INTO message_streaks (user_id_1, user_id_2, streak_count, last_interaction_date, ${updateColumn})
+         VALUES ($1, $2, 0, NULL, CURRENT_DATE)`,
         [user_id_1, user_id_2]
       );
-      console.log(`[STREAK] Created new streak between users ${user_id_1} and ${user_id_2}`);
-      return { streak_count: 1, is_new: true };
+      console.log(`[STREAK] Created new streak record (waiting for both users) between ${user_id_1} and ${user_id_2}`);
+      return { streak_count: 0, is_new: false };
     }
 
-    const lastDate = new Date(existingStreak.rows[0].last_interaction_date);
-    lastDate.setHours(0, 0, 0, 0);
-    const daysDiff = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
+    const streak = existingStreak.rows[0];
+    const user1LastMsg = streak.user1_last_message_date ? new Date(streak.user1_last_message_date) : null;
+    const user2LastMsg = streak.user2_last_message_date ? new Date(streak.user2_last_message_date) : null;
+    
+    if (user1LastMsg) user1LastMsg.setHours(0, 0, 0, 0);
+    if (user2LastMsg) user2LastMsg.setHours(0, 0, 0, 0);
 
-    if (daysDiff === 0) {
-      // Same day, no update needed
-      console.log(`[STREAK] Same day, no update needed for users ${user_id_1} and ${user_id_2}`);
-      return { streak_count: existingStreak.rows[0].streak_count, is_new: false };
-    } else if (daysDiff === 1) {
-      // Next day, increment streak
-      const newCount = existingStreak.rows[0].streak_count + 1;
-      await pool.query(
-        `UPDATE message_streaks 
-         SET streak_count = $1, last_interaction_date = CURRENT_DATE, updated_at = NOW()
-         WHERE user_id_1 = $2 AND user_id_2 = $3`,
-        [newCount, user_id_1, user_id_2]
-      );
-      console.log(`[STREAK] Incremented streak to ${newCount} for users ${user_id_1} and ${user_id_2}`);
-      return { streak_count: newCount, is_new: true };
+    // Update sender's last message date
+    const updateColumn = isSenderUser1 ? 'user1_last_message_date' : 'user2_last_message_date';
+    const otherUserLastMsg = isSenderUser1 ? user2LastMsg : user1LastMsg;
+    const senderLastMsg = isSenderUser1 ? user1LastMsg : user2LastMsg;
+
+    // Check if sender already messaged today
+    if (senderLastMsg && senderLastMsg.getTime() === today.getTime()) {
+      console.log(`[STREAK] Sender already messaged today, no update needed`);
+      return { streak_count: streak.streak_count, is_new: false };
+    }
+
+    // Update sender's last message date
+    await pool.query(
+      `UPDATE message_streaks 
+       SET ${updateColumn} = CURRENT_DATE, updated_at = NOW()
+       WHERE user_id_1 = $1 AND user_id_2 = $2`,
+      [user_id_1, user_id_2]
+    );
+
+    // Check if both users have messaged
+    if (!otherUserLastMsg) {
+      console.log(`[STREAK] Waiting for other user to message (user ${isSenderUser1 ? user_id_2 : user_id_1})`);
+      return { streak_count: streak.streak_count, is_new: false };
+    }
+
+    // Calculate day difference with other user's last message
+    const daysDiffOther = Math.floor((today - otherUserLastMsg) / (1000 * 60 * 60 * 24));
+
+    // Both users must message on the same day (today) or consecutive days
+    if (daysDiffOther === 0) {
+      // Both messaged today - check if we need to increment streak
+      const lastStreakDate = streak.last_interaction_date ? new Date(streak.last_interaction_date) : null;
+      
+      if (!lastStreakDate) {
+        // First time both users messaged - start streak at 1
+        await pool.query(
+          `UPDATE message_streaks 
+           SET streak_count = 1, last_interaction_date = CURRENT_DATE, updated_at = NOW()
+           WHERE user_id_1 = $1 AND user_id_2 = $2`,
+          [user_id_1, user_id_2]
+        );
+        console.log(`[STREAK] Started streak at 1 for users ${user_id_1} and ${user_id_2}`);
+        return { streak_count: 1, is_new: true };
+      }
+
+      lastStreakDate.setHours(0, 0, 0, 0);
+      const daysSinceLastStreak = Math.floor((today - lastStreakDate) / (1000 * 60 * 60 * 24));
+
+      if (daysSinceLastStreak === 0) {
+        // Already counted today
+        console.log(`[STREAK] Streak already updated today for users ${user_id_1} and ${user_id_2}`);
+        return { streak_count: streak.streak_count, is_new: false };
+      } else if (daysSinceLastStreak === 1) {
+        // Consecutive day - increment streak
+        const newCount = streak.streak_count + 1;
+        await pool.query(
+          `UPDATE message_streaks 
+           SET streak_count = $1, last_interaction_date = CURRENT_DATE, updated_at = NOW()
+           WHERE user_id_1 = $2 AND user_id_2 = $3`,
+          [newCount, user_id_1, user_id_2]
+        );
+        console.log(`[STREAK] Incremented streak to ${newCount} for users ${user_id_1} and ${user_id_2}`);
+        return { streak_count: newCount, is_new: true };
+      } else {
+        // Streak broken - reset to 1
+        await pool.query(
+          `UPDATE message_streaks 
+           SET streak_count = 1, last_interaction_date = CURRENT_DATE, updated_at = NOW()
+           WHERE user_id_1 = $1 AND user_id_2 = $2`,
+          [user_id_1, user_id_2]
+        );
+        console.log(`[STREAK] Reset streak to 1 for users ${user_id_1} and ${user_id_2} (broken)`);
+        return { streak_count: 1, is_new: true };
+      }
+    } else if (daysDiffOther === 1) {
+      // Other user messaged yesterday, sender messaged today - check if we can increment
+      const lastStreakDate = streak.last_interaction_date ? new Date(streak.last_interaction_date) : null;
+      
+      if (!lastStreakDate) {
+        // First mutual exchange across two days - start at 1
+        await pool.query(
+          `UPDATE message_streaks 
+           SET streak_count = 1, last_interaction_date = CURRENT_DATE, updated_at = NOW()
+           WHERE user_id_1 = $1 AND user_id_2 = $2`,
+          [user_id_1, user_id_2]
+        );
+        console.log(`[STREAK] Started streak at 1 (consecutive days) for users ${user_id_1} and ${user_id_2}`);
+        return { streak_count: 1, is_new: true };
+      }
+
+      lastStreakDate.setHours(0, 0, 0, 0);
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      // Check if last streak was yesterday
+      if (lastStreakDate.getTime() === yesterday.getTime()) {
+        // Increment streak
+        const newCount = streak.streak_count + 1;
+        await pool.query(
+          `UPDATE message_streaks 
+           SET streak_count = $1, last_interaction_date = CURRENT_DATE, updated_at = NOW()
+           WHERE user_id_1 = $2 AND user_id_2 = $3`,
+          [newCount, user_id_1, user_id_2]
+        );
+        console.log(`[STREAK] Incremented streak to ${newCount} (consecutive days) for users ${user_id_1} and ${user_id_2}`);
+        return { streak_count: newCount, is_new: true };
+      } else {
+        // Streak broken - reset to 1
+        await pool.query(
+          `UPDATE message_streaks 
+           SET streak_count = 1, last_interaction_date = CURRENT_DATE, updated_at = NOW()
+           WHERE user_id_1 = $1 AND user_id_2 = $2`,
+          [user_id_1, user_id_2]
+        );
+        console.log(`[STREAK] Reset streak to 1 for users ${user_id_1} and ${user_id_2} (gap detected)`);
+        return { streak_count: 1, is_new: true };
+      }
     } else {
-      // Streak broken, reset to 1
-      await pool.query(
-        `UPDATE message_streaks 
-         SET streak_count = 1, last_interaction_date = CURRENT_DATE, updated_at = NOW()
-         WHERE user_id_1 = $1 AND user_id_2 = $2`,
-        [user_id_1, user_id_2]
-      );
-      console.log(`[STREAK] Reset streak to 1 for users ${user_id_1} and ${user_id_2}`);
-      return { streak_count: 1, is_new: true };
+      // Other user hasn't messaged recently - waiting
+      console.log(`[STREAK] Waiting for other user (last messaged ${daysDiffOther} days ago)`);
+      return { streak_count: streak.streak_count, is_new: false };
     }
   } catch (error) {
     console.error('[STREAK] Update streak error:', error);

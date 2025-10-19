@@ -8,6 +8,26 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Critical Fixes
 
+### 🔥 Streak Logic Fix (October 19, 2025)
+**Problem:** Messaging streak was increasing even when only one person sent messages (one-sided messaging). The old logic allowed users to increase streaks by sending messages alone without the other person replying.
+
+**Root Cause:**
+- Streak logic only checked if ANY message was sent, not if BOTH users messaged
+- No tracking of which user sent messages on which day
+- This allowed unfair streak increases from one-sided conversations
+
+**Solution Applied:**
+- Added `user1_last_message_date` and `user2_last_message_date` columns to track each user's last message date
+- Modified streak logic to ONLY increment when BOTH users have messaged
+- Streak now requires mutual interaction (like TikTok/Snapchat)
+- Same-day or consecutive-day messaging from both users is required to maintain/increase streak
+
+**Files Modified:**
+- `backend/src/controllers/streakController.js`: Complete rewrite of `updateStreak()` function
+- Database: Added tracking columns to `message_streaks` table
+
+See `STREAK_LOGIC_FIX.md` for detailed technical documentation and test cases.
+
 ### ⚠️ Database User Conflict Fix (October 19, 2025)
 **Problem:** Users with the same ID in primary and secondary databases were causing authentication conflicts. When a user logged in from one database, reloading the app would sometimes show a different user with the same ID from the other database.
 
