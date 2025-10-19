@@ -284,6 +284,47 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('webrtc_offer', ({ offer }) => {
+    for (const [userId, calleeId] of activeCalls.entries()) {
+      if (activeUsers.get(userId) === socket.id) {
+        const receiverSocketId = activeUsers.get(calleeId);
+        if (receiverSocketId) {
+          io.to(receiverSocketId).emit('webrtc_offer', { offer });
+          console.log(`WebRTC offer sent from ${userId} to ${calleeId}`);
+        }
+        break;
+      }
+    }
+  });
+
+  socket.on('webrtc_answer', ({ answer }) => {
+    for (const [callerId, calleeId] of activeCalls.entries()) {
+      if (activeUsers.get(calleeId) === socket.id) {
+        const callerSocketId = activeUsers.get(callerId);
+        if (callerSocketId) {
+          io.to(callerSocketId).emit('webrtc_answer', { answer });
+          console.log(`WebRTC answer sent from ${calleeId} to ${callerId}`);
+        }
+        break;
+      }
+    }
+  });
+
+  socket.on('ice_candidate', ({ candidate }) => {
+    for (const [callerId, calleeId] of activeCalls.entries()) {
+      const callerSocketId = activeUsers.get(callerId);
+      const calleeSocketId = activeUsers.get(calleeId);
+      
+      if (socket.id === callerSocketId && calleeSocketId) {
+        io.to(calleeSocketId).emit('ice_candidate', { candidate });
+        console.log(`ICE candidate sent from caller to callee`);
+      } else if (socket.id === calleeSocketId && callerSocketId) {
+        io.to(callerSocketId).emit('ice_candidate', { candidate });
+        console.log(`ICE candidate sent from callee to caller`);
+      }
+    }
+  });
+
   socket.on('reject_call', ({ callerId }) => {
     const callerSocketId = activeUsers.get(callerId);
     if (callerSocketId) {
