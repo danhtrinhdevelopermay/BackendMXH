@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const StreakIcon = ({ count, size = 'medium' }) => {
@@ -29,7 +29,11 @@ const StreakIcon = ({ count, size = 'medium' }) => {
         style={[styles.gradient, { borderRadius: currentSize.container / 2 }]}
       >
         <View style={styles.iconContainer}>
-          <Text style={[styles.fireIcon, { fontSize: currentSize.icon }]}>🔥</Text>
+          <Image 
+            source={require('../../assets/fire-streak.gif')}
+            style={[styles.fireIcon, { width: currentSize.icon, height: currentSize.icon }]}
+            resizeMode="contain"
+          />
         </View>
       </LinearGradient>
       <View style={[styles.countBadge, { minWidth: currentSize.container }]}>
@@ -63,8 +67,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   fireIcon: {
-    fontSize: 20,
-    lineHeight: 24,
+    width: 20,
+    height: 20,
   },
   countBadge: {
     backgroundColor: '#FF6B00',
