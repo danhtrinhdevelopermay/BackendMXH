@@ -2,28 +2,12 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs').promises;
 const pool = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
-
-const uploadsDir = path.join(__dirname, '../../uploads/apk');
-
-fs.mkdir(uploadsDir, { recursive: true }).catch(console.error);
-
-const storage = multer.diskStorage({
-  destination: async (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    const timestamp = Date.now();
-    const versionName = req.body.version_name || 'unknown';
-    const filename = `shatter-${versionName}-${timestamp}.apk`;
-    cb(null, filename);
-  }
-});
+const cloudinary = require('../config/cloudinary');
 
 const upload = multer({
-  storage: storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 200 * 1024 * 1024 }, // 200MB limit
   fileFilter: (req, file, cb) => {
     if (file.mimetype === 'application/vnd.android.package-archive' || 
@@ -125,7 +109,6 @@ router.post('/upload', authenticateToken, upload.single('apk'), async (req, res)
     }
 
     if (!version_name || !version_code) {
-      await fs.unlink(req.file.path);
       return res.status(400).json({
         success: false,
         error: 'Version name and code are required'
@@ -138,36 +121,53 @@ router.post('/upload', authenticateToken, upload.single('apk'), async (req, res)
     );
 
     if (existingVersion.rows.length > 0) {
-      await fs.unlink(req.file.path);
       return res.status(400).json({
         success: false,
         error: 'Version already exists'
       });
     }
 
-    const apkUrl = `/uploads/apk/${req.file.filename}`;
+    console.log(`📤 Uploading APK ${version_name} to Cloudinary...`);
+    
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'apk',
+          resource_type: 'raw',
+          public_id: `shatter-${version_name}-${Date.now()}`,
+          format: 'apk'
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      uploadStream.end(req.file.buffer);
+    });
+
+    const apkUrl = uploadResult.secure_url;
     const fileSize = req.file.size;
+    const cloudinaryPublicId = uploadResult.public_id;
+
+    console.log(`✅ APK uploaded to Cloudinary: ${apkUrl}`);
 
     const result = await pool.query(
-      `INSERT INTO app_versions (version_name, version_code, apk_url, file_size, release_notes, is_force_update, uploaded_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO app_versions (version_name, version_code, apk_url, file_size, release_notes, is_force_update, uploaded_by, cloudinary_public_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
-      [version_name, parseInt(version_code), apkUrl, fileSize, release_notes, is_force_update === 'true', req.user.id]
+      [version_name, parseInt(version_code), apkUrl, fileSize, release_notes, is_force_update === 'true', req.user.id, cloudinaryPublicId]
     );
 
     res.json({
       success: true,
-      message: 'APK uploaded successfully',
+      message: 'APK uploaded successfully to Cloudinary',
       version: result.rows[0]
     });
   } catch (error) {
     console.error('Error uploading APK:', error);
-    if (req.file) {
-      await fs.unlink(req.file.path).catch(console.error);
-    }
     res.status(500).json({
       success: false,
-      error: 'Failed to upload APK'
+      error: 'Failed to upload APK: ' + error.message
     });
   }
 });
@@ -199,7 +199,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     const versionId = req.params.id;
     
     const result = await pool.query(
-      'SELECT apk_url FROM app_versions WHERE id = $1',
+      'SELECT cloudinary_public_id FROM app_versions WHERE id = $1',
       [versionId]
     );
 
@@ -210,13 +210,15 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       });
     }
 
-    const apkPath = path.join(__dirname, '../..', result.rows[0].apk_url);
+    const cloudinaryPublicId = result.rows[0].cloudinary_public_id;
     
     await pool.query('DELETE FROM app_versions WHERE id = $1', [versionId]);
     
-    await fs.unlink(apkPath).catch(err => {
-      console.warn('Failed to delete APK file:', err);
-    });
+    if (cloudinaryPublicId) {
+      await cloudinary.uploader.destroy(cloudinaryPublicId, { resource_type: 'raw' })
+        .then(() => console.log(`✅ Deleted APK from Cloudinary: ${cloudinaryPublicId}`))
+        .catch(err => console.warn('Failed to delete APK from Cloudinary:', err));
+    }
 
     res.json({
       success: true,
