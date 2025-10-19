@@ -6,8 +6,8 @@ const getThemeConfig = () => {
   const month = now.getMonth() + 1; // 0-indexed, so add 1
   const day = now.getDate();
 
-  // Kiểm tra xem có phải ngày 20/10 không
-  const isWomensDay = month === 10 && day === 20;
+  // Kiểm tra xem có phải ngày 20/10 không (hoặc 19/10 để test)
+  const isWomensDay = month === 10 && (day === 19 || day === 20);
   
   // Theme mặc định
   const defaultTheme = {
