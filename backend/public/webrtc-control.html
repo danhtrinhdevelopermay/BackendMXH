@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Control Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .status-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .status-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .status-value {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-value.enabled {
+            color: #10b981;
+        }
+        
+        .status-value.disabled {
+            color: #ef4444;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.enabled {
+            background: #10b981;
+        }
+        
+        .status-dot.disabled {
+            background: #ef4444;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .btn-enable {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-disable {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #1e40af;
+        }
+        
+        .info-box strong {
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎛️ WebRTC Control Panel</h1>
+        <p class="subtitle">Điều khiển tính năng WebRTC cho app mobile</p>
+        
+        <div class="status-card">
+            <div class="status-label">Trạng thái hiện tại:</div>
+            <div class="status-value" id="statusValue">
+                <span class="status-dot"></span>
+                <span>Đang tải...</span>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-enable" onclick="setWebRTC(true)">
+                ✅ Bật WebRTC
+            </button>
+            <button class="btn-disable" onclick="setWebRTC(false)">
+                ❌ Tắt WebRTC
+            </button>
+        </div>
+        
+        <div class="info-box">
+            <strong>ℹ️ Hướng dẫn:</strong>
+            <ul style="margin-left: 20px; margin-top: 8px;">
+                <li><strong>Bật WebRTC:</strong> Sử dụng khi build app riêng (Development Build)</li>
+                <li><strong>Tắt WebRTC:</strong> Test trên Expo Go mà không bị lỗi</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        async function loadStatus() {
+            try {
+                const response = await fetch('/api/webrtc-status');
+                const data = await response.json();
+                updateStatus(data.enabled);
+            } catch (error) {
+                console.error('Error loading status:', error);
+            }
+        }
+        
+        async function setWebRTC(enabled) {
+            const container = document.querySelector('.container');
+            container.classList.add('loading');
+            
+            try {
+                const response = await fetch('/api/webrtc-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ enabled })
+                });
+                
+                const data = await response.json();
+                updateStatus(data.enabled);
+            } catch (error) {
+                console.error('Error setting WebRTC:', error);
+                alert('Lỗi khi cập nhật! Vui lòng thử lại.');
+            } finally {
+                container.classList.remove('loading');
+            }
+        }
+        
+        function updateStatus(enabled) {
+            const statusValue = document.getElementById('statusValue');
+            const dot = statusValue.querySelector('.status-dot');
+            const text = statusValue.querySelector('span:last-child');
+            
+            if (enabled) {
+                statusValue.className = 'status-value enabled';
+                dot.className = 'status-dot enabled';
+                text.textContent = 'WebRTC Đang BẬT';
+            } else {
+                statusValue.className = 'status-value disabled';
+                dot.className = 'status-dot disabled';
+                text.textContent = 'WebRTC Đang TẮT';
+            }
+        }
+        
+        loadStatus();
+        setInterval(loadStatus, 5000);
+    </script>
+</body>
+</html>

@@ -5,7 +5,10 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import UserAvatar from '../components/UserAvatar';
 import { AuthContext } from '../context/AuthContext';
-import WebRTCService from '../services/WebRTCService';
+import MockWebRTCService from '../services/MockWebRTCService';
+import { getWebRTCStatus } from '../config/constants';
+
+let RealWebRTCService = null;
 
 const VoiceCallScreen = ({ route, navigation }) => {
   const { user } = useContext(AuthContext);
@@ -15,8 +18,41 @@ const VoiceCallScreen = ({ route, navigation }) => {
   const [isSpeakerOn, setIsSpeakerOn] = useState(false);
   const [callStatus, setCallStatus] = useState(callType === 'outgoing' ? 'Calling...' : 'Incoming call');
   const [pulseAnim] = useState(new Animated.Value(1));
+  const [webrtcService, setWebrtcService] = useState(MockWebRTCService);
+  const [isWebRTCEnabled, setIsWebRTCEnabled] = useState(false);
   const timerRef = React.useRef(null);
   const webrtcInitialized = React.useRef(false);
+
+  useEffect(() => {
+    checkWebRTCStatus();
+  }, []);
+
+  const checkWebRTCStatus = async () => {
+    try {
+      const enabled = await getWebRTCStatus();
+      setIsWebRTCEnabled(enabled);
+      
+      if (enabled) {
+        try {
+          if (!RealWebRTCService) {
+            RealWebRTCService = require('../services/WebRTCService').default;
+          }
+          setWebrtcService(RealWebRTCService);
+          console.log('✅ Using Real WebRTC Service');
+        } catch (error) {
+          console.log('⚠️ WebRTC module not available, using Mock');
+          setWebrtcService(MockWebRTCService);
+          setIsWebRTCEnabled(false);
+        }
+      } else {
+        setWebrtcService(MockWebRTCService);
+        console.log('📱 Using Mock WebRTC Service (UI only)');
+      }
+    } catch (error) {
+      console.error('Error checking WebRTC status:', error);
+      setWebrtcService(MockWebRTCService);
+    }
+  };
 
   useEffect(() => {
     const pulseAnimation = Animated.loop(
@@ -46,8 +82,9 @@ const VoiceCallScreen = ({ route, navigation }) => {
             webrtcInitialized.current = true;
           } catch (error) {
             console.error('Failed to initialize WebRTC:', error);
-            Alert.alert('Error', 'Failed to start audio call');
-            handleEndCall();
+            if (isWebRTCEnabled) {
+              Alert.alert('Error', 'Failed to start audio call');
+            }
           }
         }
       });
@@ -81,14 +118,14 @@ const VoiceCallScreen = ({ route, navigation }) => {
         socket.off('user_offline');
       }
     };
-  }, [socket]);
+  }, [socket, webrtcService, isWebRTCEnabled]);
 
   const initializeWebRTC = async (isInitiator) => {
     try {
-      await WebRTCService.initializeCall(socket, isInitiator);
+      await webrtcService.initializeCall(socket, isInitiator);
       
       if (isInitiator) {
-        await WebRTCService.startCall();
+        await webrtcService.startCall();
       }
     } catch (error) {
       console.error('Error initializing WebRTC:', error);
@@ -113,7 +150,7 @@ const VoiceCallScreen = ({ route, navigation }) => {
 
   const cleanupCall = async () => {
     try {
-      await WebRTCService.endCall();
+      await webrtcService.endCall();
       webrtcInitialized.current = false;
     } catch (error) {
       console.error('Error cleaning up call:', error);
@@ -145,8 +182,9 @@ const VoiceCallScreen = ({ route, navigation }) => {
         webrtcInitialized.current = true;
       } catch (error) {
         console.error('Failed to initialize WebRTC:', error);
-        Alert.alert('Error', 'Failed to start audio call');
-        handleEndCall();
+        if (isWebRTCEnabled) {
+          Alert.alert('Error', 'Failed to start audio call');
+        }
       }
     }
   };
@@ -163,13 +201,13 @@ const VoiceCallScreen = ({ route, navigation }) => {
   const handleToggleMute = () => {
     const newMutedState = !isMuted;
     setIsMuted(newMutedState);
-    WebRTCService.toggleMute(newMutedState);
+    webrtcService.toggleMute(newMutedState);
   };
 
   const handleToggleSpeaker = () => {
     const newSpeakerState = !isSpeakerOn;
     setIsSpeakerOn(newSpeakerState);
-    WebRTCService.toggleSpeaker(newSpeakerState);
+    webrtcService.toggleSpeaker(newSpeakerState);
   };
 
   return (
@@ -178,6 +216,12 @@ const VoiceCallScreen = ({ route, navigation }) => {
       style={styles.container}
     >
       <View style={styles.content}>
+        {!isWebRTCEnabled && (
+          <View style={styles.mockBadge}>
+            <Text style={styles.mockBadgeText}>📱 UI Mode (No Audio)</Text>
+          </View>
+        )}
+        
         <Text style={styles.status}>{callStatus}</Text>
         
         <Animated.View style={[styles.avatarContainer, { transform: [{ scale: pulseAnim }] }]}>
@@ -260,6 +304,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 24,
+  },
+  mockBadge: {
+    position: 'absolute',
+    top: 60,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  mockBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
   },
   status: {
     fontSize: 16,

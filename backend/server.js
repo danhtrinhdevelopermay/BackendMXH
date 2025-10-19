@@ -25,9 +25,12 @@ const autoReactionService = require('./src/services/autoReactionService');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+let webrtcEnabled = false;
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`);
@@ -50,6 +53,21 @@ app.get('/health', (req, res) => {
     uptime: process.uptime(),
     message: 'Server is healthy'
   });
+});
+
+app.get('/api/webrtc-status', (req, res) => {
+  res.json({ enabled: webrtcEnabled });
+});
+
+app.post('/api/webrtc-status', (req, res) => {
+  const { enabled } = req.body;
+  webrtcEnabled = enabled === true;
+  console.log(`🎛️ WebRTC ${webrtcEnabled ? 'BẬT' : 'TẮT'} bởi admin`);
+  res.json({ enabled: webrtcEnabled, message: `WebRTC đã ${webrtcEnabled ? 'bật' : 'tắt'}` });
+});
+
+app.get('/webrtc-control', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'webrtc-control.html'));
 });
 
 app.use('/api/auth', authRoutes);
