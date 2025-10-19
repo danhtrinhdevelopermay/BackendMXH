@@ -1,12 +1,8 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const StreakIcon = ({ count, size = 'medium' }) => {
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-  const rotateAnim = useRef(new Animated.Value(0)).current;
-  const glowAnim = useRef(new Animated.Value(0)).current;
-
   const sizes = {
     small: { icon: 16, text: 12, container: 24 },
     medium: { icon: 20, text: 14, container: 28 },
@@ -15,79 +11,13 @@ const StreakIcon = ({ count, size = 'medium' }) => {
 
   const currentSize = sizes[size];
 
-  useEffect(() => {
-    // Pulse animation
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(scaleAnim, {
-          toValue: 1.15,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-
-    // Subtle rotation animation
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(rotateAnim, {
-          toValue: 1,
-          duration: 1500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(rotateAnim, {
-          toValue: -1,
-          duration: 1500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(rotateAnim, {
-          toValue: 0,
-          duration: 1500,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-
-    // Glow animation
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(glowAnim, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(glowAnim, {
-          toValue: 0,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  }, []);
-
-  const rotate = rotateAnim.interpolate({
-    inputRange: [-1, 1],
-    outputRange: ['-5deg', '5deg'],
-  });
-
-  const glowOpacity = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.5, 1],
-  });
-
   if (count === 0) return null;
 
   return (
-    <Animated.View 
+    <View 
       style={[
         styles.container,
         { 
-          transform: [{ scale: scaleAnim }, { rotate }],
           height: currentSize.container,
         }
       ]}
@@ -98,18 +28,16 @@ const StreakIcon = ({ count, size = 'medium' }) => {
         end={{ x: 1, y: 1 }}
         style={[styles.gradient, { borderRadius: currentSize.container / 2 }]}
       >
-        <Animated.View style={[styles.glowContainer, { opacity: glowOpacity }]}>
-          <View style={styles.iconContainer}>
-            <Text style={[styles.fireIcon, { fontSize: currentSize.icon }]}>🔥</Text>
-          </View>
-        </Animated.View>
+        <View style={styles.iconContainer}>
+          <Text style={[styles.fireIcon, { fontSize: currentSize.icon }]}>🔥</Text>
+        </View>
       </LinearGradient>
       <View style={[styles.countBadge, { minWidth: currentSize.container }]}>
         <Text style={[styles.countText, { fontSize: currentSize.text }]} numberOfLines={1}>
           {count}
         </Text>
       </View>
-    </Animated.View>
+    </View>
   );
 };
 
@@ -129,13 +57,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 4,
     elevation: 4,
-  },
-  glowContainer: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   iconContainer: {
     justifyContent: 'center',
