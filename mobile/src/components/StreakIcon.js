@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 
 const StreakIcon = ({ count, size = 'medium' }) => {
   const sizes = {
-    small: { icon: 40, text: 10, container: 50 },
-    medium: { icon: 50, text: 12, container: 60 },
-    large: { icon: 60, text: 14, container: 70 }
+    small: { icon: 24, text: 10, container: 32 },
+    medium: { icon: 28, text: 11, container: 36 },
+    large: { icon: 32, text: 12, container: 40 }
   };
 
   const currentSize = sizes[size];
@@ -50,19 +50,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   fireIcon: {
-    width: 50,
-    height: 50,
+    width: 28,
+    height: 28,
   },
   countBadge: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
+    bottom: -2,
+    right: -2,
     backgroundColor: '#FF6B00',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 10,
-    minWidth: 24,
-    height: 18,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 8,
+    minWidth: 20,
+    height: 16,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   countText: {
     color: '#FFFFFF',
     fontWeight: '700',
-    fontSize: 12,
+    fontSize: 11,
     textAlign: 'center',
   },
 });
