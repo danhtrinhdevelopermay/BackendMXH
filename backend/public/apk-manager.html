@@ -399,11 +399,6 @@
     const API_URL = window.location.origin;
     let authToken = localStorage.getItem('token');
 
-    if (!authToken) {
-      alert('Bạn cần đăng nhập để truy cập trang này!');
-      window.location.href = '/';
-    }
-
     const showAlert = (message, type = 'success') => {
       const alert = document.getElementById('alert');
       alert.textContent = message;
