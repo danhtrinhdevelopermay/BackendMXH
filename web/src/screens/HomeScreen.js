@@ -318,12 +318,6 @@ const HomeScreen = ({ navigation }) => {
                     }
                   }}
                   src={mediaUrl}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
-                    backgroundColor: '#000'
-                  }}
                   controls
                   loop
                   playsInline
@@ -332,6 +326,15 @@ const HomeScreen = ({ navigation }) => {
                   onError={(error) => {
                     console.log('Video error:', error);
                     handleMediaError();
+                  }}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '400px',
+                    width: 'auto',
+                    height: 'auto',
+                    display: 'block',
+                    margin: '0 auto',
+                    backgroundColor: '#000'
                   }}
                 />
               ) : (
@@ -624,13 +627,17 @@ const styles = StyleSheet.create({
   mediaContainer: {
     marginTop: 8,
     width: '100%',
+    minHeight: 200,
+    maxHeight: 400,
     backgroundColor: '#000',
+    display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
   postMedia: {
     width: '100%',
-    height: 400,
+    height: '100%',
     backgroundColor: '#000',
   },
   mediaErrorContainer: {

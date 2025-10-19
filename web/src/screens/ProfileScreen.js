@@ -285,17 +285,20 @@ const ProfileScreen = ({ route, navigation }) => {
             {isVideo ? (
                 <video
                   src={mediaUrl}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
-                    backgroundColor: '#000'
-                  }}
                   controls
                   loop
                   playsInline
                   muted={false}
                   onError={(error) => console.log('Video error:', error)}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '400px',
+                    width: 'auto',
+                    height: 'auto',
+                    display: 'block',
+                    margin: '0 auto',
+                    backgroundColor: '#000'
+                  }}
                 />
             ) : (
               <TouchableOpacity 
