@@ -15,26 +15,29 @@ const VIETNAMESE_LAST_NAMES = [
   'Bùi', 'Đỗ', 'Hồ', 'Ngô', 'Dương', 'Lý', 'Đinh', 'Đào', 'Cao', 'Mai'
 ];
 
-const AVATAR_URLS = [
-  'https://i.pravatar.cc/150?img=1',
-  'https://i.pravatar.cc/150?img=2',
-  'https://i.pravatar.cc/150?img=3',
-  'https://i.pravatar.cc/150?img=5',
-  'https://i.pravatar.cc/150?img=6',
-  'https://i.pravatar.cc/150?img=7',
-  'https://i.pravatar.cc/150?img=8',
-  'https://i.pravatar.cc/150?img=9',
-  'https://i.pravatar.cc/150?img=11',
-  'https://i.pravatar.cc/150?img=12',
-  'https://i.pravatar.cc/150?img=13',
-  'https://i.pravatar.cc/150?img=14',
-  'https://i.pravatar.cc/150?img=15',
-  'https://i.pravatar.cc/150?img=16',
-  'https://i.pravatar.cc/150?img=17',
-  'https://i.pravatar.cc/150?img=18',
-  'https://i.pravatar.cc/150?img=19',
-  'https://i.pravatar.cc/150?img=20'
+const DICEBEAR_STYLES = [
+  'pixel-art',
+  'avataaars',
+  'bottts',
+  'lorelei',
+  'micah',
+  'adventurer',
+  'big-ears',
+  'big-smile',
+  'miniavs',
+  'open-peeps',
+  'personas',
+  'fun-emoji',
+  'notionists',
+  'croodles',
+  'thumbs',
+  'shapes'
 ];
+
+function generateDiceBearAvatar(email) {
+  const style = DICEBEAR_STYLES[Math.floor(Math.random() * DICEBEAR_STYLES.length)];
+  return `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(email)}`;
+}
 
 const BIOS = [
   'Yêu thích du lịch và khám phá 🌏',
@@ -99,7 +102,7 @@ async function createFakeUsers(count = 100) {
       const suffix = `${randomNum}`;
       const username = generateUsername(fullName, suffix);
       const email = `${username}@fake.com`;
-      const avatar_url = getRandomElement(AVATAR_URLS);
+      const avatar_url = generateDiceBearAvatar(email);
       const bio = getRandomElement(BIOS);
       
       const result = await pool.query(
