@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APK Manager - Shatter Admin</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+
+    .header p {
+      color: #666;
+      font-size: 16px;
+    }
+
+    .upload-section {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    .upload-section h2 {
+      color: #333;
+      margin-bottom: 25px;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: border-color 0.3s;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .file-input-wrapper input[type=file] {
+      position: absolute;
+      left: -9999px;
+    }
+
+    .file-input-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 15px;
+      background: #f5f5f5;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .file-input-label:hover {
+      background: #ebebeb;
+      border-color: #667eea;
+    }
+
+    .file-input-label.has-file {
+      background: #e8f5e9;
+      border-color: #4caf50;
+    }
+
+    .btn {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-danger {
+      background: #f44336;
+      color: white;
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+
+    .btn-danger:hover {
+      background: #d32f2f;
+    }
+
+    .versions-section {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    .versions-section h2 {
+      color: #333;
+      margin-bottom: 25px;
+      font-size: 24px;
+    }
+
+    .version-card {
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      transition: all 0.3s;
+    }
+
+    .version-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    .version-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .version-info {
+      flex: 1;
+    }
+
+    .version-name {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .version-meta {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+
+    .badge-force {
+      background: #ff5252;
+      color: white;
+    }
+
+    .badge-optional {
+      background: #4caf50;
+      color: white;
+    }
+
+    .release-notes {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+      color: #555;
+      line-height: 1.6;
+    }
+
+    .alert {
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .alert.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-state svg {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 20px;
+      opacity: 0.3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📱 APK Manager</h1>
+      <p>Quản lý phiên bản ứng dụng Shatter</p>
+    </div>
+
+    <div id="alert" class="alert"></div>
+
+    <div class="upload-section">
+      <h2>⬆️ Upload APK Mới</h2>
+      <form id="uploadForm">
+        <div class="form-group">
+          <label>Tên phiên bản (VD: 1.0.0) *</label>
+          <input type="text" id="versionName" placeholder="1.0.0" required>
+        </div>
+
+        <div class="form-group">
+          <label>Mã phiên bản (Số nguyên, VD: 100) *</label>
+          <input type="number" id="versionCode" placeholder="100" required>
+          <small style="color: #999; display: block; margin-top: 5px;">
+            Mã phiên bản phải lớn hơn phiên bản trước đó
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Nội dung cập nhật</label>
+          <textarea id="releaseNotes" placeholder="- Sửa lỗi...&#10;- Thêm tính năng mới...&#10;- Cải thiện hiệu suất..."></textarea>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <input type="checkbox" id="forceUpdate">
+          <label for="forceUpdate" style="margin-bottom: 0;">
+            Bắt buộc cập nhật (Người dùng không thể bỏ qua)
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label>File APK *</label>
+          <div class="file-input-wrapper">
+            <input type="file" id="apkFile" accept=".apk" required>
+            <label for="apkFile" class="file-input-label" id="fileLabel">
+              <span>📁 Chọn file APK</span>
+              <span id="fileName"></span>
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="uploadBtn">
+          <span>⬆️ Upload APK</span>
+        </button>
+      </form>
+    </div>
+
+    <div class="versions-section">
+      <h2>📋 Danh Sách Phiên Bản</h2>
+      <div class="loading" id="versionsLoading">
+        <div class="spinner"></div>
+        <p>Đang tải...</p>
+      </div>
+      <div id="versionsList"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = window.location.origin;
+    let authToken = localStorage.getItem('token');
+
+    if (!authToken) {
+      alert('Bạn cần đăng nhập để truy cập trang này!');
+      window.location.href = '/';
+    }
+
+    const showAlert = (message, type = 'success') => {
+      const alert = document.getElementById('alert');
+      alert.textContent = message;
+      alert.className = `alert alert-${type} show`;
+      setTimeout(() => {
+        alert.classList.remove('show');
+      }, 5000);
+    };
+
+    document.getElementById('apkFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      const label = document.getElementById('fileLabel');
+      const fileName = document.getElementById('fileName');
+      
+      if (file) {
+        fileName.textContent = `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+        label.classList.add('has-file');
+      } else {
+        fileName.textContent = '';
+        label.classList.remove('has-file');
+      }
+    });
+
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const uploadBtn = document.getElementById('uploadBtn');
+      const formData = new FormData();
+      
+      formData.append('version_name', document.getElementById('versionName').value);
+      formData.append('version_code', document.getElementById('versionCode').value);
+      formData.append('release_notes', document.getElementById('releaseNotes').value);
+      formData.append('is_force_update', document.getElementById('forceUpdate').checked);
+      formData.append('apk', document.getElementById('apkFile').files[0]);
+
+      uploadBtn.disabled = true;
+      uploadBtn.innerHTML = '<span>⏳ Đang upload...</span>';
+
+      try {
+        const response = await fetch(`${API_URL}/api/app-versions/upload`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          showAlert('✅ Upload APK thành công!', 'success');
+          document.getElementById('uploadForm').reset();
+          document.getElementById('fileLabel').classList.remove('has-file');
+          document.getElementById('fileName').textContent = '';
+          loadVersions();
+        } else {
+          showAlert('❌ ' + data.error, 'error');
+        }
+      } catch (error) {
+        showAlert('❌ Lỗi: ' + error.message, 'error');
+      } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.innerHTML = '<span>⬆️ Upload APK</span>';
+      }
+    });
+
+    const loadVersions = async () => {
+      const loading = document.getElementById('versionsLoading');
+      const list = document.getElementById('versionsList');
+      
+      loading.classList.add('show');
+      list.innerHTML = '';
+
+      try {
+        const response = await fetch(`${API_URL}/api/app-versions/list`, {
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.versions.length > 0) {
+          list.innerHTML = data.versions.map(v => `
+            <div class="version-card">
+              <div class="version-header">
+                <div class="version-info">
+                  <div class="version-name">
+                    ${v.version_name}
+                    <span class="badge badge-${v.is_force_update ? 'force' : 'optional'}">
+                      ${v.is_force_update ? '🔴 Bắt buộc' : '🟢 Tùy chọn'}
+                    </span>
+                  </div>
+                  <div class="version-meta">
+                    Code: ${v.version_code} • 
+                    Kích thước: ${(v.file_size / 1024 / 1024).toFixed(2)} MB • 
+                    Tải lên: ${new Date(v.created_at).toLocaleDateString('vi-VN')} bởi ${v.uploaded_by_name || 'Admin'}
+                  </div>
+                </div>
+                <button class="btn btn-danger" onclick="deleteVersion(${v.id})">
+                  🗑️ Xóa
+                </button>
+              </div>
+              ${v.release_notes ? `
+                <div class="release-notes">
+                  <strong>📝 Nội dung cập nhật:</strong><br>
+                  ${v.release_notes.replace(/\n/g, '<br>')}
+                </div>
+              ` : ''}
+            </div>
+          `).join('');
+        } else {
+          list.innerHTML = `
+            <div class="empty-state">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+              </svg>
+              <h3>Chưa có phiên bản nào</h3>
+              <p>Hãy upload APK đầu tiên!</p>
+            </div>
+          `;
+        }
+      } catch (error) {
+        showAlert('❌ Lỗi tải danh sách: ' + error.message, 'error');
+      } finally {
+        loading.classList.remove('show');
+      }
+    };
+
+    const deleteVersion = async (id) => {
+      if (!confirm('Bạn có chắc muốn xóa phiên bản này?')) return;
+
+      try {
+        const response = await fetch(`${API_URL}/api/app-versions/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          showAlert('✅ Đã xóa phiên bản!', 'success');
+          loadVersions();
+        } else {
+          showAlert('❌ ' + data.error, 'error');
+        }
+      } catch (error) {
+        showAlert('❌ Lỗi: ' + error.message, 'error');
+      }
+    };
+
+    loadVersions();
+  </script>
+</body>
+</html>

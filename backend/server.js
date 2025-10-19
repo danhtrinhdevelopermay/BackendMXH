@@ -17,6 +17,7 @@ const pushTokenRoutes = require('./src/routes/pushTokens');
 const thoughtRoutes = require('./src/routes/thoughts');
 const storyRoutes = require('./src/routes/stories');
 const streakRoutes = require('./src/routes/streaks');
+const appVersionsRoutes = require('./src/routes/appVersions');
 const { authenticateToken } = require('./src/middleware/auth');
 const pool = require('./src/config/database');
 const cloudinary = require('./src/config/cloudinary');
@@ -31,6 +32,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path}`);
@@ -70,6 +72,10 @@ app.get('/webrtc-control', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'webrtc-control.html'));
 });
 
+app.get('/apk-manager', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'apk-manager.html'));
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
@@ -83,6 +89,7 @@ app.use('/api/push-tokens', pushTokenRoutes);
 app.use('/api/thoughts', thoughtRoutes);
 app.use('/api/stories', storyRoutes);
 app.use('/api/streaks', streakRoutes);
+app.use('/api/app-versions', appVersionsRoutes);
 
 app.get('/api/auto-reactions/status', authenticateToken, (req, res) => {
   res.json(autoReactionService.getStats());
