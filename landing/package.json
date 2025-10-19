@@ -1,0 +1,16 @@
+{
+  "name": "shatter-landing",
+  "version": "1.0.0",
+  "description": "Landing page for Shatter social media app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["landing", "shatter"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
