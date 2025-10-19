@@ -20,6 +20,7 @@ const streakRoutes = require('./src/routes/streaks');
 const { authenticateToken } = require('./src/middleware/auth');
 const pool = require('./src/config/database');
 const cloudinary = require('./src/config/cloudinary');
+const autoReactionService = require('./src/services/autoReactionService');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -276,6 +277,10 @@ io.on('connection', (socket) => {
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
+  
+  autoReactionService.start().catch(err => {
+    console.error('❌ Failed to start Auto Reaction Service:', err);
+  });
   
   if (process.env.RENDER_EXTERNAL_URL) {
     const axios = require('axios');
