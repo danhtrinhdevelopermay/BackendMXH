@@ -66,6 +66,24 @@ app.use('/api/thoughts', thoughtRoutes);
 app.use('/api/stories', storyRoutes);
 app.use('/api/streaks', streakRoutes);
 
+app.get('/api/auto-reactions/status', authenticateToken, (req, res) => {
+  res.json(autoReactionService.getStats());
+});
+
+app.post('/api/auto-reactions/start', authenticateToken, async (req, res) => {
+  try {
+    await autoReactionService.start();
+    res.json({ message: 'Auto Reaction Service started', stats: autoReactionService.getStats() });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to start service', details: error.message });
+  }
+});
+
+app.post('/api/auto-reactions/stop', authenticateToken, (req, res) => {
+  autoReactionService.stop();
+  res.json({ message: 'Auto Reaction Service stopped', stats: autoReactionService.getStats() });
+});
+
 app.post('/api/upload', authenticateToken, upload.single('media'), async (req, res) => {
   try {
     console.log('Upload request received from user:', req.user.id);
