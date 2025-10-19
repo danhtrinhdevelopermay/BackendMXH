@@ -18,7 +18,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Architecture (React Native + Expo)
 The mobile application uses React Native with Expo SDK. Navigation is handled by React Navigation (Stack and Bottom Tab navigators), and UI components are built with React Native Paper. State management primarily uses React Context API. Axios manages HTTP requests, Expo SecureStore provides secure token storage, and Expo Image Picker and Expo AV handle media.
-- **Key Features**: Navigation flows (authenticated/unauthenticated), video playback (autoplay in feed, full controls on detail), user thoughts/notes (short notes with emojis in Messages screen), post reactions (single-tap like/unlike, long-press for menu), message reactions (long-press for emoji menu with push notifications), messaging streaks (TikTok-style mutual messaging streak system with animated fire icon and milestone badges).
+- **Key Features**: Navigation flows (authenticated/unauthenticated), video playback (autoplay in feed, full controls on detail), user thoughts/notes (short notes with emojis in Messages screen), post reactions (single-tap like/unlike, long-press for menu), message reactions (long-press for emoji menu with push notifications), messaging streaks (TikTok-style mutual messaging streak system with animated fire icon and milestone badges), **real-time voice calls** (WebRTC-powered audio calls with mute/speaker controls, using STUN servers for peer-to-peer connectivity).
 
 ### Backend Architecture (Node.js + Express)
 The backend is a RESTful API built with Node.js and Express, following an MVC-like structure. It uses JWT for stateless authentication with bcrypt for password hashing and Express-validator for request validation.
@@ -28,6 +28,7 @@ The backend is a RESTful API built with Node.js and Express, following an MVC-li
   - **Anti-Spindown System**: Automatic keep-alive mechanism for Render.com deployment.
   - **Dual Database System**: Supports primary and secondary PostgreSQL databases for redundancy. Writes go to primary with failover to secondary. Reads query both databases and merge results, ensuring data consistency and availability.
   - **Auto-Reaction System**: Automated service that adds gradual, natural reactions from 100 fake Vietnamese accounts to new posts. Reactions are distributed realistically (Like 40%, Love 30%, Haha 15%, Wow 10%, Sad 5%) with timing between 5 seconds to 3 minutes. Service runs in background and checks for new posts every 10 seconds.
+  - **WebRTC Signaling**: Socket.IO server handles WebRTC signaling for voice calls, relaying SDP offers/answers and ICE candidates between call participants.
 
 ### Web Platform Architecture
 A separate web version is created from the mobile codebase using Expo Web (React Native Web).
@@ -47,6 +48,7 @@ A separate web version is created from the mobile codebase using Expo Web (React
 - **JWT (jsonwebtoken)**: Token generation and verification (backend).
 - **Bcrypt**: Password hashing (backend).
 - **Axios**: HTTP client for keep-alive pings (backend).
+- **WebRTC**: Real-time peer-to-peer audio communication using `react-native-webrtc` for media streams and RTCPeerConnection, with `react-native-incall-manager` for audio routing (earpiece/speaker control). Uses Google STUN servers for NAT traversal.
 
 ### Deployment
 - **Backend**: Render.com
