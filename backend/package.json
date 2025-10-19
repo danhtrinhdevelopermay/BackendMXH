@@ -16,7 +16,6 @@
   "license": "ISC",
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
-    "@octokit/rest": "^22.0.0",
     "axios": "^1.7.9",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.5.1",

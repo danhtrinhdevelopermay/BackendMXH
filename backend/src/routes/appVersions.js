@@ -5,7 +5,6 @@ const path = require('path');
 const fs = require('fs').promises;
 const pool = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
-const { uploadAPKtoGitHub, deleteAPKfromGitHub } = require('../utils/githubRelease');
 
 const uploadsDir = path.join(__dirname, '../../uploads/apk');
 
@@ -146,19 +145,10 @@ router.post('/upload', upload.single('apk'), async (req, res) => {
       });
     }
 
-    const localApkPath = req.file.path;
+    const apkUrl = `/uploads/apk/${req.file.filename}`;
     const fileSize = req.file.size;
 
-    console.log(`✅ APK saved locally: ${localApkPath}`);
-
-    const githubResult = await uploadAPKtoGitHub(
-      localApkPath,
-      version_name,
-      version_code,
-      release_notes
-    );
-
-    const apkUrl = githubResult.downloadUrl;
+    console.log(`✅ APK saved locally: ${apkUrl}`);
 
     const result = await pool.query(
       `INSERT INTO app_versions (version_name, version_code, apk_url, file_size, release_notes, is_force_update, uploaded_by)
@@ -167,15 +157,10 @@ router.post('/upload', upload.single('apk'), async (req, res) => {
       [version_name, parseInt(version_code), apkUrl, fileSize, release_notes, is_force_update === 'true', null]
     );
 
-    await fs.unlink(localApkPath).catch(err => {
-      console.warn('Failed to delete local APK file:', err);
-    });
-
     res.json({
       success: true,
-      message: 'APK uploaded successfully to GitHub Releases',
-      version: result.rows[0],
-      githubUrl: githubResult.releaseUrl
+      message: 'APK uploaded successfully',
+      version: result.rows[0]
     });
   } catch (error) {
     console.error('Error uploading APK:', error);
@@ -216,7 +201,7 @@ router.delete('/:id', async (req, res) => {
     const versionId = req.params.id;
     
     const result = await pool.query(
-      'SELECT version_name FROM app_versions WHERE id = $1',
+      'SELECT apk_url FROM app_versions WHERE id = $1',
       [versionId]
     );
 
@@ -227,17 +212,17 @@ router.delete('/:id', async (req, res) => {
       });
     }
 
-    const versionName = result.rows[0].version_name;
+    const apkPath = path.join(__dirname, '../..', result.rows[0].apk_url);
     
     await pool.query('DELETE FROM app_versions WHERE id = $1', [versionId]);
     
-    await deleteAPKfromGitHub(versionName).catch(err => {
-      console.warn('Failed to delete APK from GitHub:', err);
+    await fs.unlink(apkPath).catch(err => {
+      console.warn('Failed to delete APK file:', err);
     });
 
     res.json({
       success: true,
-      message: 'Version deleted successfully from database and GitHub'
+      message: 'Version deleted successfully'
     });
   } catch (error) {
     console.error('Error deleting version:', error);
