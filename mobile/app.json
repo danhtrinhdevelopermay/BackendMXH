@@ -18,7 +18,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.shatter.app",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Shatter cần quyền truy cập camera để thực hiện cuộc gọi video.",
+        "NSMicrophoneUsageDescription": "Shatter cần quyền truy cập microphone để thực hiện cuộc gọi âm thanh."
       }
     },
     "android": {
@@ -26,7 +28,14 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.shatter.app"
+      "package": "com.shatter.app",
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "MODIFY_AUDIO_SETTINGS",
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
