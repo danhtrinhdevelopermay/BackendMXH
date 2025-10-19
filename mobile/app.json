@@ -16,7 +16,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.socialmedia.app",
+      "bundleIdentifier": "com.shatter.app",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -26,7 +26,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.socialmedia.app"
+      "package": "com.shatter.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -35,7 +35,24 @@
       "apiUrl": "https://backendmxh-1.onrender.com",
       "oneSignalAppId": "${ONESIGNAL_APP_ID}",
       "eas": {
-        "projectId": "a932a640-0100-45be-86fc-cc014fe6c555"
+        "projectId": "f73d306d-0996-48e5-a0ba-9c111a978e93",
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "targetName": "OneSignalNotificationServiceExtension",
+                  "bundleIdentifier": "com.shatter.app.OneSignalNotificationServiceExtension",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.com.shatter.app.onesignal"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
       }
     },
     "plugins": [
