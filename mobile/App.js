@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { AuthProvider } from './src/context/AuthContext';
 import { AlertProvider } from './src/context/AlertContext';
-import { ThemeProvider } from './src/context/ThemeContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import CustomAlert from './src/components/CustomAlert';
 import Constants from 'expo-constants';
@@ -54,15 +53,13 @@ export default function App() {
   }, []);
 
   return (
-    <ThemeProvider>
-      <PaperProvider>
-        <AlertProvider>
-          <AuthProvider>
-            <AppNavigator />
-            <CustomAlert />
-          </AuthProvider>
-        </AlertProvider>
-      </PaperProvider>
-    </ThemeProvider>
+    <PaperProvider>
+      <AlertProvider>
+        <AuthProvider>
+          <AppNavigator />
+          <CustomAlert />
+        </AuthProvider>
+      </AlertProvider>
+    </PaperProvider>
   );
 }
