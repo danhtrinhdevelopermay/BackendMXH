@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { neonConfig } = require('@neondatabase/serverless');
 const { Pool } = require('pg');
 

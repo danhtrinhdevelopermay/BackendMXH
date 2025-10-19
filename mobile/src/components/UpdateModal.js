@@ -31,7 +31,9 @@ const UpdateModal = ({ visible, updateInfo, onUpdateLater }) => {
     setDownloadProgress(0);
 
     try {
-      const apkUrl = `${API_URL}${updateInfo.apkUrl}`;
+      const apkUrl = updateInfo.apkUrl.startsWith('http://') || updateInfo.apkUrl.startsWith('https://') 
+        ? updateInfo.apkUrl 
+        : `${API_URL}${updateInfo.apkUrl}`;
       const fileName = `shatter-${updateInfo.versionName}.apk`;
       const fileUri = FileSystem.documentDirectory + fileName;
 
