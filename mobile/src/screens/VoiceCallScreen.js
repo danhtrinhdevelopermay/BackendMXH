@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Animated, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import UserAvatar from '../components/UserAvatar';
 import { AuthContext } from '../context/AuthContext';
+import WebRTCService from '../services/WebRTCService';
 
 const VoiceCallScreen = ({ route, navigation }) => {
   const { user } = useContext(AuthContext);
@@ -15,6 +16,7 @@ const VoiceCallScreen = ({ route, navigation }) => {
   const [callStatus, setCallStatus] = useState(callType === 'outgoing' ? 'Calling...' : 'Incoming call');
   const [pulseAnim] = useState(new Animated.Value(1));
   const timerRef = React.useRef(null);
+  const webrtcInitialized = React.useRef(false);
 
   useEffect(() => {
     const pulseAnimation = Animated.loop(
@@ -34,9 +36,20 @@ const VoiceCallScreen = ({ route, navigation }) => {
     pulseAnimation.start();
 
     if (socket) {
-      socket.on('call_accepted', () => {
+      socket.on('call_accepted', async () => {
         setCallStatus('Connected');
         startCallTimer();
+        
+        if (!webrtcInitialized.current) {
+          try {
+            await initializeWebRTC(callType === 'outgoing');
+            webrtcInitialized.current = true;
+          } catch (error) {
+            console.error('Failed to initialize WebRTC:', error);
+            Alert.alert('Error', 'Failed to start audio call');
+            handleEndCall();
+          }
+        }
       });
 
       socket.on('call_rejected', () => {
@@ -46,6 +59,7 @@ const VoiceCallScreen = ({ route, navigation }) => {
 
       socket.on('call_ended', () => {
         setCallStatus('Call ended');
+        cleanupCall();
         setTimeout(() => navigation.goBack(), 1000);
       });
 
@@ -56,6 +70,7 @@ const VoiceCallScreen = ({ route, navigation }) => {
     }
 
     return () => {
+      cleanupCall();
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
@@ -67,6 +82,19 @@ const VoiceCallScreen = ({ route, navigation }) => {
       }
     };
   }, [socket]);
+
+  const initializeWebRTC = async (isInitiator) => {
+    try {
+      await WebRTCService.initializeCall(socket, isInitiator);
+      
+      if (isInitiator) {
+        await WebRTCService.startCall();
+      }
+    } catch (error) {
+      console.error('Error initializing WebRTC:', error);
+      throw error;
+    }
+  };
 
   const startCallTimer = () => {
     if (timerRef.current) {
@@ -83,17 +111,27 @@ const VoiceCallScreen = ({ route, navigation }) => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleEndCall = () => {
+  const cleanupCall = async () => {
+    try {
+      await WebRTCService.endCall();
+      webrtcInitialized.current = false;
+    } catch (error) {
+      console.error('Error cleaning up call:', error);
+    }
+  };
+
+  const handleEndCall = async () => {
     if (socket) {
       socket.emit('end_call', {
         userId: user.id,
         otherUserId: otherUser.id
       });
     }
+    await cleanupCall();
     navigation.goBack();
   };
 
-  const handleAcceptCall = () => {
+  const handleAcceptCall = async () => {
     if (socket && callType === 'incoming') {
       socket.emit('accept_call', {
         callerId: otherUser.id,
@@ -101,6 +139,15 @@ const VoiceCallScreen = ({ route, navigation }) => {
       });
       setCallStatus('Connected');
       startCallTimer();
+      
+      try {
+        await initializeWebRTC(false);
+        webrtcInitialized.current = true;
+      } catch (error) {
+        console.error('Failed to initialize WebRTC:', error);
+        Alert.alert('Error', 'Failed to start audio call');
+        handleEndCall();
+      }
     }
   };
 
@@ -111,6 +158,18 @@ const VoiceCallScreen = ({ route, navigation }) => {
       });
     }
     navigation.goBack();
+  };
+
+  const handleToggleMute = () => {
+    const newMutedState = !isMuted;
+    setIsMuted(newMutedState);
+    WebRTCService.toggleMute(newMutedState);
+  };
+
+  const handleToggleSpeaker = () => {
+    const newSpeakerState = !isSpeakerOn;
+    setIsSpeakerOn(newSpeakerState);
+    WebRTCService.toggleSpeaker(newSpeakerState);
   };
 
   return (
@@ -138,7 +197,7 @@ const VoiceCallScreen = ({ route, navigation }) => {
         <View style={styles.controls}>
           <TouchableOpacity
             style={[styles.controlButton, isMuted && styles.activeControl]}
-            onPress={() => setIsMuted(!isMuted)}
+            onPress={handleToggleMute}
           >
             <Ionicons
               name={isMuted ? 'mic-off' : 'mic'}
@@ -149,7 +208,7 @@ const VoiceCallScreen = ({ route, navigation }) => {
 
           <TouchableOpacity
             style={[styles.controlButton, isSpeakerOn && styles.activeControl]}
-            onPress={() => setIsSpeakerOn(!isSpeakerOn)}
+            onPress={handleToggleSpeaker}
           >
             <MaterialCommunityIcons
               name={isSpeakerOn ? 'volume-high' : 'volume-off'}
