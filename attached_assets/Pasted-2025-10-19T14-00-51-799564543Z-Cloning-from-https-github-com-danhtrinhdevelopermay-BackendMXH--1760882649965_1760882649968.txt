@@ -1,0 +1,61 @@
+2025-10-19T14:00:51.799564543Z ==> Cloning from https://github.com/danhtrinhdevelopermay/BackendMXH
+2025-10-19T14:01:00.284249517Z ==> Checking out commit d9e5dbe681c14697a43aca9961ab8c5cb965d5da in branch main
+2025-10-19T14:01:06.526524347Z ==> Transferred 62MB in 8s. Extraction took 2s.
+2025-10-19T14:01:22.793378074Z ==> Using Node.js version 22.16.0 (default)
+2025-10-19T14:01:22.827968383Z ==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+2025-10-19T14:01:22.955527221Z ==> Running build command 'cd backend && npm install'...
+2025-10-19T14:01:25.989495787Z 
+2025-10-19T14:01:25.989531648Z added 218 packages, and audited 219 packages in 3s
+2025-10-19T14:01:25.989730322Z 
+2025-10-19T14:01:25.989747173Z 22 packages are looking for funding
+2025-10-19T14:01:25.989757203Z   run `npm fund` for details
+2025-10-19T14:01:25.999268574Z 
+2025-10-19T14:01:25.999290425Z 8 vulnerabilities (6 moderate, 2 critical)
+2025-10-19T14:01:25.999293435Z 
+2025-10-19T14:01:25.999296585Z Some issues need review, and may require choosing
+2025-10-19T14:01:25.999299895Z a different dependency.
+2025-10-19T14:01:25.999315835Z 
+2025-10-19T14:01:25.999319536Z Run `npm audit` for details.
+2025-10-19T14:01:29.478823374Z ==> Uploading build...
+2025-10-19T14:01:43.607858404Z ==> Uploaded in 11.3s. Compression took 2.8s
+2025-10-19T14:01:43.689974091Z ==> Build successful 🎉
+2025-10-19T14:01:52.597163992Z ==> Deploying...
+2025-10-19T14:02:08.868894044Z ==> Running 'cd backend && npm start'
+2025-10-19T14:02:10.173093634Z 
+2025-10-19T14:02:10.173118785Z > social-media-backend@1.0.0 start
+2025-10-19T14:02:10.173122675Z > node server.js
+2025-10-19T14:02:10.173124955Z 
+2025-10-19T14:02:10.465136798Z [dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+2025-10-19T14:02:12.264365232Z ✅ Secondary database configured for failover
+2025-10-19T14:02:13.770455086Z Server is running on port 10000
+2025-10-19T14:02:13.770828865Z 🤖 Đang khởi tạo Auto Reaction Service...
+2025-10-19T14:02:13.861428326Z 🔄 Render Anti-Spindown activated
+2025-10-19T14:02:13.861453967Z 📡 Backend: Pinging https://backendmxh-1.onrender.com/health every 14 minutes
+2025-10-19T14:02:13.861457227Z 📡 Web App: Pinging https://shattereb.onrender.com every 14 minutes
+2025-10-19T14:02:14.479347641Z HEAD /
+2025-10-19T14:02:14.560327284Z ✅ Đã tải 100 tài khoản ảo
+2025-10-19T14:02:14.560364005Z 🚀 Auto Reaction Service đã khởi động
+2025-10-19T14:02:14.560369935Z 📊 Sẽ kiểm tra bài viết mới mỗi 10 giây
+2025-10-19T14:02:19.062296892Z ✅ Web App keep-alive ping successful at 2025-10-19T14:02:19.062Z
+2025-10-19T14:02:19.06264961Z ✅ Backend keep-alive ping successful at 2025-10-19T14:02:19.062Z
+2025-10-19T14:02:23.410174982Z ==> Your service is live 🎉
+2025-10-19T14:02:23.60051529Z ==> 
+2025-10-19T14:02:23.787651948Z ==> ///////////////////////////////////////////////////////////
+2025-10-19T14:02:23.978505835Z ==> 
+2025-10-19T14:02:24.169204763Z ==> Available at your primary URL https://backendmxh-1.onrender.com
+2025-10-19T14:02:24.362928471Z ==> 
+2025-10-19T14:02:24.553970968Z ==> ///////////////////////////////////////////////////////////
+2025-10-19T14:02:26.43628994Z GET /
+2025-10-19T14:02:30.850280251Z GET /apk-manager
+2025-10-19T14:02:31.040547338Z GET /api/app-versions/list
+2025-10-19T14:02:59.541932366Z POST /api/app-versions/upload
+2025-10-19T14:03:02.870668003Z 📤 Uploading APK 1.0.2 to Cloudinary...
+2025-10-19T14:03:12.431351849Z Error uploading APK: {
+2025-10-19T14:03:12.431382779Z   message: 'Server returned unexpected status code - 413',
+2025-10-19T14:03:12.431388069Z   http_code: 413,
+2025-10-19T14:03:12.431393199Z   name: 'UnexpectedResponse'
+2025-10-19T14:03:12.43139753Z }
+2025-10-19T14:03:33.103944648Z GET /apk-manager
+2025-10-19T14:03:33.31910712Z GET /api/app-versions/list
+2025-10-19T14:03:33.103944648Z GET /apk-manager
+2025-10-19T14:03:33.31910712Z GET /api/app-versions/list
