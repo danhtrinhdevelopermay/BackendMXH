@@ -295,6 +295,16 @@ const HomeScreen = ({ navigation }) => {
           const isVisible = visibleItems.includes(item.id);
           const hasError = mediaErrors[item.id];
           
+          const aspectRatio = (item.media_width && item.media_height) 
+            ? item.media_width / item.media_height 
+            : 16/9;
+          
+          const mediaStyle = {
+            width: '100%',
+            aspectRatio: aspectRatio,
+            backgroundColor: '#f3f4f6',
+          };
+          
           const handleMediaError = () => {
             setMediaErrors(prev => ({ ...prev, [item.id]: true }));
           };
@@ -322,7 +332,7 @@ const HomeScreen = ({ navigation }) => {
                       }
                     }}
                     source={{ uri: mediaUrl }}
-                    style={styles.postMedia}
+                    style={mediaStyle}
                     resizeMode="cover"
                     shouldPlay={isVisible}
                     isLooping
@@ -340,7 +350,7 @@ const HomeScreen = ({ navigation }) => {
                 >
                   <Card.Cover 
                     source={{ uri: mediaUrl }} 
-                    style={styles.postMedia}
+                    style={mediaStyle}
                     onError={handleMediaError}
                   />
                 </TouchableOpacity>
