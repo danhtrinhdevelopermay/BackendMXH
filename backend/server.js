@@ -16,6 +16,7 @@ const userRoutes = require('./src/routes/users');
 const pushTokenRoutes = require('./src/routes/pushTokens');
 const thoughtRoutes = require('./src/routes/thoughts');
 const storyRoutes = require('./src/routes/stories');
+const streakRoutes = require('./src/routes/streaks');
 const { authenticateToken } = require('./src/middleware/auth');
 const pool = require('./src/config/database');
 const cloudinary = require('./src/config/cloudinary');
@@ -62,6 +63,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/push-tokens', pushTokenRoutes);
 app.use('/api/thoughts', thoughtRoutes);
 app.use('/api/stories', storyRoutes);
+app.use('/api/streaks', streakRoutes);
 
 app.post('/api/upload', authenticateToken, upload.single('media'), async (req, res) => {
   try {

@@ -1,5 +1,6 @@
 const pool = require('../config/database');
 const { sendPushNotification } = require('./pushTokenController');
+const { updateStreak } = require('./streakController');
 
 const sendMessage = async (req, res) => {
   const { receiver_id, content } = req.body;
@@ -26,6 +27,10 @@ const sendMessage = async (req, res) => {
       `${senderName}: ${content}`,
       { screen: 'Chat', userId: sender_id, userName: senderName }
     );
+
+    // Update streak
+    const streakResult = await updateStreak(sender_id, receiver_id);
+    console.log(`[MESSAGE] Streak update result:`, streakResult);
 
     res.status(201).json(result.rows[0]);
   } catch (error) {
@@ -59,7 +64,46 @@ const getConversations = async (req, res) => {
       [user_id]
     );
 
-    res.json(result.rows);
+    // Get streaks for each conversation
+    const conversationsWithStreaks = await Promise.all(
+      result.rows.map(async (conversation) => {
+        const orderUserIds = (userId1, userId2) => {
+          return userId1 < userId2 
+            ? { user_id_1: userId1, user_id_2: userId2 }
+            : { user_id_1: userId2, user_id_2: userId1 };
+        };
+
+        const { user_id_1, user_id_2 } = orderUserIds(user_id, conversation.other_user_id);
+        
+        const streakResult = await pool.queryAll(
+          `SELECT streak_count, last_interaction_date 
+           FROM message_streaks 
+           WHERE user_id_1 = $1 AND user_id_2 = $2`,
+          [user_id_1, user_id_2]
+        );
+
+        let streak_count = 0;
+        if (streakResult.rows.length > 0) {
+          const lastDate = new Date(streakResult.rows[0].last_interaction_date);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          lastDate.setHours(0, 0, 0, 0);
+          
+          const daysDiff = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
+          
+          if (daysDiff <= 1) {
+            streak_count = streakResult.rows[0].streak_count;
+          }
+        }
+
+        return {
+          ...conversation,
+          streak_count
+        };
+      })
+    );
+
+    res.json(conversationsWithStreaks);
   } catch (error) {
     console.error('Get conversations error:', error);
     res.status(500).json({ error: 'Server error' });
