@@ -32,10 +32,13 @@ Server sẽ chạy tại `http://localhost:3000`
 ```
 landing/
 ├── public/
-│   ├── index.html          # Trang chủ
-│   ├── privacy-policy.html # Chính sách bảo mật
-│   └── styles.css          # CSS
-├── server.js               # Express server
+│   ├── downloads/
+│   │   ├── Shatter-Android.apk  # Android APK (72MB)
+│   │   └── Shatter-iOS.tar.gz   # iOS tar.gz (21MB)
+│   ├── index.html               # Trang chủ
+│   ├── privacy-policy.html      # Chính sách bảo mật
+│   └── styles.css               # CSS
+├── server.js                    # Express server
 ├── package.json
 └── README.md
 ```
@@ -44,3 +47,12 @@ landing/
 
 - Trang chủ: `/`
 - Chính sách bảo mật: `/privacy-policy`
+- Download Android: `/downloads/Shatter-Android.apk`
+- Download iOS: `/downloads/Shatter-iOS.tar.gz`
+
+## Lưu ý khi deploy
+
+Các file APK và tar.gz có dung lượng lớn (tổng ~93MB). Đảm bảo:
+- Repository của bạn có thể chứa file lớn (hoặc sử dụng Git LFS)
+- Render có đủ băng thông cho việc download
+- Hoặc tải các file này lên hosting riêng (Cloudinary, S3, etc.) và cập nhật link
