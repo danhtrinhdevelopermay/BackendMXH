@@ -283,14 +283,18 @@ const ProfileScreen = ({ route, navigation }) => {
         return (
           <View style={styles.mediaContainer}>
             {isVideo ? (
-                <Video
-                  source={{ uri: mediaUrl }}
-                  style={styles.postMedia}
-                  resizeMode="contain"
-                  useNativeControls
-                  shouldPlay={false}
-                  isLooping
-                  isMuted={false}
+                <video
+                  src={mediaUrl}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    backgroundColor: '#000'
+                  }}
+                  controls
+                  loop
+                  playsInline
+                  muted={false}
                   onError={(error) => console.log('Video error:', error)}
                 />
             ) : (

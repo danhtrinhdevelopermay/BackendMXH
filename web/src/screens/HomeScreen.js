@@ -311,19 +311,24 @@ const HomeScreen = ({ navigation }) => {
           return (
             <View style={styles.mediaContainer}>
               {isVideo ? (
-                <Video
+                <video
                   ref={(ref) => {
                     if (ref) {
                       videoRefs.current[item.id] = ref;
                     }
                   }}
-                  source={{ uri: mediaUrl }}
-                  style={styles.postMedia}
-                  resizeMode="contain"
-                  useNativeControls
-                  shouldPlay={isVisible}
-                  isLooping
-                  isMuted={false}
+                  src={mediaUrl}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    backgroundColor: '#000'
+                  }}
+                  controls
+                  loop
+                  playsInline
+                  autoPlay={isVisible}
+                  muted={false}
                   onError={(error) => {
                     console.log('Video error:', error);
                     handleMediaError();
