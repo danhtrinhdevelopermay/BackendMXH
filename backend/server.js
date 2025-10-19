@@ -231,9 +231,20 @@ const activeCalls = new Map();
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
-  socket.on('user_online', (userId) => {
+  socket.on('user_online', async (userId) => {
     activeUsers.set(userId, socket.id);
     console.log(`User ${userId} is online with socket ${socket.id}`);
+    
+    try {
+      await pool.query(
+        'UPDATE users SET is_online = TRUE, last_seen = CURRENT_TIMESTAMP WHERE id = $1',
+        [userId]
+      );
+      
+      io.emit('user_status_changed', { userId, isOnline: true });
+    } catch (error) {
+      console.error('Error updating user online status:', error);
+    }
   });
 
   socket.on('typing', ({ userId, receiverId }) => {
@@ -292,12 +303,24 @@ io.on('connection', (socket) => {
     console.log(`Call ended between ${userId} and ${otherUserId}`);
   });
 
-  socket.on('disconnect', () => {
+  socket.on('disconnect', async () => {
     for (const [userId, socketId] of activeUsers.entries()) {
       if (socketId === socket.id) {
         activeUsers.delete(userId);
         activeCalls.delete(userId);
         console.log(`User ${userId} disconnected`);
+        
+        try {
+          await pool.query(
+            'UPDATE users SET is_online = FALSE, last_seen = CURRENT_TIMESTAMP WHERE id = $1',
+            [userId]
+          );
+          
+          io.emit('user_status_changed', { userId, isOnline: false });
+        } catch (error) {
+          console.error('Error updating user offline status:', error);
+        }
+        
         break;
       }
     }

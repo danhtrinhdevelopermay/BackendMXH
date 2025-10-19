@@ -5,7 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
-import { messageAPI } from '../api/api';
+import { messageAPI, userAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
 import UserAvatar from '../components/UserAvatar';
 import SocketService from '../services/SocketService';
@@ -23,6 +23,8 @@ const ChatScreen = ({ route, navigation }) => {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [showReactions, setShowReactions] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [isOnline, setIsOnline] = useState(false);
+  const [lastSeen, setLastSeen] = useState(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const typingAnim = useRef(new Animated.Value(0)).current;
   const typingTimeoutRef = useRef(null);
@@ -53,12 +55,22 @@ const ChatScreen = ({ route, navigation }) => {
           setIsTyping(false);
         }
       });
+      
+      socket.on('user_status_changed', (data) => {
+        if (data.userId === parseInt(userId)) {
+          setIsOnline(data.isOnline);
+          if (!data.isOnline) {
+            setLastSeen(new Date());
+          }
+        }
+      });
     }
     
     return () => {
       if (socket) {
         socket.off('user_typing');
         socket.off('user_stop_typing');
+        socket.off('user_status_changed');
       }
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
@@ -74,9 +86,20 @@ const ChatScreen = ({ route, navigation }) => {
       console.error('Failed to fetch messages');
     }
   };
+  
+  const fetchUserStatus = async () => {
+    try {
+      const response = await userAPI.getUserById(userId);
+      setIsOnline(response.data.is_online || false);
+      setLastSeen(response.data.last_seen ? new Date(response.data.last_seen) : null);
+    } catch (error) {
+      console.error('Failed to fetch user status');
+    }
+  };
 
   useEffect(() => {
     fetchMessages();
+    fetchUserStatus();
     const interval = setInterval(fetchMessages, 3000);
     return () => clearInterval(interval);
   }, [userId]);
@@ -232,6 +255,28 @@ const ChatScreen = ({ route, navigation }) => {
     
     return currentDate !== prevDate;
   };
+  
+  const formatLastSeen = (lastSeenDate) => {
+    if (!lastSeenDate) return '';
+    
+    const now = new Date();
+    const diffMs = now - lastSeenDate;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) {
+      return 'Đang hoạt động';
+    } else if (diffMins < 60) {
+      return `Hoạt động ${diffMins} phút trước`;
+    } else if (diffHours < 24) {
+      return `Hoạt động ${diffHours} giờ trước`;
+    } else if (diffDays === 1) {
+      return 'Hoạt động hôm qua';
+    } else {
+      return `Hoạt động ${diffDays} ngày trước`;
+    }
+  };
 
   const reactions = [
     { icon: '👍', name: 'like' },
@@ -336,11 +381,13 @@ const ChatScreen = ({ route, navigation }) => {
               user={otherUser} 
               size={36}
             />
-            <View style={styles.onlineIndicator} />
+            {isOnline && <View style={styles.onlineIndicator} />}
           </View>
           <View style={styles.headerText}>
             <Text style={styles.headerName}>{userName}</Text>
-            <Text style={styles.headerStatus}>Đang hoạt động</Text>
+            <Text style={styles.headerStatus}>
+              {isOnline ? 'Đang hoạt động' : formatLastSeen(lastSeen)}
+            </Text>
           </View>
         </View>
 
