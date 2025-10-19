@@ -1,12 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 
 const StreakIcon = ({ count, size = 'medium' }) => {
   const sizes = {
-    small: { icon: 16, text: 12, container: 24 },
-    medium: { icon: 20, text: 14, container: 28 },
-    large: { icon: 24, text: 16, container: 32 }
+    small: { icon: 40, text: 10, container: 50 },
+    medium: { icon: 50, text: 12, container: 60 },
+    large: { icon: 60, text: 14, container: 70 }
   };
 
   const currentSize = sizes[size];
@@ -18,25 +17,19 @@ const StreakIcon = ({ count, size = 'medium' }) => {
       style={[
         styles.container,
         { 
+          width: currentSize.container,
           height: currentSize.container,
         }
       ]}
     >
-      <LinearGradient
-        colors={['#FF6B00', '#FF8C00', '#FFA500']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.gradient, { borderRadius: currentSize.container / 2 }]}
-      >
-        <View style={styles.iconContainer}>
-          <Image 
-            source={require('../../assets/fire-streak.gif')}
-            style={[styles.fireIcon, { width: currentSize.icon, height: currentSize.icon }]}
-            resizeMode="contain"
-          />
-        </View>
-      </LinearGradient>
-      <View style={[styles.countBadge, { minWidth: currentSize.container }]}>
+      <View style={styles.iconContainer}>
+        <Image 
+          source={require('../../assets/fire-streak.gif')}
+          style={[styles.fireIcon, { width: currentSize.icon, height: currentSize.icon }]}
+          resizeMode="contain"
+        />
+      </View>
+      <View style={styles.countBadge}>
         <Text style={[styles.countText, { fontSize: currentSize.text }]} numberOfLines={1}>
           {count}
         </Text>
@@ -47,37 +40,29 @@ const StreakIcon = ({ count, size = 'medium' }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 4,
-  },
-  gradient: {
-    width: 28,
-    height: 28,
+    position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#FF6B00',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
-    elevation: 4,
+    marginLeft: 4,
   },
   iconContainer: {
     justifyContent: 'center',
     alignItems: 'center',
   },
   fireIcon: {
-    width: 20,
-    height: 20,
+    width: 50,
+    height: 50,
   },
   countBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
     backgroundColor: '#FF6B00',
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 12,
-    marginLeft: -8,
-    minWidth: 28,
-    height: 20,
+    borderRadius: 10,
+    minWidth: 24,
+    height: 18,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -89,7 +74,7 @@ const styles = StyleSheet.create({
   countText: {
     color: '#FFFFFF',
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: 12,
     textAlign: 'center',
   },
 });
