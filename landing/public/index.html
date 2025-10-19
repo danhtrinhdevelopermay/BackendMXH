@@ -7,63 +7,151 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="noise-bg"></div>
+    
     <header>
         <nav class="navbar">
             <div class="container">
-                <div class="logo">Shatter</div>
+                <div class="logo">
+                    <span class="logo-icon">⚡</span>
+                    <span>Shatter</span>
+                </div>
                 <ul class="nav-links">
                     <li><a href="#features">Tính năng</a></li>
                     <li><a href="#about">Giới thiệu</a></li>
-                    <li><a href="/privacy-policy">Chính sách bảo mật</a></li>
+                    <li><a href="/privacy-policy">Bảo mật</a></li>
+                    <li><a href="#download" class="nav-cta">Tải xuống</a></li>
                 </ul>
             </div>
         </nav>
     </header>
 
     <section class="hero">
+        <div class="hero-gradient"></div>
         <div class="container">
-            <h1>Kết nối và Chia sẻ Mọi Khoảnh Khắc</h1>
-            <p class="subtitle">Shatter - Mạng xã hội hiện đại giúp bạn kết nối với bạn bè, chia sẻ câu chuyện và tạo dựng cộng đồng của riêng bạn</p>
-            <div class="cta-buttons">
-                <a href="#download" class="btn btn-primary">Tải ứng dụng</a>
-                <a href="#about" class="btn btn-secondary">Tìm hiểu thêm</a>
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    Mạng xã hội thế hệ mới
+                </div>
+                <h1 class="hero-title">
+                    Kết nối là một
+                    <span class="gradient-text">cách tốt hơn</span>
+                    để xây dựng cộng đồng
+                </h1>
+                <p class="hero-subtitle">
+                    Shatter mang đến trải nghiệm mạng xã hội hiện đại với tính năng story, 
+                    chat thời gian thực, streak tracking và nhiều hơn nữa.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#download" class="btn btn-primary">
+                        <span>Bắt đầu ngay</span>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M4 10h12m0 0l-4-4m4 4l-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </a>
+                    <a href="#features" class="btn btn-secondary">
+                        <span>Khám phá tính năng</span>
+                    </a>
+                </div>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">10K+</div>
+                        <div class="stat-label">Người dùng</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-number">50K+</div>
+                        <div class="stat-label">Bài viết</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-number">99%</div>
+                        <div class="stat-label">Hài lòng</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="floating-card card-1">
+                    <div class="card-icon">📱</div>
+                    <div class="card-text">Stories</div>
+                </div>
+                <div class="floating-card card-2">
+                    <div class="card-icon">💬</div>
+                    <div class="card-text">Messages</div>
+                </div>
+                <div class="floating-card card-3">
+                    <div class="card-icon">🔥</div>
+                    <div class="card-text">Streaks</div>
+                </div>
             </div>
         </div>
     </section>
 
     <section id="features" class="features">
         <div class="container">
-            <h2>Tính năng nổi bật</h2>
+            <div class="section-header">
+                <div class="section-badge">Tính năng</div>
+                <h2>Trải nghiệm được trao quyền<br/>với <span class="gradient-text">Shatter</span></h2>
+                <p>Khám phá các tính năng mạnh mẽ giúp bạn kết nối và chia sẻ một cách tốt nhất</p>
+            </div>
+            
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">📱</div>
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon">📸</div>
+                    </div>
                     <h3>Chia sẻ Story</h3>
-                    <p>Chia sẻ những khoảnh khắc đặc biệt của bạn qua hình ảnh và video</p>
+                    <p>Chia sẻ những khoảnh khắc đặc biệt của bạn qua hình ảnh và video chất lượng cao</p>
+                    <div class="feature-arrow">→</div>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">💬</div>
+                
+                <div class="feature-card featured">
+                    <div class="feature-badge">Phổ biến</div>
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon">💬</div>
+                    </div>
                     <h3>Nhắn tin Real-time</h3>
                     <p>Trò chuyện với bạn bè ngay lập tức với hệ thống tin nhắn thời gian thực</p>
+                    <div class="feature-arrow">→</div>
                 </div>
+                
                 <div class="feature-card">
-                    <div class="feature-icon">🔥</div>
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon">🔥</div>
+                    </div>
                     <h3>Theo dõi Streak</h3>
                     <p>Duy trì chuỗi ngày sử dụng liên tiếp và xây dựng thói quen tích cực</p>
+                    <div class="feature-arrow">→</div>
                 </div>
+                
                 <div class="feature-card">
-                    <div class="feature-icon">👥</div>
-                    <h3>Kết bạn</h3>
-                    <p>Mở rộng mạng lưới quan hệ với hệ thống kết bạn thông minh</p>
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon">👥</div>
+                    </div>
+                    <h3>Kết bạn thông minh</h3>
+                    <p>Mở rộng mạng lưới quan hệ với hệ thống gợi ý kết bạn AI</p>
+                    <div class="feature-arrow">→</div>
                 </div>
+                
                 <div class="feature-card">
-                    <div class="feature-icon">🔒</div>
-                    <h3>Bảo mật</h3>
-                    <p>Thông tin của bạn được bảo vệ với công nghệ mã hóa tiên tiến</p>
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon">🔒</div>
+                    </div>
+                    <h3>Bảo mật cao</h3>
+                    <p>Thông tin của bạn được bảo vệ với công nghệ mã hóa end-to-end</p>
+                    <div class="feature-arrow">→</div>
                 </div>
+                
                 <div class="feature-card">
-                    <div class="feature-icon">🔔</div>
-                    <h3>Thông báo</h3>
-                    <p>Không bỏ lỡ bất kỳ cập nhật nào từ bạn bè và cộng đồng</p>
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon">🔔</div>
+                    </div>
+                    <h3>Thông báo thông minh</h3>
+                    <p>Không bỏ lỡ bất kỳ cập nhật quan trọng nào từ bạn bè và cộng đồng</p>
+                    <div class="feature-arrow">→</div>
                 </div>
             </div>
         </div>
@@ -71,40 +159,85 @@
 
     <section id="about" class="about">
         <div class="container">
-            <h2>Về Shatter</h2>
-            <p>Shatter là nền tảng mạng xã hội được thiết kế để kết nối mọi người một cách chân thực và ý nghĩa. Chúng tôi tin rằng công nghệ có thể tạo ra những kết nối sâu sắc và mang lại giá trị tích cực cho cuộc sống.</p>
-            <p>Với giao diện thân thiện, tính năng đa dạng và cam kết bảo vệ quyền riêng tư của người dùng, Shatter là nơi bạn có thể tự do thể hiện bản thân và chia sẻ những trải nghiệm đáng nhớ.</p>
+            <div class="about-content">
+                <div class="about-text">
+                    <div class="section-badge">Về chúng tôi</div>
+                    <h2>Xây dựng tương lai của <span class="gradient-text">mạng xã hội</span></h2>
+                    <p>Shatter là nền tảng mạng xã hội được thiết kế để kết nối mọi người một cách chân thực và ý nghĩa. Chúng tôi tin rằng công nghệ có thể tạo ra những kết nối sâu sắc và mang lại giá trị tích cực cho cuộc sống.</p>
+                    <p>Với giao diện thân thiện, tính năng đa dạng và cam kết bảo vệ quyền riêng tư của người dùng, Shatter là nơi bạn có thể tự do thể hiện bản thân.</p>
+                    
+                    <div class="about-features">
+                        <div class="about-feature-item">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            <span>100% miễn phí</span>
+                        </div>
+                        <div class="about-feature-item">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            <span>Không quảng cáo</span>
+                        </div>
+                        <div class="about-feature-item">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                            <span>Bảo mật cao</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-visual">
+                    <div class="visual-card">
+                        <div class="visual-content">
+                            <div class="visual-stat">
+                                <div class="visual-number">2025</div>
+                                <div class="visual-label">Ra mắt</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
     <section id="download" class="download">
         <div class="container">
-            <h2>Tải ứng dụng ngay hôm nay</h2>
-            <p>Có mặt trên cả iOS và Android</p>
-            <div class="download-buttons">
-                <a href="/downloads/Shatter-iOS.tar.gz" class="download-btn" download>
-                    <span class="download-icon">📱</span>
-                    <div>
-                        <small>Tải xuống cho</small>
-                        <strong>iOS</strong>
-                    </div>
+            <div class="download-content">
+                <div class="section-badge">Tải xuống</div>
+                <h2>Tải ứng dụng Shatter<br/>ngay hôm nay</h2>
+                <p>Có mặt trên cả iOS và Android. Bắt đầu kết nối với bạn bè ngay bây giờ.</p>
+                
+                <div class="download-buttons">
+                    <a href="/downloads/Shatter-iOS.tar.gz" class="download-btn" download>
+                        <div class="download-icon">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
+                                <path d="M25.1 13.2c0-3.4 2.8-5.1 2.9-5.2-1.6-2.3-4.1-2.7-5-2.7-2.1-.2-4.1 1.2-5.2 1.2-1.1 0-2.7-1.2-4.5-1.2-2.3 0-4.4 1.3-5.6 3.4-2.4 4.1-.6 10.3 1.7 13.6 1.1 1.6 2.5 3.4 4.3 3.4 1.7-.1 2.4-1.1 4.5-1.1s2.7 1.1 4.5 1.1c1.9-.1 3.1-1.7 4.2-3.3 1.3-1.9 1.9-3.7 1.9-3.8-.1 0-3.6-1.4-3.7-5.4z"/>
+                                <path d="M21.2 4.4c.9-1.1 1.5-2.7 1.4-4.3-1.3.1-2.9.9-3.8 2-1 1.1-1.7 2.7-1.5 4.3 1.6.1 3.1-.8 3.9-2z"/>
+                            </svg>
+                        </div>
+                        <div class="download-text">
+                            <div class="download-label">Tải cho</div>
+                            <div class="download-platform">iOS</div>
+                        </div>
+                    </a>
+                    
+                    <a href="/downloads/Shatter-Android.apk" class="download-btn" download>
+                        <div class="download-icon">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="currentColor">
+                                <path d="M4 8.5c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5v10c0 .8-.7 1.5-1.5 1.5S4 19.3 4 18.5v-10zm22 0c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5v10c0 .8-.7 1.5-1.5 1.5S26 19.3 26 18.5v-10zM9 7h14v11c0 1.1-.9 2-2 2h-1v5c0 .8-.7 1.5-1.5 1.5S17 25.8 17 25v-5h-2v5c0 .8-.7 1.5-1.5 1.5S12 25.8 12 25v-5h-1c-1.1 0-2-.9-2-2V7zm11.5-4l1.3-2.3c.1-.1 0-.3-.1-.3-.1-.1-.3 0-.3.1l-1.3 2.3c-.9-.4-1.9-.6-3-.6s-2.1.2-3 .6L12.8.5c-.1-.1-.3-.1-.3-.1-.1 0-.2.1-.1.3L13.6 3c-2.4 1.2-4 3.7-4 6.5h12.8c0-2.8-1.6-5.3-4-6.5zM13.5 7c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm5 0c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z"/>
+                            </svg>
+                        </div>
+                        <div class="download-text">
+                            <div class="download-label">Tải cho</div>
+                            <div class="download-platform">Android</div>
+                        </div>
+                    </a>
+                </div>
+                
+                <a href="/install-guide" class="install-guide-link">
+                    📖 Xem hướng dẫn cài đặt chi tiết
                 </a>
-                <a href="/downloads/Shatter-Android.apk" class="download-btn" download>
-                    <span class="download-icon">🤖</span>
-                    <div>
-                        <small>Tải xuống cho</small>
-                        <strong>Android</strong>
-                    </div>
-                </a>
-            </div>
-            <div class="download-info">
-                <p class="download-note">
-                    <strong>Lưu ý Android:</strong> Bạn cần bật "Cài đặt từ nguồn không xác định" trong cài đặt để cài APK.<br>
-                    <strong>Lưu ý iOS:</strong> File tar.gz cần được giải nén. Bạn sẽ nhận được file IPA để cài đặt.
-                </p>
-                <p style="margin-top: 1rem;">
-                    <a href="/install-guide" class="btn btn-secondary" style="display: inline-block;">📖 Xem hướng dẫn cài đặt chi tiết</a>
-                </p>
             </div>
         </div>
     </section>
@@ -112,29 +245,40 @@
     <footer>
         <div class="container">
             <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Shatter</h4>
+                <div class="footer-brand">
+                    <div class="logo">
+                        <span class="logo-icon">⚡</span>
+                        <span>Shatter</span>
+                    </div>
                     <p>Kết nối và chia sẻ mọi khoảnh khắc</p>
                 </div>
-                <div class="footer-section">
-                    <h4>Liên kết</h4>
-                    <ul>
-                        <li><a href="#features">Tính năng</a></li>
-                        <li><a href="#about">Giới thiệu</a></li>
-                        <li><a href="/install-guide">Hướng dẫn cài đặt</a></li>
-                        <li><a href="/privacy-policy">Chính sách bảo mật</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Liên hệ</h4>
-                    <ul>
-                        <li>Email: support@shatter.app</li>
-                        <li>Hỗ trợ: help@shatter.app</li>
-                    </ul>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Sản phẩm</h4>
+                        <ul>
+                            <li><a href="#features">Tính năng</a></li>
+                            <li><a href="#download">Tải xuống</a></li>
+                            <li><a href="/install-guide">Hướng dẫn</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Công ty</h4>
+                        <ul>
+                            <li><a href="#about">Về chúng tôi</a></li>
+                            <li><a href="/privacy-policy">Bảo mật</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Hỗ trợ</h4>
+                        <ul>
+                            <li><a href="mailto:support@shatter.app">Email</a></li>
+                            <li><a href="mailto:help@shatter.app">Trợ giúp</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 Shatter. Bản quyền được bảo lưu.</p>
+                <p>&copy; 2025 Shatter. All rights reserved.</p>
             </div>
         </div>
     </footer>
