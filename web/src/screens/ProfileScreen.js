@@ -290,10 +290,11 @@ const ProfileScreen = ({ route, navigation }) => {
                 <Video
                   source={{ uri: mediaUrl }}
                   style={styles.postMedia}
-                  resizeMode="cover"
+                  resizeMode="contain"
+                  useNativeControls
                   shouldPlay={false}
                   isLooping
-                  isMuted={true}
+                  isMuted={false}
                   onError={(error) => console.log('Video error:', error)}
                 />
               </TouchableOpacity>
@@ -305,7 +306,7 @@ const ProfileScreen = ({ route, navigation }) => {
                 <Image 
                   source={{ uri: mediaUrl }} 
                   style={styles.postMedia}
-                  resizeMode="cover"
+                  resizeMode="contain"
                 />
               </TouchableOpacity>
             )}
@@ -575,6 +576,7 @@ const styles = StyleSheet.create({
   postMedia: {
     width: '100%',
     height: 280,
+    backgroundColor: '#000',
   },
   postActions: {
     flexDirection: 'row',

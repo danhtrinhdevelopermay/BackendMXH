@@ -323,8 +323,9 @@ const HomeScreen = ({ navigation }) => {
                     }}
                     source={{ uri: mediaUrl }}
                     style={styles.postMedia}
-                    resizeMode="cover"
-                    shouldPlay={isVisible}
+                    resizeMode="contain"
+                    useNativeControls
+                    shouldPlay={false}
                     isLooping
                     isMuted={false}
                     onError={(error) => {
@@ -627,7 +628,7 @@ const styles = StyleSheet.create({
   postMedia: {
     width: '100%',
     height: 300,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#000',
   },
   mediaErrorContainer: {
     width: '100%',
