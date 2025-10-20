@@ -76,6 +76,25 @@ app.get('/apk-manager', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'apk-manager.html'));
 });
 
+app.get('/database-control', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'database-control.html'));
+});
+
+app.get('/api/database-status', (req, res) => {
+  res.json(pool.getDatabaseStatus());
+});
+
+app.post('/api/database-switch', (req, res) => {
+  const { target } = req.body;
+  const usePrimary = target === 'primary';
+  pool.setWriteTarget(usePrimary);
+  res.json({ 
+    success: true, 
+    message: `Database write target switched to ${target}`,
+    status: pool.getDatabaseStatus()
+  });
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
