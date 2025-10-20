@@ -210,9 +210,12 @@ const HomeScreen = ({ navigation }) => {
         </View>
         <View style={styles.createPostDivider} />
         <View style={styles.createPostActions}>
-          <TouchableOpacity style={styles.createPostAction}>
-            <Ionicons name="videocam" size={24} color="#f3425f" />
-            <Text style={styles.createActionText}>Video trực tiếp</Text>
+          <TouchableOpacity 
+            style={styles.createPostAction}
+            onPress={() => navigation.navigate('Camera')}
+          >
+            <Ionicons name="camera" size={24} color="#1D9BF0" />
+            <Text style={styles.createActionText}>Camera</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.createPostAction}>
             <Ionicons name="image" size={24} color="#45bd62" />

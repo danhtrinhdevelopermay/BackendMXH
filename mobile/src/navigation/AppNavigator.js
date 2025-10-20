@@ -32,6 +32,7 @@ import CreateStoryScreen from '../screens/CreateStoryScreen';
 import ViewStoryScreen from '../screens/ViewStoryScreen';
 import CreateThoughtScreen from '../screens/CreateThoughtScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import CameraScreen from '../screens/CameraScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -504,6 +505,15 @@ const NavigationWrapper = () => {
                 headerShown: false,
                 ...modalTransition,
                 presentation: 'modal',
+              }} 
+            />
+            <Stack.Screen 
+              name="Camera" 
+              component={CameraScreen} 
+              options={{ 
+                headerShown: false,
+                ...fadeTransition,
+                presentation: 'fullScreenModal',
               }} 
             />
           </>
