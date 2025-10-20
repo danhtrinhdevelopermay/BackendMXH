@@ -26,10 +26,10 @@ The backend is a RESTful API built with Node.js and Express, following an MVC-li
   - **Media Storage**: Cloudinary for cloud-based storage of images and videos. Media dimensions (width/height) are captured from Cloudinary on upload and stored in database for aspect ratio calculations.
   - **Privacy & Visibility**: Posts support `public` and `friends` privacy settings.
   - **Anti-Spindown System**: Automatic keep-alive mechanism for Render.com deployment.
-  - **Dual Database System**: Supports primary and secondary PostgreSQL databases for redundancy. Writes go to primary with failover to secondary. Reads query both databases and merge results, ensuring data consistency and availability.
+  - **Dual Database System**: Supports primary and secondary PostgreSQL databases for redundancy. Write target can be switched between primary and secondary via admin panel at `/database-control`. Reads always query both databases and merge results. Auto-sync mechanism copies posts between databases when needed (e.g., when updating a post that exists in one database but not the write target). Ensures data consistency and availability with automatic failover.
   - **Auto-Reaction System**: Automated service that adds gradual, natural reactions from 100 fake Vietnamese accounts to new posts. Reactions are distributed realistically (Like 40%, Love 30%, Haha 15%, Wow 10%, Sad 5%) with timing between 5 seconds to 3 minutes. Service runs in background and checks for new posts every 10 seconds.
   - **WebRTC Signaling**: Socket.IO server handles WebRTC signaling for voice calls, relaying SDP offers/answers and ICE candidates between call participants.
-  - **APK Version Management**: Admin interface at `/apk-manager` for uploading new APK versions with version codes and release notes. Mobile app checks version on startup and auto-downloads/installs updates. Supports force updates and stores APK files in `/uploads/apk/` directory.
+  - **APK Version Management**: Admin interface at `/apk-manager` for managing APK versions using download URLs. Supports version codes, release notes, and force updates. Mobile app checks version on startup and auto-downloads/installs updates from provided URLs.
 
 ### Web Platform Architecture
 A separate web version is created from the mobile codebase using Expo Web (React Native Web).
