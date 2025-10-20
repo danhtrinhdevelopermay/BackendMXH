@@ -100,6 +100,14 @@ export const messageAPI = {
   getReactions: (messageId) => api.get(`/message-reactions/${messageId}`),
 };
 
+export const messageBackupAPI = {
+  createBackup: (backupData) => api.post('/message-backup/create', { backupData }),
+  listBackups: () => api.get('/message-backup/list'),
+  restoreBackup: (fileId) => api.post('/message-backup/restore', { fileId }),
+  deleteBackup: (fileId) => api.delete(`/message-backup/${fileId}`),
+  getBackupHistory: () => api.get('/message-backup/history'),
+};
+
 export const notificationAPI = {
   getNotifications: () => api.get('/notifications'),
   markAsRead: (notificationId) => api.put(`/notifications/${notificationId}/read`),

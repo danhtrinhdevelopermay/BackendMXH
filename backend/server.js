@@ -11,6 +11,7 @@ const reactionRoutes = require('./src/routes/reactions');
 const friendshipRoutes = require('./src/routes/friendships');
 const messageRoutes = require('./src/routes/messages');
 const messageReactionRoutes = require('./src/routes/messageReactions');
+const messageBackupRoutes = require('./src/routes/messageBackup');
 const notificationRoutes = require('./src/routes/notifications');
 const userRoutes = require('./src/routes/users');
 const pushTokenRoutes = require('./src/routes/pushTokens');
@@ -22,6 +23,7 @@ const { authenticateToken } = require('./src/middleware/auth');
 const pool = require('./src/config/database');
 const cloudinary = require('./src/config/cloudinary');
 const autoReactionService = require('./src/services/autoReactionService');
+const messageCleanupService = require('./src/services/messageCleanupService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -83,6 +85,7 @@ app.use('/api/reactions', reactionRoutes);
 app.use('/api/friendships', friendshipRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/message-reactions', messageReactionRoutes);
+app.use('/api/message-backup', authenticateToken, messageBackupRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/push-tokens', pushTokenRoutes);
@@ -399,6 +402,8 @@ server.listen(PORT, '0.0.0.0', () => {
   autoReactionService.start().catch(err => {
     console.error('❌ Failed to start Auto Reaction Service:', err);
   });
+
+  messageCleanupService.start();
   
   if (process.env.RENDER_EXTERNAL_URL) {
     const axios = require('axios');

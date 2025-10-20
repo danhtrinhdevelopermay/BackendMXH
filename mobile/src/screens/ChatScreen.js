@@ -10,6 +10,7 @@ import { AuthContext } from '../context/AuthContext';
 import UserAvatar from '../components/UserAvatar';
 import SocketService from '../services/SocketService';
 import { useAlert } from '../context/AlertContext';
+import MessageStorageService from '../services/MessageStorageService';
 
 const ChatScreen = ({ route, navigation }) => {
   const { userId, userName, userAvatar } = route.params;
@@ -81,9 +82,16 @@ const ChatScreen = ({ route, navigation }) => {
   const fetchMessages = async () => {
     try {
       const response = await messageAPI.getMessages(userId);
-      setMessages(response.data);
+      const messagesFromAPI = response.data;
+      setMessages(messagesFromAPI);
+      
+      await MessageStorageService.saveMessages(messagesFromAPI, userId);
     } catch (error) {
-      console.error('Failed to fetch messages');
+      console.error('Failed to fetch messages from API, loading from local storage');
+      const localMessages = await MessageStorageService.getMessages(userId);
+      if (localMessages && localMessages.length > 0) {
+        setMessages(localMessages);
+      }
     }
   };
   
@@ -129,9 +137,27 @@ const ChatScreen = ({ route, navigation }) => {
     if (!newMessage.trim()) return;
 
     setLoading(true);
+    const messageContent = newMessage;
+    const tempMessage = {
+      id: Date.now(),
+      sender_id: user.id,
+      receiver_id: userId,
+      content: messageContent,
+      created_at: new Date().toISOString(),
+      is_read: false,
+      temp: true
+    };
+
     try {
-      await messageAPI.sendMessage({ receiver_id: userId, content: newMessage });
+      setMessages(prev => [...prev, tempMessage]);
+      await MessageStorageService.saveMessage(tempMessage, userId);
+      
+      const response = await messageAPI.sendMessage({ receiver_id: userId, content: messageContent });
       setNewMessage('');
+      
+      if (response.data) {
+        await MessageStorageService.saveMessage(response.data, userId);
+      }
       
       Animated.sequence([
         Animated.timing(fadeAnim, {
@@ -148,7 +174,8 @@ const ChatScreen = ({ route, navigation }) => {
       
       fetchMessages();
     } catch (error) {
-      console.error('Failed to send message');
+      console.error('Failed to send message, but saved locally');
+      showAlert('Thông báo', 'Tin nhắn đã được lưu cục bộ và sẽ gửi khi có kết nối', 'info');
     } finally {
       setLoading(false);
     }
