@@ -201,25 +201,15 @@ class MultiDatabasePool {
                          text.trim().toUpperCase().startsWith('UPDATE') || 
                          text.trim().toUpperCase().startsWith('DELETE');
     
-    let targetPool;
     if (isWriteQuery) {
       const writeDb = this.databases.get(this.writeTargetId);
-      targetPool = writeDb ? writeDb.pool : this.databases.get('primary').pool;
-    } else {
-      targetPool = this.databases.get('primary').pool;
-    }
-
-    try {
-      const result = await targetPool.query(text, params);
+      const targetPool = writeDb ? writeDb.pool : this.databases.get('primary').pool;
       
-      if (isWriteQuery) {
-        const writeDb = this.databases.get(this.writeTargetId);
+      try {
+        const result = await targetPool.query(text, params);
         console.log(`📝 Write operation to ${writeDb ? writeDb.name.toUpperCase() : 'PRIMARY'}`);
-      }
-      
-      return result;
-    } catch (error) {
-      if (isWriteQuery) {
+        return result;
+      } catch (error) {
         console.warn(`⚠️ Write to ${this.writeTargetId} failed, trying fallback...`, error.message);
         
         for (const [id, db] of this.databases) {
@@ -234,8 +224,11 @@ class MultiDatabasePool {
           }
         }
         console.error('❌ All databases failed for write operation');
+        throw error;
       }
-      throw error;
+    } else {
+      console.log(`📖 Reading from ALL databases (${this.databases.size} total)`);
+      return await this.queryAll(text, params);
     }
   }
 
