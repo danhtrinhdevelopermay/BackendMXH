@@ -48,11 +48,47 @@
       "apiUrl": "https://backendmxh-1.onrender.com",
       "oneSignalAppId": "${ONESIGNAL_APP_ID}",
       "eas": {
-        "projectId": "9ed0779e-765f-4684-8aa2-a4a2241e2eab",
+        "projectId": "4813b56b-8bb3-4a74-abce-87b3b4fd57aa",
         "build": {
           "experimental": {
             "ios": {
               "appExtensions": [
+                {
+                  "targetName": "OneSignalNotificationServiceExtension",
+                  "bundleIdentifier": "com.shatter.app.OneSignalNotificationServiceExtension",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.com.shatter.app.onesignal"
+                    ]
+                  }
+                },
+                {
+                  "targetName": "OneSignalNotificationServiceExtension",
+                  "bundleIdentifier": "com.shatter.app.OneSignalNotificationServiceExtension",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.com.shatter.app.onesignal"
+                    ]
+                  }
+                },
+                {
+                  "targetName": "OneSignalNotificationServiceExtension",
+                  "bundleIdentifier": "com.shatter.app.OneSignalNotificationServiceExtension",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.com.shatter.app.onesignal"
+                    ]
+                  }
+                },
+                {
+                  "targetName": "OneSignalNotificationServiceExtension",
+                  "bundleIdentifier": "com.shatter.app.OneSignalNotificationServiceExtension",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.com.shatter.app.onesignal"
+                    ]
+                  }
+                },
                 {
                   "targetName": "OneSignalNotificationServiceExtension",
                   "bundleIdentifier": "com.shatter.app.OneSignalNotificationServiceExtension",
