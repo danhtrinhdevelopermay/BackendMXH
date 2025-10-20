@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://shattereb.onrender.com/sitemap.xml

@@ -21,41 +21,10 @@ const createPost = async (req, res) => {
       );
       
       if (result.rows.length === 0) {
-        console.log(`Post not found in write database, checking both databases...`);
-        const existingPost = await pool.queryAll(
-          'SELECT * FROM posts WHERE id = $1 AND user_id = $2',
-          [media_id, user_id]
-        );
-        
-        if (existingPost.rows.length === 0) {
-          console.log(`Media not found or unauthorized - media_id: ${media_id}, user_id: ${user_id}`);
-          return res.status(404).json({ error: 'Media not found or unauthorized' });
-        }
-        
-        const sourcePost = existingPost.rows[0];
-        console.log(`Found post in other database, inserting into current write database...`);
-        result = await pool.query(
-          `INSERT INTO posts (id, user_id, content, media_url, media_type, media_width, media_height, privacy, created_at) 
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
-           ON CONFLICT (id) DO UPDATE 
-           SET content = $3, privacy = $8
-           RETURNING *`,
-          [
-            sourcePost.id,
-            sourcePost.user_id,
-            content,
-            sourcePost.media_url,
-            sourcePost.media_type,
-            sourcePost.media_width,
-            sourcePost.media_height,
-            privacy,
-            sourcePost.created_at
-          ]
-        );
-        console.log(`Post synced and updated successfully - ID: ${result.rows[0].id}`);
-      } else {
-        console.log(`Post updated successfully - ID: ${result.rows[0].id}`);
+        console.log(`Media not found or unauthorized - media_id: ${media_id}, user_id: ${user_id}`);
+        return res.status(404).json({ error: 'Media not found or unauthorized' });
       }
+      console.log(`Post updated successfully - ID: ${result.rows[0].id}`);
     } else {
       console.log('Creating new post without media');
       result = await pool.query(
@@ -67,7 +36,7 @@ const createPost = async (req, res) => {
 
     const post = result.rows[0];
     
-    const postWithUser = await pool.queryAll(
+    const postWithUser = await pool.query(
       `SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.media_width, p.media_height, p.privacy, p.created_at, p.updated_at,
        u.username, u.full_name, u.avatar_url, u.is_verified 
        FROM posts p 

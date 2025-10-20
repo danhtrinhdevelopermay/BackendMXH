@@ -45,7 +45,7 @@ const upload = multer({
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'web', 'index.html'));
+  res.json({ message: 'Social Media API is running' });
 });
 
 app.get('/health', (req, res) => {
@@ -74,102 +74,6 @@ app.get('/webrtc-control', (req, res) => {
 
 app.get('/apk-manager', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'apk-manager.html'));
-});
-
-app.get('/database-control', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'database-control.html'));
-});
-
-app.get('/api/database-status', (req, res) => {
-  res.json(pool.getDatabaseStatus());
-});
-
-app.post('/api/database-switch', (req, res) => {
-  try {
-    const { target } = req.body;
-    pool.setWriteTarget(target);
-    res.json({ 
-      success: true, 
-      message: `Database write target switched to ${target}`,
-      status: pool.getDatabaseStatus()
-    });
-  } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
-  }
-});
-
-app.post('/api/database-add', async (req, res) => {
-  try {
-    const { id, name, connectionString } = req.body;
-    
-    if (!id || !name || !connectionString) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Missing required fields: id, name, connectionString' 
-      });
-    }
-
-    await pool.addDatabase(id, name, connectionString);
-    res.json({ 
-      success: true, 
-      message: `Database '${name}' added successfully`,
-      status: pool.getDatabaseStatus()
-    });
-  } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
-  }
-});
-
-app.post('/api/database-remove', async (req, res) => {
-  try {
-    const { id } = req.body;
-    
-    if (!id) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Database ID is required' 
-      });
-    }
-
-    await pool.removeDatabase(id);
-    res.json({ 
-      success: true, 
-      message: `Database removed successfully`,
-      status: pool.getDatabaseStatus()
-    });
-  } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
-  }
-});
-
-app.get('/api/database-schema', async (req, res) => {
-  try {
-    const schema = await pool.exportSchema();
-    res.type('text/plain').send(schema);
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-app.post('/api/database-push-schema', async (req, res) => {
-  try {
-    const { targetId } = req.body;
-    
-    if (!targetId) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Target database ID is required' 
-      });
-    }
-
-    await pool.pushSchemaToDatabase(targetId);
-    res.json({ 
-      success: true, 
-      message: `Schema pushed to database '${targetId}' successfully`
-    });
-  } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
-  }
 });
 
 app.use('/api/auth', authRoutes);
