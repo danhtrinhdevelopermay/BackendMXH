@@ -18,7 +18,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Architecture (React Native + Expo)
 The mobile application uses React Native with Expo SDK. Navigation is handled by React Navigation (Stack and Bottom Tab navigators), and UI components are built with React Native Paper. State management primarily uses React Context API (AuthContext, AlertContext). Axios manages HTTP requests, Expo SecureStore provides secure token storage, and Expo Image Picker and Expo AV handle media.
-- **Key Features**: Navigation flows (authenticated/unauthenticated), video playback (autoplay in feed, full controls on detail), user thoughts/notes (short notes with emojis in Messages screen), post reactions (single-tap like/unlike, long-press for menu), message reactions (long-press for emoji menu with push notifications), messaging streaks (TikTok-style mutual messaging streak system with animated fire icon and milestone badges), **real-time voice calls** (WebRTC-powered audio calls with mute/speaker controls, using STUN servers for peer-to-peer connectivity), **automatic APK updates** (OTA update system that checks for new versions on startup, auto-downloads and installs APKs with progress tracking), **message backup & restore** (Zalo-style dual-storage architecture where messages are stored in database for 24h and local storage permanently, with Google Drive backup/restore functionality).
+- **Key Features**: Navigation flows (authenticated/unauthenticated), video playback (autoplay in feed, full controls on detail), user thoughts/notes (short notes with emojis in Messages screen), post reactions (single-tap like/unlike, long-press for menu), message reactions (long-press for emoji menu with push notifications), messaging streaks (TikTok-style mutual messaging streak system with animated fire icon and milestone badges), **real-time voice calls** (WebRTC-powered audio calls with mute/speaker controls, using STUN servers for peer-to-peer connectivity), **automatic APK updates** (OTA update system that checks for new versions on startup, auto-downloads and installs APKs with progress tracking), **message backup & restore** (Zalo-style dual-storage architecture where messages are stored in database for 24h and local storage permanently, with Google Drive backup/restore functionality), **beauty camera** (TikTok-style camera with 8 beauty filters including smooth skin, brightness, vintage, pink, cool, warm, and custom beauty mode with adjustable sliders for smooth, brighten, big eyes, and slim face effects).
 
 ### Backend Architecture (Node.js + Express)
 The backend is a RESTful API built with Node.js and Express, following an MVC-like structure. It uses JWT for stateless authentication with bcrypt for password hashing and Express-validator for request validation.
@@ -45,7 +45,7 @@ A separate web version is created from the mobile codebase using Expo Web (React
 - **Fake Accounts**: 100 Vietnamese fake user accounts (emails: @fake.com, password: FakeUser123) for auto-reaction system. These accounts don't trigger notifications.
 
 ### Third-Party Services & APIs
-- **Expo Services**: SecureStore, Image Picker, AV, Constants, FileSystem (for APK downloads), IntentLauncher (for APK installation), AsyncStorage (for local message storage).
+- **Expo Services**: SecureStore, Image Picker, AV, Constants, FileSystem (for APK downloads), IntentLauncher (for APK installation), AsyncStorage (for local message storage), Camera (for beauty camera feature), GL (for filter effects), Image Manipulator (for applying beauty filters).
 - **Cloudinary**: Cloud-based media storage and delivery.
 - **Multer**: File upload middleware (backend - handles media uploads and APK files).
 - **JWT (jsonwebtoken)**: Token generation and verification (backend).
@@ -54,6 +54,7 @@ A separate web version is created from the mobile codebase using Expo Web (React
 - **WebRTC**: Real-time peer-to-peer audio communication using `react-native-webrtc` for media streams and RTCPeerConnection, with `react-native-incall-manager` for audio routing (earpiece/speaker control). Uses Google STUN servers for NAT traversal.
 - **Google APIs (googleapis)**: Google Drive API v3 for message backup/restore functionality, using OAuth2 credentials managed by Replit's integration system.
 - **Node-cron**: Scheduled task runner for automatic message cleanup service (runs every 6 hours).
+- **React Native Community Slider**: Slider component for adjusting beauty filter intensity.
 
 ### Deployment
 - **Backend**: Render.com
