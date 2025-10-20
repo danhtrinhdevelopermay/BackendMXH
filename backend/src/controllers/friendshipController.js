@@ -70,7 +70,7 @@ const respondToFriendRequest = async (req, res) => {
       await pool.query(
         `INSERT INTO notifications (user_id, type, content, related_user_id) 
          VALUES ($1, $2, $3, $4)`,
-        [result.rows[0].requester_id, 'friend_accept', 'accepted your friend request', user_id]
+        [result.rows[0].requester_id, 'friend_accept', 'đã chấp nhận lời mời kết bạn của bạn', user_id]
       );
 
       const accepter = await pool.query('SELECT full_name, username FROM users WHERE id = $1', [user_id]);

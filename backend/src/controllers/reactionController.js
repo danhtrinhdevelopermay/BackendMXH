@@ -34,10 +34,20 @@ const addReaction = async (req, res) => {
     );
 
     if (postOwner.rows[0] && postOwner.rows[0].user_id !== user_id) {
+      const reactionTexts = {
+        'like': 'thích',
+        'love': 'yêu thích',
+        'haha': 'thấy buồn cười',
+        'wow': 'ngạc nhiên',
+        'sad': 'thấy buồn',
+        'angry': 'tức giận'
+      };
+      const reactionText = reactionTexts[reaction_type] || 'bày tỏ cảm xúc';
+      
       await pool.query(
         `INSERT INTO notifications (user_id, type, content, related_user_id, related_post_id) 
          VALUES ($1, $2, $3, $4, $5)`,
-        [postOwner.rows[0].user_id, 'reaction', `reacted ${reaction_type} to your post`, user_id, postId]
+        [postOwner.rows[0].user_id, 'reaction', `đã ${reactionText} bài viết của bạn`, user_id, postId]
       );
 
       const reactor = await pool.query('SELECT full_name, username FROM users WHERE id = $1', [user_id]);
