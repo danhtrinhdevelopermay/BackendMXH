@@ -67,26 +67,45 @@ class DualDatabasePool {
   constructor(primary, secondary) {
     this.primary = primary;
     this.secondary = secondary;
-    this.useSecondary = false;
+    this.writeToPrimary = false;
   }
 
   async query(text, params) {
+    const isWriteQuery = text.trim().toUpperCase().startsWith('INSERT') || 
+                         text.trim().toUpperCase().startsWith('UPDATE') || 
+                         text.trim().toUpperCase().startsWith('DELETE');
+    
+    const targetPool = isWriteQuery 
+      ? (this.writeToPrimary ? this.primary : (this.secondary || this.primary))
+      : this.primary;
+
     try {
-      if (this.useSecondary && this.secondary) {
-        return await this.secondary.query(text, params);
+      const result = await targetPool.query(text, params);
+      
+      if (isWriteQuery) {
+        console.log(`📝 Write operation to ${this.writeToPrimary ? 'PRIMARY' : 'SECONDARY'} database`);
       }
-      return await this.primary.query(text, params);
+      
+      return result;
     } catch (error) {
-      if (this.secondary && !this.useSecondary) {
-        console.warn('⚠️ Primary database failed, switching to secondary...', error.message);
+      if (isWriteQuery && this.secondary && targetPool === this.primary) {
+        console.warn('⚠️ Primary database write failed, trying secondary...', error.message);
         try {
-          this.useSecondary = true;
           const result = await this.secondary.query(text, params);
-          console.log('✅ Successfully switched to secondary database');
+          console.log('✅ Successfully wrote to secondary database');
           return result;
         } catch (secondaryError) {
-          this.useSecondary = false;
-          console.error('❌ Both databases failed:', secondaryError.message);
+          console.error('❌ Both databases failed for write:', secondaryError.message);
+          throw error;
+        }
+      } else if (isWriteQuery && this.primary && targetPool === this.secondary) {
+        console.warn('⚠️ Secondary database write failed, trying primary...', error.message);
+        try {
+          const result = await this.primary.query(text, params);
+          console.log('✅ Successfully wrote to primary database');
+          return result;
+        } catch (primaryError) {
+          console.error('❌ Both databases failed for write:', primaryError.message);
           throw error;
         }
       }
@@ -94,16 +113,31 @@ class DualDatabasePool {
     }
   }
 
+  setWriteTarget(usePrimary) {
+    this.writeToPrimary = usePrimary;
+    console.log(`🔄 Write target switched to ${usePrimary ? 'PRIMARY' : 'SECONDARY'} database`);
+  }
+
+  getWriteTarget() {
+    return this.writeToPrimary ? 'primary' : 'secondary';
+  }
+
+  getDatabaseStatus() {
+    return {
+      writeTarget: this.writeToPrimary ? 'primary' : 'secondary',
+      hasPrimary: !!this.primary,
+      hasSecondary: !!this.secondary,
+      primaryUrl: process.env.DATABASE_URL ? '***configured***' : null,
+      secondaryUrl: process.env.DATABASE_URL_SECONDARY ? '***configured***' : null
+    };
+  }
+
   async connect() {
     try {
-      if (this.useSecondary && this.secondary) {
-        return await this.secondary.connect();
-      }
       return await this.primary.connect();
     } catch (error) {
-      if (this.secondary && !this.useSecondary) {
+      if (this.secondary) {
         console.warn('⚠️ Primary database connection failed, using secondary...');
-        this.useSecondary = true;
         return await this.secondary.connect();
       }
       throw error;
