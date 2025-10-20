@@ -171,9 +171,9 @@ const ProfileScreen = ({ route, navigation }) => {
               <>
                 <TouchableOpacity 
                   style={styles.iconButton}
-                  onPress={handleLogout}
+                  onPress={() => navigation.navigate('Settings')}
                 >
-                  <Ionicons name="log-out-outline" size={20} color="#0f1419" />
+                  <Ionicons name="settings-outline" size={20} color="#0f1419" />
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.editButton}

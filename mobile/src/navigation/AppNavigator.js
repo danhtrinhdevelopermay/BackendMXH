@@ -31,6 +31,7 @@ import PostDetailScreen from '../screens/PostDetailScreen';
 import CreateStoryScreen from '../screens/CreateStoryScreen';
 import ViewStoryScreen from '../screens/ViewStoryScreen';
 import CreateThoughtScreen from '../screens/CreateThoughtScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -459,6 +460,14 @@ const NavigationWrapper = () => {
               options={{ 
                 headerShown: true, 
                 title: 'Chỉnh sửa hồ sơ',
+                ...slideFromRightTransition,
+              }} 
+            />
+            <Stack.Screen 
+              name="Settings" 
+              component={SettingsScreen} 
+              options={{ 
+                headerShown: false,
                 ...slideFromRightTransition,
               }} 
             />
