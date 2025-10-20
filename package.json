@@ -11,6 +11,7 @@
   "description": "",
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
+    "@react-native-async-storage/async-storage": "^2.2.0",
     "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.7.0",
@@ -22,9 +23,11 @@
     "expo-notifications": "^0.32.12",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
+    "googleapis": "^164.0.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "node-cache": "^5.1.2",
+    "node-cron": "^4.2.1",
     "pg": "^8.16.3",
     "socket.io-client": "^4.8.1",
     "ws": "^8.18.3"

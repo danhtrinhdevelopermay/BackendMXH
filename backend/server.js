@@ -24,7 +24,7 @@ const cloudinary = require('./src/config/cloudinary');
 const autoReactionService = require('./src/services/autoReactionService');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 let webrtcEnabled = false;
 
