@@ -45,7 +45,7 @@ const upload = multer({
 });
 
 app.get('/', (req, res) => {
-  res.json({ message: 'Social Media API is running' });
+  res.sendFile(path.join(__dirname, 'public', 'web', 'index.html'));
 });
 
 app.get('/health', (req, res) => {
