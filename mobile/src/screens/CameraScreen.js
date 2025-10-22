@@ -214,28 +214,30 @@ const CameraScreen = () => {
         style={styles.camera}
         facing={facing}
         flash={flashMode}
-      >
-        <View style={styles.topControls}>
-          <TouchableOpacity style={styles.topButton} onPress={() => navigation.goBack()}>
-            <Ionicons name="close" size={32} color="#fff" />
+      />
+      
+      <View style={styles.topControls}>
+        <TouchableOpacity style={styles.topButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="close" size={32} color="#fff" />
+        </TouchableOpacity>
+        
+        <View style={styles.topRightControls}>
+          <TouchableOpacity style={styles.topButton} onPress={toggleFlash}>
+            <Ionicons name={getFlashIcon()} size={28} color="#fff" />
           </TouchableOpacity>
           
-          <View style={styles.topRightControls}>
-            <TouchableOpacity style={styles.topButton} onPress={toggleFlash}>
-              <Ionicons name={getFlashIcon()} size={28} color="#fff" />
+          {selectedFilter === 'beauty' && (
+            <TouchableOpacity 
+              style={styles.topButton} 
+              onPress={() => setShowSettings(!showSettings)}
+            >
+              <Ionicons name="options" size={28} color="#fff" />
             </TouchableOpacity>
-            
-            {selectedFilter === 'beauty' && (
-              <TouchableOpacity 
-                style={styles.topButton} 
-                onPress={() => setShowSettings(!showSettings)}
-              >
-                <Ionicons name="options" size={28} color="#fff" />
-              </TouchableOpacity>
-            )}
-          </View>
+          )}
         </View>
+      </View>
 
+      {showSettings && (
         <Animated.View 
           style={[
             styles.settingsPanel,
@@ -325,74 +327,74 @@ const CameraScreen = () => {
             <Text style={styles.settingValue}>{Math.round(beautySettings.slimFace)}</Text>
           </View>
         </Animated.View>
+      )}
 
-        {showFilters && (
-          <View style={styles.filtersContainer}>
-            <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.filtersScroll}
-            >
-              {FILTERS.map(filter => (
-                <TouchableOpacity
-                  key={filter.id}
-                  style={[
-                    styles.filterButton,
-                    selectedFilter === filter.id && styles.filterButtonActive
-                  ]}
-                  onPress={() => setSelectedFilter(filter.id)}
-                >
-                  <View style={[
-                    styles.filterIconContainer,
-                    selectedFilter === filter.id && styles.filterIconContainerActive
-                  ]}>
-                    <Ionicons 
-                      name={filter.icon} 
-                      size={24} 
-                      color={selectedFilter === filter.id ? '#fff' : '#fff'} 
-                    />
-                  </View>
-                  <Text style={[
-                    styles.filterText,
-                    selectedFilter === filter.id && styles.filterTextActive
-                  ]}>
-                    {filter.name}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        )}
-
-        <View style={styles.bottomControls}>
-          <TouchableOpacity 
-            style={styles.galleryButton}
-            onPress={() => setShowFilters(!showFilters)}
+      {showFilters && (
+        <View style={styles.filtersContainer}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filtersScroll}
           >
-            <Ionicons name={showFilters ? "funnel" : "funnel-outline"} size={28} color="#fff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.captureButton, isRecording && styles.captureButtonRecording]}
-            onPress={takePicture}
-            onLongPress={startRecording}
-            onPressOut={stopRecording}
-          >
-            <View style={[styles.captureInner, isRecording && styles.captureInnerRecording]} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.flipButton} onPress={toggleCameraFacing}>
-            <Ionicons name="camera-reverse" size={32} color="#fff" />
-          </TouchableOpacity>
+            {FILTERS.map(filter => (
+              <TouchableOpacity
+                key={filter.id}
+                style={[
+                  styles.filterButton,
+                  selectedFilter === filter.id && styles.filterButtonActive
+                ]}
+                onPress={() => setSelectedFilter(filter.id)}
+              >
+                <View style={[
+                  styles.filterIconContainer,
+                  selectedFilter === filter.id && styles.filterIconContainerActive
+                ]}>
+                  <Ionicons 
+                    name={filter.icon} 
+                    size={24} 
+                    color={selectedFilter === filter.id ? '#fff' : '#fff'} 
+                  />
+                </View>
+                <Text style={[
+                  styles.filterText,
+                  selectedFilter === filter.id && styles.filterTextActive
+                ]}>
+                  {filter.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
+      )}
 
-        {isRecording && (
-          <View style={styles.recordingIndicator}>
-            <View style={styles.recordingDot} />
-            <Text style={styles.recordingText}>Đang quay...</Text>
-          </View>
-        )}
-      </CameraView>
+      <View style={styles.bottomControls}>
+        <TouchableOpacity 
+          style={styles.galleryButton}
+          onPress={() => setShowFilters(!showFilters)}
+        >
+          <Ionicons name={showFilters ? "funnel" : "funnel-outline"} size={28} color="#fff" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.captureButton, isRecording && styles.captureButtonRecording]}
+          onPress={takePicture}
+          onLongPress={startRecording}
+          onPressOut={stopRecording}
+        >
+          <View style={[styles.captureInner, isRecording && styles.captureInnerRecording]} />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.flipButton} onPress={toggleCameraFacing}>
+          <Ionicons name="camera-reverse" size={32} color="#fff" />
+        </TouchableOpacity>
+      </View>
+
+      {isRecording && (
+        <View style={styles.recordingIndicator}>
+          <View style={styles.recordingDot} />
+          <Text style={styles.recordingText}>Đang quay...</Text>
+        </View>
+      )}
     </View>
   );
 };
