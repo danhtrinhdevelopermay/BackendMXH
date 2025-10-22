@@ -2,31 +2,32 @@ import React, { useState, useRef } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Image, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import Slider from '@react-native-community/slider';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { Video } from 'expo-av';
 
 const { width, height } = Dimensions.get('window');
 
-const FILTERS = [
-  { id: 'none', name: 'Gốc', icon: 'close-circle' },
-  { id: 'bright', name: 'Sáng', brightness: 0.3, contrast: 0.1 },
-  { id: 'vivid', name: 'Rực rỡ', saturation: 0.4, contrast: 0.2 },
-  { id: 'cool', name: 'Mát', saturation: -0.2, brightness: 0.1 },
-  { id: 'warm', name: 'Ấm', saturation: 0.2, brightness: 0.15 },
-  { id: 'vintage', name: 'Cổ điển', sepia: 0.5, contrast: -0.1 },
-  { id: 'bw', name: 'Đen trắng', saturation: -1, contrast: 0.15 },
-  { id: 'fade', name: 'Mờ', contrast: -0.25, brightness: 0.1 },
-  { id: 'dramatic', name: 'Kịch tính', contrast: 0.5, saturation: 0.2 },
+const CROP_PRESETS = [
+  { id: 'original', name: 'Gốc', ratio: null },
+  { id: 'square', name: 'Vuông', ratio: 1 },
+  { id: '4:3', name: '4:3', ratio: 4/3 },
+  { id: '16:9', name: '16:9', ratio: 16/9 },
+  { id: '9:16', name: '9:16', ratio: 9/16 },
+  { id: '3:4', name: '3:4', ratio: 3/4 },
 ];
 
 const EDIT_TOOLS = [
-  { id: 'filters', name: 'Bộ lọc', icon: 'color-palette' },
-  { id: 'adjust', name: 'Điều chỉnh', icon: 'options' },
-  { id: 'crop', name: 'Cắt', icon: 'crop' },
   { id: 'rotate', name: 'Xoay', icon: 'refresh' },
-  { id: 'text', name: 'Chữ', icon: 'text' },
-  { id: 'draw', name: 'Vẽ', icon: 'brush' },
+  { id: 'flip', name: 'Lật', icon: 'swap-horizontal' },
+  { id: 'crop', name: 'Cắt', icon: 'crop' },
+  { id: 'resize', name: 'Kích thước', icon: 'resize' },
+];
+
+const RESIZE_OPTIONS = [
+  { id: 'hd', name: 'HD', width: 1280 },
+  { id: 'full', name: 'Full HD', width: 1920 },
+  { id: '4k', name: '4K', width: 3840 },
+  { id: 'original', name: 'Gốc', width: null },
 ];
 
 const ImageEditorScreen = () => {
@@ -34,95 +35,19 @@ const ImageEditorScreen = () => {
   const route = useRoute();
   const { imageUri, mediaType = 'image' } = route.params;
 
-  const [selectedTool, setSelectedTool] = useState('filters');
-  const [selectedFilter, setSelectedFilter] = useState('none');
+  const [selectedTool, setSelectedTool] = useState('rotate');
   const [editedImageUri, setEditedImageUri] = useState(imageUri);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [imageSize, setImageSize] = useState(null);
   
-  const [adjustments, setAdjustments] = useState({
-    brightness: 0,
-    contrast: 0,
-    saturation: 0,
-    sharpen: 0,
-  });
-
   const [rotation, setRotation] = useState(0);
+  const [flipped, setFlipped] = useState({ horizontal: false, vertical: false });
 
-  const applyFilter = async (filterId) => {
-    if (filterId === 'none') {
-      setEditedImageUri(imageUri);
-      setSelectedFilter('none');
-      return;
-    }
-
-    setIsProcessing(true);
-    const filter = FILTERS.find(f => f.id === filterId);
-    
-    try {
-      const actions = [];
-      
-      if (filter.brightness !== undefined) {
-        actions.push({ brightness: filter.brightness });
-      }
-      if (filter.contrast !== undefined) {
-        actions.push({ contrast: filter.contrast });
-      }
-      if (filter.saturation !== undefined) {
-        actions.push({ saturation: filter.saturation });
-      }
-      if (filter.sepia !== undefined) {
-        actions.push({ sepia: filter.sepia });
-      }
-
-      const result = await ImageManipulator.manipulateAsync(
-        imageUri,
-        actions,
-        { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG }
-      );
-
-      setEditedImageUri(result.uri);
-      setSelectedFilter(filterId);
-    } catch (error) {
-      console.error('Error applying filter:', error);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const applyAdjustments = async () => {
-    setIsProcessing(true);
-    
-    try {
-      const actions = [];
-      
-      if (adjustments.brightness !== 0) {
-        actions.push({ brightness: adjustments.brightness });
-      }
-      if (adjustments.contrast !== 0) {
-        actions.push({ contrast: adjustments.contrast });
-      }
-      if (adjustments.saturation !== 0) {
-        actions.push({ saturation: adjustments.saturation });
-      }
-
-      if (actions.length === 0) {
-        setIsProcessing(false);
-        return;
-      }
-
-      const result = await ImageManipulator.manipulateAsync(
-        editedImageUri || imageUri,
-        actions,
-        { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG }
-      );
-
-      setEditedImageUri(result.uri);
-    } catch (error) {
-      console.error('Error applying adjustments:', error);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  React.useEffect(() => {
+    Image.getSize(imageUri, (w, h) => {
+      setImageSize({ width: w, height: h });
+    });
+  }, [imageUri]);
 
   const applyRotation = async (degrees) => {
     setIsProcessing(true);
@@ -143,19 +68,99 @@ const ImageEditorScreen = () => {
     }
   };
 
-  const applyCrop = async (cropData) => {
+  const applyFlip = async (direction) => {
+    setIsProcessing(true);
+    
+    try {
+      const flipAction = direction === 'horizontal' 
+        ? { flip: ImageManipulator.FlipType.Horizontal }
+        : { flip: ImageManipulator.FlipType.Vertical };
+
+      const result = await ImageManipulator.manipulateAsync(
+        editedImageUri || imageUri,
+        [flipAction],
+        { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG }
+      );
+
+      setEditedImageUri(result.uri);
+      setFlipped(prev => ({
+        ...prev,
+        [direction]: !prev[direction]
+      }));
+    } catch (error) {
+      console.error('Error flipping image:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const applyCrop = async (preset) => {
+    if (!imageSize || preset.ratio === null) return;
+    
+    setIsProcessing(true);
+    
+    try {
+      const { width: imgWidth, height: imgHeight } = imageSize;
+      let cropWidth, cropHeight, originX, originY;
+
+      if (preset.ratio) {
+        const currentRatio = imgWidth / imgHeight;
+        
+        if (currentRatio > preset.ratio) {
+          cropHeight = imgHeight;
+          cropWidth = cropHeight * preset.ratio;
+          originX = (imgWidth - cropWidth) / 2;
+          originY = 0;
+        } else {
+          cropWidth = imgWidth;
+          cropHeight = cropWidth / preset.ratio;
+          originX = 0;
+          originY = (imgHeight - cropHeight) / 2;
+        }
+
+        const result = await ImageManipulator.manipulateAsync(
+          editedImageUri || imageUri,
+          [{
+            crop: {
+              originX: Math.max(0, originX),
+              originY: Math.max(0, originY),
+              width: Math.min(cropWidth, imgWidth),
+              height: Math.min(cropHeight, imgHeight),
+            }
+          }],
+          { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG }
+        );
+
+        setEditedImageUri(result.uri);
+        Image.getSize(result.uri, (w, h) => {
+          setImageSize({ width: w, height: h });
+        });
+      }
+    } catch (error) {
+      console.error('Error cropping image:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const applyResize = async (option) => {
+    if (!option.width) return;
+    
     setIsProcessing(true);
     
     try {
       const result = await ImageManipulator.manipulateAsync(
         editedImageUri || imageUri,
-        [{ crop: cropData }],
+        [{ resize: { width: option.width } }],
         { compress: 0.9, format: ImageManipulator.SaveFormat.JPEG }
       );
 
       setEditedImageUri(result.uri);
+      Image.getSize(result.uri, (w, h) => {
+        setImageSize({ width: w, height: h });
+      });
     } catch (error) {
-      console.error('Error cropping image:', error);
+      console.error('Error resizing image:', error);
     } finally {
       setIsProcessing(false);
     }
@@ -175,159 +180,106 @@ const ImageEditorScreen = () => {
 
   const resetEdits = () => {
     setEditedImageUri(imageUri);
-    setSelectedFilter('none');
-    setAdjustments({
-      brightness: 0,
-      contrast: 0,
-      saturation: 0,
-      sharpen: 0,
-    });
     setRotation(0);
+    setFlipped({ horizontal: false, vertical: false });
+    Image.getSize(imageUri, (w, h) => {
+      setImageSize({ width: w, height: h });
+    });
   };
 
   const renderToolPanel = () => {
     switch (selectedTool) {
-      case 'filters':
-        return (
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.filtersScroll}
-          >
-            {FILTERS.map(filter => (
-              <TouchableOpacity
-                key={filter.id}
-                style={styles.filterButton}
-                onPress={() => applyFilter(filter.id)}
-              >
-                <View style={[
-                  styles.filterPreview,
-                  selectedFilter === filter.id && styles.filterPreviewActive
-                ]}>
-                  <Image 
-                    source={{ uri: imageUri }} 
-                    style={styles.filterPreviewImage}
-                  />
-                </View>
-                <Text style={[
-                  styles.filterName,
-                  selectedFilter === filter.id && styles.filterNameActive
-                ]}>
-                  {filter.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        );
-
-      case 'adjust':
-        return (
-          <ScrollView style={styles.adjustPanel}>
-            <View style={styles.adjustItem}>
-              <View style={styles.adjustHeader}>
-                <Ionicons name="sunny" size={20} color="#1D9BF0" />
-                <Text style={styles.adjustLabel}>Độ sáng</Text>
-                <Text style={styles.adjustValue}>{Math.round(adjustments.brightness * 100)}</Text>
-              </View>
-              <Slider
-                style={styles.slider}
-                minimumValue={-1}
-                maximumValue={1}
-                value={adjustments.brightness}
-                onValueChange={(value) => 
-                  setAdjustments(prev => ({ ...prev, brightness: value }))
-                }
-                onSlidingComplete={applyAdjustments}
-                minimumTrackTintColor="#1D9BF0"
-                maximumTrackTintColor="#CFD9DE"
-              />
-            </View>
-
-            <View style={styles.adjustItem}>
-              <View style={styles.adjustHeader}>
-                <MaterialCommunityIcons name="contrast-box" size={20} color="#1D9BF0" />
-                <Text style={styles.adjustLabel}>Độ tương phản</Text>
-                <Text style={styles.adjustValue}>{Math.round(adjustments.contrast * 100)}</Text>
-              </View>
-              <Slider
-                style={styles.slider}
-                minimumValue={-1}
-                maximumValue={1}
-                value={adjustments.contrast}
-                onValueChange={(value) => 
-                  setAdjustments(prev => ({ ...prev, contrast: value }))
-                }
-                onSlidingComplete={applyAdjustments}
-                minimumTrackTintColor="#1D9BF0"
-                maximumTrackTintColor="#CFD9DE"
-              />
-            </View>
-
-            <View style={styles.adjustItem}>
-              <View style={styles.adjustHeader}>
-                <MaterialCommunityIcons name="invert-colors" size={20} color="#1D9BF0" />
-                <Text style={styles.adjustLabel}>Độ bão hòa</Text>
-                <Text style={styles.adjustValue}>{Math.round(adjustments.saturation * 100)}</Text>
-              </View>
-              <Slider
-                style={styles.slider}
-                minimumValue={-1}
-                maximumValue={1}
-                value={adjustments.saturation}
-                onValueChange={(value) => 
-                  setAdjustments(prev => ({ ...prev, saturation: value }))
-                }
-                onSlidingComplete={applyAdjustments}
-                minimumTrackTintColor="#1D9BF0"
-                maximumTrackTintColor="#CFD9DE"
-              />
-            </View>
-          </ScrollView>
-        );
-
       case 'rotate':
         return (
-          <View style={styles.rotatePanel}>
+          <View style={styles.actionPanel}>
             <TouchableOpacity 
-              style={styles.rotateButton}
+              style={styles.actionButton}
               onPress={() => applyRotation(-90)}
             >
               <Ionicons name="arrow-back" size={24} color="#fff" />
-              <Text style={styles.rotateText}>Xoay trái</Text>
+              <Text style={styles.actionText}>Xoay trái 90°</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
-              style={styles.rotateButton}
+              style={styles.actionButton}
               onPress={() => applyRotation(90)}
             >
               <Ionicons name="arrow-forward" size={24} color="#fff" />
-              <Text style={styles.rotateText}>Xoay phải</Text>
+              <Text style={styles.actionText}>Xoay phải 90°</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
-              style={styles.rotateButton}
+              style={styles.actionButton}
               onPress={() => applyRotation(180)}
             >
               <Ionicons name="refresh" size={24} color="#fff" />
-              <Text style={styles.rotateText}>Lật ngược</Text>
+              <Text style={styles.actionText}>Lật ngược 180°</Text>
+            </TouchableOpacity>
+          </View>
+        );
+
+      case 'flip':
+        return (
+          <View style={styles.actionPanel}>
+            <TouchableOpacity 
+              style={[styles.actionButton, flipped.horizontal && styles.actionButtonActive]}
+              onPress={() => applyFlip('horizontal')}
+            >
+              <Ionicons name="swap-horizontal" size={24} color="#fff" />
+              <Text style={styles.actionText}>Lật ngang</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.actionButton, flipped.vertical && styles.actionButtonActive]}
+              onPress={() => applyFlip('vertical')}
+            >
+              <Ionicons name="swap-vertical" size={24} color="#fff" />
+              <Text style={styles.actionText}>Lật dọc</Text>
             </TouchableOpacity>
           </View>
         );
 
       case 'crop':
         return (
-          <View style={styles.cropPanel}>
-            <Text style={styles.comingSoonText}>Đang phát triển</Text>
-            <Text style={styles.comingSoonSubtext}>Tính năng cắt ảnh sẽ có sớm</Text>
-          </View>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.presetsScroll}
+          >
+            {CROP_PRESETS.map(preset => (
+              <TouchableOpacity
+                key={preset.id}
+                style={styles.presetButton}
+                onPress={() => applyCrop(preset)}
+              >
+                <View style={[
+                  styles.presetBox,
+                  preset.ratio && { aspectRatio: preset.ratio }
+                ]}>
+                  <Ionicons name="crop" size={20} color="#1D9BF0" />
+                </View>
+                <Text style={styles.presetName}>{preset.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         );
 
-      case 'text':
-      case 'draw':
+      case 'resize':
         return (
-          <View style={styles.cropPanel}>
-            <Text style={styles.comingSoonText}>Đang phát triển</Text>
-            <Text style={styles.comingSoonSubtext}>Tính năng này sẽ có sớm</Text>
+          <View style={styles.actionPanel}>
+            {RESIZE_OPTIONS.map(option => (
+              <TouchableOpacity
+                key={option.id}
+                style={styles.actionButton}
+                onPress={() => applyResize(option)}
+              >
+                <MaterialCommunityIcons name="resize" size={24} color="#fff" />
+                <Text style={styles.actionText}>{option.name}</Text>
+                {option.width && (
+                  <Text style={styles.actionSubtext}>{option.width}px</Text>
+                )}
+              </TouchableOpacity>
+            ))}
           </View>
         );
 
@@ -342,7 +294,7 @@ const ImageEditorScreen = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="close" size={28} color="#0F1419" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Chỉnh sửa ảnh</Text>
+        <Text style={styles.headerTitle}>Chỉnh sửa {mediaType === 'video' ? 'video' : 'ảnh'}</Text>
         <TouchableOpacity onPress={resetEdits}>
           <Text style={styles.resetText}>Đặt lại</Text>
         </TouchableOpacity>
@@ -370,6 +322,14 @@ const ImageEditorScreen = () => {
             style={styles.previewImage}
             resizeMode="contain"
           />
+        )}
+        
+        {imageSize && (
+          <View style={styles.imageSizeInfo}>
+            <Text style={styles.imageSizeText}>
+              {Math.round(imageSize.width)} × {Math.round(imageSize.height)}
+            </Text>
+          </View>
         )}
       </View>
 
@@ -498,6 +458,20 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 12,
   },
+  imageSizeInfo: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  imageSizeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
   toolsContainer: {
     backgroundColor: '#fff',
     borderTopWidth: 1,
@@ -534,106 +508,76 @@ const styles = StyleSheet.create({
   },
   toolPanel: {
     backgroundColor: '#fff',
-    height: 200,
+    minHeight: 150,
     borderTopWidth: 1,
     borderTopColor: '#E4E6EB',
-  },
-  filtersScroll: {
-    paddingHorizontal: 16,
     paddingVertical: 16,
-    gap: 16,
   },
-  filterButton: {
-    alignItems: 'center',
-  },
-  filterPreview: {
-    width: 70,
-    height: 70,
-    borderRadius: 12,
-    overflow: 'hidden',
-    borderWidth: 3,
-    borderColor: 'transparent',
-    marginBottom: 6,
-  },
-  filterPreviewActive: {
-    borderColor: '#1D9BF0',
-  },
-  filterPreviewImage: {
-    width: '100%',
-    height: '100%',
-  },
-  filterName: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#536471',
-  },
-  filterNameActive: {
-    color: '#1D9BF0',
-    fontWeight: '700',
-  },
-  adjustPanel: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-  },
-  adjustItem: {
-    marginBottom: 20,
-  },
-  adjustHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-    gap: 8,
-  },
-  adjustLabel: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#0F1419',
-  },
-  adjustValue: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#1D9BF0',
-  },
-  slider: {
-    width: '100%',
-    height: 40,
-  },
-  rotatePanel: {
-    flex: 1,
+  actionPanel: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
     paddingHorizontal: 20,
+    flexWrap: 'wrap',
+    gap: 12,
   },
-  rotateButton: {
+  actionButton: {
     alignItems: 'center',
     backgroundColor: '#1D9BF0',
-    paddingVertical: 12,
+    paddingVertical: 16,
     paddingHorizontal: 20,
-    borderRadius: 12,
+    borderRadius: 16,
+    minWidth: 100,
     gap: 6,
   },
-  rotateText: {
+  actionButtonActive: {
+    backgroundColor: '#7856FF',
+  },
+  actionText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
   },
-  cropPanel: {
-    flex: 1,
+  actionSubtext: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  presetsScroll: {
+    paddingHorizontal: 20,
+    gap: 16,
+  },
+  presetButton: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  presetBox: {
+    width: 70,
+    height: 70,
+    backgroundColor: '#F7F9FA',
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#E4E6EB',
   },
-  comingSoonText: {
+  presetName: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#0F1419',
+  },
+  videoInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+    gap: 12,
+    backgroundColor: '#F7F9FA',
+  },
+  videoInfoText: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#536471',
-    marginBottom: 8,
-  },
-  comingSoonSubtext: {
-    fontSize: 14,
-    color: '#8899A6',
+    fontWeight: '600',
+    color: '#0F1419',
   },
   actionButtons: {
     flexDirection: 'row',
@@ -672,19 +616,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
-  },
-  videoInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-    gap: 12,
-    backgroundColor: '#F7F9FA',
-  },
-  videoInfoText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#0F1419',
   },
 });
 
