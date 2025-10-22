@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { TouchableOpacity, Animated, Easing } from 'react-native';
+import { TouchableOpacity, Animated, Easing, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, CardStyleInterpolators, TransitionPresets } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -33,6 +33,7 @@ import ViewStoryScreen from '../screens/ViewStoryScreen';
 import CreateThoughtScreen from '../screens/CreateThoughtScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import CameraScreen from '../screens/CameraScreen';
+import NotificationBell from '../components/NotificationBell';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -270,21 +271,29 @@ const HomeTabs = () => {
           headerShown: true,
           title: 'Trang chủ',
           headerRight: () => (
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Search')}
-              style={{ marginRight: 16 }}
-            >
-              <Ionicons name="search" size={24} color="#050505" />
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 8 }}>
+              <NotificationBell navigation={navigation} />
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Search')}
+                style={{ marginRight: 16 }}
+              >
+                <Ionicons name="search" size={24} color="#050505" />
+              </TouchableOpacity>
+            </View>
           ),
         })}
       />
       <Tab.Screen 
         name="Bạn bè" 
         component={AnimatedFriends}
-        options={{
+        options={({ navigation }) => ({
           headerShown: true,
-        }}
+          headerRight: () => (
+            <View style={{ marginRight: 16 }}>
+              <NotificationBell navigation={navigation} />
+            </View>
+          ),
+        })}
       />
       <Tab.Screen 
         name="Tin nhắn" 
@@ -303,9 +312,14 @@ const HomeTabs = () => {
       <Tab.Screen 
         name="Hồ sơ" 
         component={AnimatedProfile}
-        options={{
+        options={({ navigation }) => ({
           headerShown: true,
-        }}
+          headerRight: () => (
+            <View style={{ marginRight: 16 }}>
+              <NotificationBell navigation={navigation} />
+            </View>
+          ),
+        })}
       />
     </Tab.Navigator>
   );
