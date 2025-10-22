@@ -54,6 +54,12 @@ const CameraScreen = () => {
     }
   }, [showSettings]);
 
+  useEffect(() => {
+    if (selectedFilter !== 'beauty' && showSettings) {
+      setShowSettings(false);
+    }
+  }, [selectedFilter]);
+
   if (!permission) {
     return <View style={styles.container} />;
   }
