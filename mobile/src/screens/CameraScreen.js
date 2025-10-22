@@ -164,10 +164,9 @@ const CameraScreen = () => {
           skipProcessing: false,
         });
         
-        const filteredUri = await applyFilter(photo.uri);
-        
-        navigation.navigate('CreatePost', { 
-          capturedMedia: { uri: filteredUri, type: 'image' }
+        navigation.navigate('ImageEditor', { 
+          imageUri: photo.uri,
+          mediaType: 'image'
         });
       } catch (error) {
         console.error('Error taking picture:', error);
@@ -183,8 +182,9 @@ const CameraScreen = () => {
           maxDuration: 60,
         });
         
-        navigation.navigate('CreatePost', { 
-          capturedMedia: { uri: video.uri, type: 'video' }
+        navigation.navigate('ImageEditor', { 
+          imageUri: video.uri,
+          mediaType: 'video'
         });
       } catch (error) {
         console.error('Error recording video:', error);

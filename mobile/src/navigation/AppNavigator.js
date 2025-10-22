@@ -33,6 +33,7 @@ import ViewStoryScreen from '../screens/ViewStoryScreen';
 import CreateThoughtScreen from '../screens/CreateThoughtScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import CameraScreen from '../screens/CameraScreen';
+import ImageEditorScreen from '../screens/ImageEditorScreen';
 import NotificationBell from '../components/NotificationBell';
 
 const Stack = createStackNavigator();
@@ -528,6 +529,14 @@ const NavigationWrapper = () => {
                 headerShown: false,
                 ...fadeTransition,
                 presentation: 'fullScreenModal',
+              }} 
+            />
+            <Stack.Screen 
+              name="ImageEditor" 
+              component={ImageEditorScreen} 
+              options={{ 
+                headerShown: false,
+                ...slideFromRightTransition,
               }} 
             />
           </>

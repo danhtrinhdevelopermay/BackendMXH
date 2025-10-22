@@ -4,6 +4,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Slider from '@react-native-community/slider';
 import * as ImageManipulator from 'expo-image-manipulator';
+import { Video } from 'expo-av';
 
 const { width, height } = Dimensions.get('window');
 
@@ -354,52 +355,74 @@ const ImageEditorScreen = () => {
             <Text style={styles.processingText}>Đang xử lý...</Text>
           </View>
         )}
-        <Image 
-          source={{ uri: editedImageUri }} 
-          style={styles.previewImage}
-          resizeMode="contain"
-        />
+        {mediaType === 'video' ? (
+          <Video
+            source={{ uri: editedImageUri }}
+            style={styles.previewImage}
+            resizeMode="contain"
+            shouldPlay
+            isLooping
+            isMuted
+          />
+        ) : (
+          <Image 
+            source={{ uri: editedImageUri }} 
+            style={styles.previewImage}
+            resizeMode="contain"
+          />
+        )}
       </View>
 
-      <View style={styles.toolsContainer}>
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.toolsScroll}
-        >
-          {EDIT_TOOLS.map(tool => (
-            <TouchableOpacity
-              key={tool.id}
-              style={[
-                styles.toolButton,
-                selectedTool === tool.id && styles.toolButtonActive
-              ]}
-              onPress={() => setSelectedTool(tool.id)}
+      {mediaType === 'image' && (
+        <>
+          <View style={styles.toolsContainer}>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.toolsScroll}
             >
-              <View style={[
-                styles.toolIconContainer,
-                selectedTool === tool.id && styles.toolIconContainerActive
-              ]}>
-                <Ionicons 
-                  name={tool.icon} 
-                  size={24} 
-                  color={selectedTool === tool.id ? '#fff' : '#0F1419'} 
-                />
-              </View>
-              <Text style={[
-                styles.toolName,
-                selectedTool === tool.id && styles.toolNameActive
-              ]}>
-                {tool.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
+              {EDIT_TOOLS.map(tool => (
+                <TouchableOpacity
+                  key={tool.id}
+                  style={[
+                    styles.toolButton,
+                    selectedTool === tool.id && styles.toolButtonActive
+                  ]}
+                  onPress={() => setSelectedTool(tool.id)}
+                >
+                  <View style={[
+                    styles.toolIconContainer,
+                    selectedTool === tool.id && styles.toolIconContainerActive
+                  ]}>
+                    <Ionicons 
+                      name={tool.icon} 
+                      size={24} 
+                      color={selectedTool === tool.id ? '#fff' : '#0F1419'} 
+                    />
+                  </View>
+                  <Text style={[
+                    styles.toolName,
+                    selectedTool === tool.id && styles.toolNameActive
+                  ]}>
+                    {tool.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
 
-      <View style={styles.toolPanel}>
-        {renderToolPanel()}
-      </View>
+          <View style={styles.toolPanel}>
+            {renderToolPanel()}
+          </View>
+        </>
+      )}
+      
+      {mediaType === 'video' && (
+        <View style={styles.videoInfo}>
+          <Ionicons name="videocam" size={24} color="#1D9BF0" />
+          <Text style={styles.videoInfoText}>Video đã sẵn sàng để đăng</Text>
+        </View>
+      )}
 
       <View style={styles.actionButtons}>
         <TouchableOpacity 
@@ -649,6 +672,19 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
+  },
+  videoInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+    gap: 12,
+    backgroundColor: '#F7F9FA',
+  },
+  videoInfoText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#0F1419',
   },
 });
 
