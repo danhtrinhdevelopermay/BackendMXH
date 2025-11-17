@@ -105,7 +105,7 @@ const ReactionsModal = ({ visible, onClose, postId }) => {
       transparent={true}
       onRequestClose={onClose}
     >
-      <BlurView intensity={90} tint="dark" style={styles.modalOverlay}>
+      <BlurView intensity={90} tint="dark" experimentalBlurMethod="dimezisBlurView" style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Reactions ({totalCount})</Text>

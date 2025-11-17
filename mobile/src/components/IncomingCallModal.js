@@ -40,7 +40,7 @@ const IncomingCallModal = ({ visible, caller, onAccept, onReject }) => {
       animationType="fade"
       statusBarTranslucent
     >
-      <BlurView intensity={100} tint="dark" style={styles.container}>
+      <BlurView intensity={100} tint="dark" experimentalBlurMethod="dimezisBlurView" style={styles.container}>
         <LinearGradient
           colors={['rgba(102, 126, 234, 0.7)', 'rgba(118, 75, 162, 0.7)']}
           style={styles.gradientOverlay}

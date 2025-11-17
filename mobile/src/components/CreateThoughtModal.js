@@ -41,7 +41,7 @@ const CreateThoughtModal = ({ visible, onDismiss, onSave, initialThought }) => {
         onDismiss={onDismiss}
         style={styles.modalWrapper}
       >
-        <BlurView intensity={80} tint="dark" style={styles.blurContainer}>
+        <BlurView intensity={80} tint="dark" experimentalBlurMethod="dimezisBlurView" style={styles.blurContainer}>
           <View style={styles.modalContainer}>
             <View style={styles.header}>
               <Text style={styles.title}>Chia sẻ suy nghĩ</Text>

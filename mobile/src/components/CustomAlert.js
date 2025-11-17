@@ -98,7 +98,8 @@ const CustomAlert = () => {
     >
       <AnimatedBlurView 
         intensity={animatedBlurIntensity}
-        tint="dark" 
+        tint="dark"
+        experimentalBlurMethod="dimezisBlurView"
         style={styles.overlay}
       >
         <Animated.View style={[styles.backdrop, { opacity: opacityAnim }]}>

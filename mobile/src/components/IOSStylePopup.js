@@ -115,7 +115,8 @@ const IOSStylePopup = ({
     >
       <AnimatedBlurView 
         intensity={animatedBlurIntensity}
-        tint="dark" 
+        tint="dark"
+        experimentalBlurMethod="dimezisBlurView"
         style={styles.overlay}
       >
         <TouchableWithoutFeedback onPress={handleBackdropPress}>
