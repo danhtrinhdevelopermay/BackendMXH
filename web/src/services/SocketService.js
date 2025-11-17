@@ -4,7 +4,7 @@ import Constants from 'expo-constants';
 class SocketService {
   constructor() {
     this.socket = null;
-    this.API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
+    this.API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000';
   }
 
   connect(userId) {

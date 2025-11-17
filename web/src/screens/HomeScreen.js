@@ -289,7 +289,7 @@ const HomeScreen = ({ navigation }) => {
         )}
         
         {item.media_type && item.media_url && (() => {
-          const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
+          const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000';
           const mediaUrl = item.media_url.startsWith('http') ? item.media_url : `${API_URL}${item.media_url}`;
           const isVideo = item.media_type?.startsWith('video/');
           const isVisible = visibleItems.includes(item.id);

@@ -4,7 +4,7 @@ import { Avatar } from 'react-native-paper';
 import Constants from 'expo-constants';
 
 const UserAvatar = React.memo(({ user, userId: userIdProp, size = 40, style }) => {
-  const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
+  const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000';
   const [imageError, setImageError] = useState(false);
   
   const userId = userIdProp || user?.user_id || user?.id;

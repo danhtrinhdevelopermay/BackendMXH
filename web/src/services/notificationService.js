@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
-const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
+const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000';
 
 export async function registerForPushNotificationsAsync() {
   if (Platform.OS === 'web') {

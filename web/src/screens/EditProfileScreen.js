@@ -16,7 +16,7 @@ const EditProfileScreen = ({ navigation }) => {
   const [avatarUri, setAvatarUri] = useState(null);
   const [coverUri, setCoverUri] = useState(null);
 
-  const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
+  const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000';
 
   const pickImage = async (type) => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();

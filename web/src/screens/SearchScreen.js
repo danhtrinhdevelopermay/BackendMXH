@@ -89,7 +89,7 @@ const SearchScreen = ({ navigation }) => {
   );
 
   const renderPost = ({ item }) => {
-    const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
+    const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000';
     const mediaUrl = item.media_url || (item.media_type ? `${API_URL}/api/media/${item.id}` : null);
 
     return (

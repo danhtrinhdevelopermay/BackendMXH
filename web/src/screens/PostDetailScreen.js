@@ -142,7 +142,7 @@ const PostDetailScreen = ({ route, navigation }) => {
     return null;
   }
 
-  const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
+  const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000';
   const mediaUrl = post.media_url || `${API_URL}/api/media/${post.id}`;
   const isVideo = post.media_type?.startsWith('video/');
 

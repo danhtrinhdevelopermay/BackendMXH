@@ -23,7 +23,7 @@ const ProfileScreen = ({ route, navigation }) => {
   const [friendshipStatus, setFriendshipStatus] = useState(null);
   const [stats, setStats] = useState({ posts_count: 0, friends_count: 0, photos_count: 0 });
   
-  const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
+  const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000';
 
   const fetchUserData = async () => {
     try {

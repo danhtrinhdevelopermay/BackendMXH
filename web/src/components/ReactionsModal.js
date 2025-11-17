@@ -13,7 +13,7 @@ const ReactionsModal = ({ visible, onClose, postId }) => {
   const [loading, setLoading] = useState(true);
   const [selectedType, setSelectedType] = useState('all');
 
-  const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
+  const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000';
 
   useEffect(() => {
     if (visible && postId) {
