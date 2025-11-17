@@ -25,7 +25,7 @@
       "backgroundColor": "#ffffff"
     },
     "extra": {
-      "apiUrl": "https://f65742ce-d097-4112-8e4c-07dc0bd7c027-00-1q17n01fxgjlk.pike.replit.dev:3000"
+      "apiUrl": "http://localhost:3000"
     }
   }
 }

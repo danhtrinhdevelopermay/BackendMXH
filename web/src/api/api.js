@@ -2,7 +2,14 @@ import axios from 'axios';
 import { getItem } from '../utils/storage';
 import Constants from 'expo-constants';
 
-const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000';
+const getApiUrl = () => {
+  if (typeof window !== 'undefined' && window.location) {
+    return window.location.origin;
+  }
+  return Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000';
+};
+
+const API_URL = getApiUrl();
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
