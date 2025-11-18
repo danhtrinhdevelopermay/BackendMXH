@@ -209,6 +209,17 @@
         {
           "mode": "development"
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true,
+            "extraMavenRepos": [
+              "https://maven.google.com"
+            ]
+          }
+        }
       ]
     ]
   }
