@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated, Dimensions } from 'react-native';
 import { Text } from 'react-native-paper';
+import { BlurView } from 'expo-blur';
 
 const { width, height } = Dimensions.get('window');
 
@@ -173,24 +174,44 @@ const ColoredBlob = ({ color, delay, size }) => {
 
 const AILoadingOverlay = ({ visible }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const blurIntensity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (visible) {
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(blurIntensity, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: false,
+        }),
+      ]).start();
     } else {
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(blurIntensity, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: false,
+        }),
+      ]).start();
     }
-  }, [visible, fadeAnim]);
+  }, [visible, fadeAnim, blurIntensity]);
 
   if (!visible) return null;
+
+  const animatedBlurIntensity = blurIntensity.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 95],
+  });
 
   const particles = Array.from({ length: 30 }, (_, i) => (
     <Particle key={`particle-${i}`} delay={i * 100} />
@@ -204,37 +225,51 @@ const AILoadingOverlay = ({ visible }) => {
     { color: 'rgba(168, 85, 247, 0.3)', size: 190, delay: 2000 },
   ];
 
-  return (
-    <Animated.View style={[styles.overlay, { opacity: fadeAnim }]} pointerEvents="auto">
-      <View style={styles.blobContainer}>
-        {blobs.map((blob, i) => (
-          <ColoredBlob
-            key={`blob-${i}`}
-            color={blob.color}
-            size={blob.size}
-            delay={blob.delay}
-          />
-        ))}
-      </View>
-      
-      <View style={styles.particleContainer}>
-        {particles}
-      </View>
+  const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 
-      <View style={styles.content}>
-        <Text style={styles.loadingText}>✨ AI đang xử lý...</Text>
-      </View>
-    </Animated.View>
+  return (
+    <AnimatedBlurView
+      intensity={animatedBlurIntensity}
+      tint="dark"
+      experimentalBlurMethod="dimezisBlurView"
+      style={styles.overlay}
+    >
+      <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]}>
+        <View style={styles.blobContainer}>
+          {blobs.map((blob, i) => (
+            <ColoredBlob
+              key={`blob-${i}`}
+              color={blob.color}
+              size={blob.size}
+              delay={blob.delay}
+            />
+          ))}
+        </View>
+        
+        <View style={styles.particleContainer}>
+          {particles}
+        </View>
+
+        <View style={styles.content}>
+          <Text style={styles.loadingText}>✨ AI đang xử lý...</Text>
+        </View>
+      </Animated.View>
+    </AnimatedBlurView>
   );
 };
 
 const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 9999,
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   blobContainer: {
     ...StyleSheet.absoluteFillObject,
