@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated, Dimensions } from 'react-native';
+import { Modal, View, StyleSheet, Animated, Dimensions } from 'react-native';
 import { Text } from 'react-native-paper';
 import { BlurView } from 'expo-blur';
 
@@ -228,33 +228,40 @@ const AILoadingOverlay = ({ visible }) => {
   const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 
   return (
-    <AnimatedBlurView
-      intensity={animatedBlurIntensity}
-      tint="dark"
-      experimentalBlurMethod="dimezisBlurView"
-      style={styles.overlay}
+    <Modal
+      transparent
+      visible={visible}
+      animationType="none"
+      statusBarTranslucent
     >
-      <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]}>
-        <View style={styles.blobContainer}>
-          {blobs.map((blob, i) => (
-            <ColoredBlob
-              key={`blob-${i}`}
-              color={blob.color}
-              size={blob.size}
-              delay={blob.delay}
-            />
-          ))}
-        </View>
-        
-        <View style={styles.particleContainer}>
-          {particles}
-        </View>
+      <AnimatedBlurView
+        intensity={animatedBlurIntensity}
+        tint="dark"
+        experimentalBlurMethod="dimezisBlurView"
+        style={styles.overlay}
+      >
+        <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]}>
+          <View style={styles.blobContainer}>
+            {blobs.map((blob, i) => (
+              <ColoredBlob
+                key={`blob-${i}`}
+                color={blob.color}
+                size={blob.size}
+                delay={blob.delay}
+              />
+            ))}
+          </View>
+          
+          <View style={styles.particleContainer}>
+            {particles}
+          </View>
 
-        <View style={styles.content}>
-          <Text style={styles.loadingText}>✨ AI đang xử lý...</Text>
-        </View>
-      </Animated.View>
-    </AnimatedBlurView>
+          <View style={styles.content}>
+            <Text style={styles.loadingText}>✨ AI đang xử lý...</Text>
+          </View>
+        </Animated.View>
+      </AnimatedBlurView>
+    </Modal>
   );
 };
 
