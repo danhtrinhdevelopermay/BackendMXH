@@ -2,6 +2,36 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/database');
 const { authenticateToken } = require('../middleware/auth');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+const apkStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, '../../uploads/apk');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const timestamp = Date.now();
+    const versionName = req.body.version_name || 'v1.0.0';
+    cb(null, `shatter-${versionName}-${timestamp}.apk`);
+  }
+});
+
+const uploadApk = multer({
+  storage: apkStorage,
+  limits: { fileSize: 200 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (path.extname(file.originalname).toLowerCase() === '.apk') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only APK files are allowed'));
+    }
+  }
+});
 
 router.get('/latest', async (req, res) => {
   try {
@@ -81,18 +111,21 @@ router.get('/check/:currentVersionCode', async (req, res) => {
   }
 });
 
-router.post('/upload', async (req, res) => {
+router.post('/upload', uploadApk.single('apk'), async (req, res) => {
   try {
-    const { version_name, version_code, apk_url, file_size, release_notes, is_force_update } = req.body;
+    const { version_name, version_code, file_size, release_notes, is_force_update } = req.body;
     
-    if (!apk_url) {
+    if (!req.file) {
       return res.status(400).json({
         success: false,
-        error: 'APK download link is required'
+        error: 'APK file is required'
       });
     }
 
     if (!version_name || !version_code) {
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
+      }
       return res.status(400).json({
         success: false,
         error: 'Version name and code are required'
@@ -105,31 +138,38 @@ router.post('/upload', async (req, res) => {
     );
 
     if (existingVersion.rows.length > 0) {
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
+      }
       return res.status(400).json({
         success: false,
         error: 'Version already exists'
       });
     }
 
-    console.log(`✅ APK URL registered: ${apk_url}`);
+    const apkUrl = `/api/app-versions/download/${req.file.filename}`;
+    console.log(`✅ APK uploaded: ${req.file.filename}`);
 
     const result = await pool.query(
       `INSERT INTO app_versions (version_name, version_code, apk_url, file_size, release_notes, is_force_update, uploaded_by)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
-      [version_name, parseInt(version_code), apk_url, file_size ? parseInt(file_size) : null, release_notes, is_force_update === 'true' || is_force_update === true, null]
+      [version_name, parseInt(version_code), apkUrl, file_size ? parseInt(file_size) : null, release_notes, is_force_update === 'true' || is_force_update === true, null]
     );
 
     res.json({
       success: true,
-      message: 'APK link registered successfully',
+      message: 'APK uploaded successfully',
       version: result.rows[0]
     });
   } catch (error) {
-    console.error('Error registering APK:', error);
+    console.error('Error uploading APK:', error);
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
     res.status(500).json({
       success: false,
-      error: 'Failed to register APK: ' + error.message
+      error: 'Failed to upload APK: ' + error.message
     });
   }
 });
@@ -156,12 +196,36 @@ router.get('/list', async (req, res) => {
   }
 });
 
+router.get('/download/:filename', (req, res) => {
+  try {
+    const filename = req.params.filename;
+    const filePath = path.join(__dirname, '../../uploads/apk', filename);
+    
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({
+        success: false,
+        error: 'File not found'
+      });
+    }
+
+    res.setHeader('Content-Type', 'application/vnd.android.package-archive');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.download(filePath);
+  } catch (error) {
+    console.error('Error downloading APK:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to download APK'
+    });
+  }
+});
+
 router.delete('/:id', async (req, res) => {
   try {
     const versionId = req.params.id;
     
     const result = await pool.query(
-      'SELECT id FROM app_versions WHERE id = $1',
+      'SELECT apk_url FROM app_versions WHERE id = $1',
       [versionId]
     );
 
@@ -170,6 +234,15 @@ router.delete('/:id', async (req, res) => {
         success: false,
         error: 'Version not found'
       });
+    }
+
+    const apkUrl = result.rows[0].apk_url;
+    if (apkUrl && apkUrl.startsWith('/api/app-versions/download/')) {
+      const filename = apkUrl.split('/').pop();
+      const filePath = path.join(__dirname, '../../uploads/apk', filename);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
     }
     
     await pool.query('DELETE FROM app_versions WHERE id = $1', [versionId]);
