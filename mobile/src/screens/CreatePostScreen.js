@@ -10,6 +10,7 @@ import { useAlert } from '../context/AlertContext';
 import { Ionicons } from '@expo/vector-icons';
 import UserAvatar from '../components/UserAvatar';
 import VerifiedBadge from '../components/VerifiedBadge';
+import AILoadingOverlay from '../components/AILoadingOverlay';
 
 const CreatePostScreen = ({ navigation }) => {
   const { user } = useContext(AuthContext);
@@ -124,6 +125,7 @@ const CreatePostScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <AILoadingOverlay visible={aiLoading} />
       <View style={styles.header}>
         <View style={styles.userInfo}>
           <UserAvatar 
