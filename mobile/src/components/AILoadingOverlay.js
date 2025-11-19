@@ -89,8 +89,10 @@ const Particle = ({ delay }) => {
 };
 
 const ColoredBlob = ({ color, delay, size }) => {
-  const translateX = useRef(new Animated.Value(Math.random() * width - size / 2)).current;
-  const translateY = useRef(new Animated.Value(Math.random() * height - size / 2)).current;
+  const translateXValue = Math.random() * width - size / 2;
+  const translateYValue = Math.random() * height - size / 2;
+  const translateX = useRef(new Animated.Value(translateXValue)).current;
+  const translateY = useRef(new Animated.Value(translateYValue)).current;
   const scale = useRef(new Animated.Value(0.8)).current;
   const rotate = useRef(new Animated.Value(0)).current;
 
@@ -158,17 +160,26 @@ const ColoredBlob = ({ color, delay, size }) => {
   });
 
   return (
-    <Animated.View
-      style={[
-        styles.blob,
-        {
-          width: size,
-          height: size,
-          backgroundColor: color,
-          transform: [{ translateX }, { translateY }, { scale }, { rotate: rotation }],
-        },
-      ]}
-    />
+    <View
+      style={{
+        position: 'absolute',
+        transform: [{ translateX }, { translateY }],
+      }}
+    >
+      <BlurView intensity={50} tint="light" style={{ borderRadius: 9999, overflow: 'hidden' }}>
+        <Animated.View
+          style={[
+            styles.blob,
+            {
+              width: size,
+              height: size,
+              backgroundColor: color,
+              transform: [{ scale }, { rotate: rotation }],
+            },
+          ]}
+        />
+      </BlurView>
+    </View>
   );
 };
 
@@ -218,11 +229,11 @@ const AILoadingOverlay = ({ visible }) => {
   ));
 
   const blobs = [
-    { color: 'rgba(99, 102, 241, 0.3)', size: 200, delay: 0 },
-    { color: 'rgba(139, 92, 246, 0.3)', size: 250, delay: 500 },
-    { color: 'rgba(236, 72, 153, 0.3)', size: 180, delay: 1000 },
-    { color: 'rgba(59, 130, 246, 0.3)', size: 220, delay: 1500 },
-    { color: 'rgba(168, 85, 247, 0.3)', size: 190, delay: 2000 },
+    { color: 'rgba(99, 102, 241, 0.6)', size: 200, delay: 0 },
+    { color: 'rgba(139, 92, 246, 0.6)', size: 250, delay: 500 },
+    { color: 'rgba(236, 72, 153, 0.6)', size: 180, delay: 1000 },
+    { color: 'rgba(59, 130, 246, 0.6)', size: 220, delay: 1500 },
+    { color: 'rgba(168, 85, 247, 0.6)', size: 190, delay: 2000 },
   ];
 
   const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
@@ -282,9 +293,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   blob: {
-    position: 'absolute',
     borderRadius: 9999,
-    opacity: 0.6,
   },
   particleContainer: {
     ...StyleSheet.absoluteFillObject,
