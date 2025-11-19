@@ -14,6 +14,7 @@ import StoriesBar from '../components/StoriesBar';
 import VerifiedBadge from '../components/VerifiedBadge';
 import ReactionsModal from '../components/ReactionsModal';
 import LikeButton from '../components/LikeButton';
+import ShareModal from '../components/ShareModal';
 
 const { width } = Dimensions.get('window');
 
@@ -30,6 +31,8 @@ const HomeScreen = ({ navigation }) => {
   const [reactionsModalVisible, setReactionsModalVisible] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState(null);
   const [mediaErrors, setMediaErrors] = useState({});
+  const [shareModalVisible, setShareModalVisible] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
   const videoRefs = useRef({});
 
   const fetchPosts = async () => {
@@ -449,7 +452,13 @@ const HomeScreen = ({ navigation }) => {
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => {
+                setSelectedPost(item);
+                setShareModalVisible(true);
+              }}
+            >
               <View style={styles.actionNormal}>
                 <Ionicons name="share-outline" size={22} color="#6b7280" />
                 <Text style={styles.actionText}>Chia sẻ</Text>
@@ -498,6 +507,15 @@ const HomeScreen = ({ navigation }) => {
         visible={reactionsModalVisible}
         onClose={() => setReactionsModalVisible(false)}
         postId={selectedPostId}
+      />
+      
+      <ShareModal
+        visible={shareModalVisible}
+        onDismiss={() => {
+          setShareModalVisible(false);
+          setSelectedPost(null);
+        }}
+        post={selectedPost}
       />
     </View>
   );
