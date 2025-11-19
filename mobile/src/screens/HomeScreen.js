@@ -13,6 +13,7 @@ import UserAvatar from '../components/UserAvatar';
 import StoriesBar from '../components/StoriesBar';
 import VerifiedBadge from '../components/VerifiedBadge';
 import ReactionsModal from '../components/ReactionsModal';
+import LikeButton from '../components/LikeButton';
 
 const { width } = Dimensions.get('window');
 
@@ -412,28 +413,12 @@ const HomeScreen = ({ navigation }) => {
           )}
 
           <View style={styles.actionsContainer}>
-            <TouchableOpacity 
-              style={styles.actionButton}
-              onLongPress={() => toggleReactionMenu(item.id)}
+            <LikeButton
+              isLiked={!!item.user_reaction}
+              reactionType={item.user_reaction}
               onPress={() => handleReaction(item.id, 'like', item.user_reaction)}
-            >
-              {item.user_reaction ? (
-                <LinearGradient
-                  colors={['#667eea', '#764ba2']}
-                  style={styles.actionGradient}
-                >
-                  <Text style={styles.actionIconEmoji}>{getReactionIcon(item.user_reaction)}</Text>
-                  <Text style={styles.actionTextActive}>
-                    {item.user_reaction.charAt(0).toUpperCase() + item.user_reaction.slice(1)}
-                  </Text>
-                </LinearGradient>
-              ) : (
-                <View style={styles.actionNormal}>
-                  <Ionicons name="heart-outline" size={22} color="#6b7280" />
-                  <Text style={styles.actionText}>Thích</Text>
-                </View>
-              )}
-            </TouchableOpacity>
+              onLongPress={() => toggleReactionMenu(item.id)}
+            />
 
             {reactionMenuVisible[item.id] && (
               <View style={styles.reactionMenu}>
