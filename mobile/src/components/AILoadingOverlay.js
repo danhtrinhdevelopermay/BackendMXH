@@ -5,183 +5,81 @@ import { BlurView } from 'expo-blur';
 
 const { width, height } = Dimensions.get('window');
 
-const Particle = ({ delay }) => {
-  const translateX = useRef(new Animated.Value(Math.random() * width)).current;
-  const translateY = useRef(new Animated.Value(Math.random() * height)).current;
-  const opacity = useRef(new Animated.Value(0)).current;
-  const scale = useRef(new Animated.Value(0.5)).current;
+const AnimatedOrb = () => {
+  const rotate1 = useRef(new Animated.Value(0)).current;
+  const rotate2 = useRef(new Animated.Value(0)).current;
+  const scale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    const animate = () => {
-      Animated.loop(
-        Animated.parallel([
-          Animated.sequence([
-            Animated.timing(opacity, {
-              toValue: 1,
-              duration: 1000,
-              delay: delay,
-              useNativeDriver: true,
-            }),
-            Animated.timing(opacity, {
-              toValue: 0,
-              duration: 1000,
-              useNativeDriver: true,
-            }),
-          ]),
-          Animated.sequence([
-            Animated.timing(translateX, {
-              toValue: Math.random() * width,
-              duration: 3000 + Math.random() * 2000,
-              delay: delay,
-              useNativeDriver: true,
-            }),
-            Animated.timing(translateX, {
-              toValue: Math.random() * width,
-              duration: 3000 + Math.random() * 2000,
-              useNativeDriver: true,
-            }),
-          ]),
-          Animated.sequence([
-            Animated.timing(translateY, {
-              toValue: Math.random() * height,
-              duration: 3000 + Math.random() * 2000,
-              delay: delay,
-              useNativeDriver: true,
-            }),
-            Animated.timing(translateY, {
-              toValue: Math.random() * height,
-              duration: 3000 + Math.random() * 2000,
-              useNativeDriver: true,
-            }),
-          ]),
-          Animated.loop(
-            Animated.sequence([
-              Animated.timing(scale, {
-                toValue: 1,
-                duration: 1000,
-                useNativeDriver: true,
-              }),
-              Animated.timing(scale, {
-                toValue: 0.5,
-                duration: 1000,
-                useNativeDriver: true,
-              }),
-            ])
-          ),
-        ])
-      ).start();
-    };
+    Animated.loop(
+      Animated.parallel([
+        Animated.timing(rotate1, {
+          toValue: 1,
+          duration: 8000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(rotate2, {
+          toValue: 1,
+          duration: 6000,
+          useNativeDriver: true,
+        }),
+        Animated.sequence([
+          Animated.timing(scale, {
+            toValue: 1.15,
+            duration: 2000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scale, {
+            toValue: 0.95,
+            duration: 2000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scale, {
+            toValue: 1,
+            duration: 2000,
+            useNativeDriver: true,
+          }),
+        ]),
+      ])
+    ).start();
+  }, []);
 
-    animate();
-  }, [delay, opacity, scale, translateX, translateY]);
-
-  return (
-    <Animated.View
-      style={[
-        styles.particle,
-        {
-          transform: [{ translateX }, { translateY }, { scale }],
-          opacity,
-        },
-      ]}
-    />
-  );
-};
-
-const ColoredBlob = ({ color, delay, size }) => {
-  const translateXValue = Math.random() * width - size / 2;
-  const translateYValue = Math.random() * height - size / 2;
-  const translateX = useRef(new Animated.Value(translateXValue)).current;
-  const translateY = useRef(new Animated.Value(translateYValue)).current;
-  const scale = useRef(new Animated.Value(0.8)).current;
-  const rotate = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const animate = () => {
-      Animated.loop(
-        Animated.parallel([
-          Animated.sequence([
-            Animated.timing(translateX, {
-              toValue: Math.random() * width - size / 2,
-              duration: 4000 + Math.random() * 2000,
-              delay: delay,
-              useNativeDriver: true,
-            }),
-            Animated.timing(translateX, {
-              toValue: Math.random() * width - size / 2,
-              duration: 4000 + Math.random() * 2000,
-              useNativeDriver: true,
-            }),
-          ]),
-          Animated.sequence([
-            Animated.timing(translateY, {
-              toValue: Math.random() * height - size / 2,
-              duration: 4000 + Math.random() * 2000,
-              delay: delay,
-              useNativeDriver: true,
-            }),
-            Animated.timing(translateY, {
-              toValue: Math.random() * height - size / 2,
-              duration: 4000 + Math.random() * 2000,
-              useNativeDriver: true,
-            }),
-          ]),
-          Animated.loop(
-            Animated.sequence([
-              Animated.timing(scale, {
-                toValue: 1.2,
-                duration: 2000,
-                useNativeDriver: true,
-              }),
-              Animated.timing(scale, {
-                toValue: 0.8,
-                duration: 2000,
-                useNativeDriver: true,
-              }),
-            ])
-          ),
-          Animated.loop(
-            Animated.timing(rotate, {
-              toValue: 1,
-              duration: 8000,
-              useNativeDriver: true,
-            })
-          ),
-        ])
-      ).start();
-    };
-
-    animate();
-  }, [delay, rotate, scale, translateX, translateY, size]);
-
-  const rotation = rotate.interpolate({
+  const rotation1 = rotate1.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '360deg'],
   });
 
+  const rotation2 = rotate2.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['360deg', '0deg'],
+  });
+
   return (
-    <Animated.View
-      style={[
-        styles.blobWrapper,
-        {
-          transform: [{ translateX }, { translateY }],
-        },
-      ]}
-    >
-      <BlurView intensity={50} tint="light" style={{ borderRadius: 9999, overflow: 'hidden' }}>
-        <Animated.View
-          style={[
-            styles.blob,
-            {
-              width: size,
-              height: size,
-              backgroundColor: color,
-              transform: [{ scale }, { rotate: rotation }],
-            },
-          ]}
-        />
-      </BlurView>
-    </Animated.View>
+    <View style={styles.orbContainer}>
+      <Animated.View
+        style={[
+          styles.orbLayer,
+          {
+            transform: [{ scale }, { rotate: rotation1 }],
+          },
+        ]}
+      >
+        <View style={[styles.gradientBlob, { backgroundColor: '#6366f1' }]} />
+        <View style={[styles.gradientBlob, { backgroundColor: '#8b5cf6', left: 60, top: 40 }]} />
+      </Animated.View>
+
+      <Animated.View
+        style={[
+          styles.orbLayer,
+          {
+            transform: [{ scale }, { rotate: rotation2 }],
+          },
+        ]}
+      >
+        <View style={[styles.gradientBlob, { backgroundColor: '#ec4899', left: 40, top: 60 }]} />
+        <View style={[styles.gradientBlob, { backgroundColor: '#3b82f6', left: 80, top: 20 }]} />
+      </Animated.View>
+    </View>
   );
 };
 
@@ -226,18 +124,6 @@ const AILoadingOverlay = ({ visible }) => {
     outputRange: [0, 95],
   });
 
-  const particles = Array.from({ length: 30 }, (_, i) => (
-    <Particle key={`particle-${i}`} delay={i * 100} />
-  ));
-
-  const blobs = [
-    { color: 'rgba(99, 102, 241, 0.6)', size: 200, delay: 0 },
-    { color: 'rgba(139, 92, 246, 0.6)', size: 250, delay: 500 },
-    { color: 'rgba(236, 72, 153, 0.6)', size: 180, delay: 1000 },
-    { color: 'rgba(59, 130, 246, 0.6)', size: 220, delay: 1500 },
-    { color: 'rgba(168, 85, 247, 0.6)', size: 190, delay: 2000 },
-  ];
-
   const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 
   return (
@@ -254,20 +140,9 @@ const AILoadingOverlay = ({ visible }) => {
         style={styles.overlay}
       >
         <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]}>
-          <View style={styles.blobContainer}>
-            {blobs.map((blob, i) => (
-              <ColoredBlob
-                key={`blob-${i}`}
-                color={blob.color}
-                size={blob.size}
-                delay={blob.delay}
-              />
-            ))}
-          </View>
-          
-          <View style={styles.particleContainer}>
-            {particles}
-          </View>
+          <BlurView intensity={80} tint="light" style={styles.orbBlur}>
+            <AnimatedOrb />
+          </BlurView>
 
           <View style={styles.content}>
             <Text style={styles.loadingText}>✨ AI đang xử lý...</Text>
@@ -291,28 +166,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  blobContainer: {
-    ...StyleSheet.absoluteFillObject,
+  orbBlur: {
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    overflow: 'hidden',
+    marginBottom: 40,
   },
-  blobWrapper: {
+  orbContainer: {
+    width: 280,
+    height: 280,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  orbLayer: {
     position: 'absolute',
+    width: '100%',
+    height: '100%',
   },
-  blob: {
-    borderRadius: 9999,
-  },
-  particleContainer: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  particle: {
+  gradientBlob: {
     position: 'absolute',
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#fff',
-    shadowColor: '#fff',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
+    width: 180,
+    height: 180,
+    borderRadius: 90,
+    opacity: 0.7,
   },
   content: {
     alignItems: 'center',
