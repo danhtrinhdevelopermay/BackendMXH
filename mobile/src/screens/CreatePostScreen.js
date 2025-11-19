@@ -1,10 +1,10 @@
 import React, { useState, useContext } from 'react';
-import { View, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
-import { TextInput, Button, Avatar, Text, Divider, Menu } from 'react-native-paper';
+import { View, StyleSheet, Image, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import { TextInput, Button, Avatar, Text, Divider, Menu, Portal, ActivityIndicator } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { Video } from 'expo-av';
-import { postAPI, uploadAPI } from '../api/api';
+import { postAPI, uploadAPI, aiAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,6 +21,9 @@ const CreatePostScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [privacy, setPrivacy] = useState('public');
   const [privacyMenuVisible, setPrivacyMenuVisible] = useState(false);
+  const [aiModalVisible, setAiModalVisible] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
 
   const pickMedia = async (type = 'all') => {
     const mediaTypeOption = type === 'video' 
@@ -39,6 +42,58 @@ const CreatePostScreen = ({ navigation }) => {
       const asset = result.assets[0];
       setMediaUri(asset.uri);
       setMediaType(asset.type);
+    }
+  };
+
+  const handleAI = () => {
+    if (content.trim()) {
+      handleImproveText();
+    } else {
+      setAiModalVisible(true);
+    }
+  };
+
+  const handleImproveText = async () => {
+    if (!content.trim()) {
+      showAlert('Lỗi', 'Vui lòng nhập nội dung trước khi cải thiện', 'error');
+      return;
+    }
+
+    setAiLoading(true);
+    try {
+      const response = await aiAPI.generateText({
+        text: content,
+        mode: 'improve',
+      });
+      setContent(response.data.text);
+      showAlert('Thành công', 'Đã cải thiện nội dung bằng AI', 'success');
+    } catch (error) {
+      showAlert('Lỗi', error.response?.data?.error || 'Không thể cải thiện văn bản', 'error');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleGenerateText = async () => {
+    if (!aiPrompt.trim()) {
+      showAlert('Lỗi', 'Vui lòng nhập yêu cầu cho AI', 'error');
+      return;
+    }
+
+    setAiLoading(true);
+    try {
+      const response = await aiAPI.generateText({
+        text: aiPrompt,
+        mode: 'generate',
+      });
+      setContent(response.data.text);
+      setAiModalVisible(false);
+      setAiPrompt('');
+      showAlert('Thành công', 'Đã tạo nội dung bằng AI', 'success');
+    } catch (error) {
+      showAlert('Lỗi', error.response?.data?.error || 'Không thể tạo văn bản', 'error');
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -174,11 +229,26 @@ const CreatePostScreen = ({ navigation }) => {
           </TouchableOpacity>
           
           <TouchableOpacity 
-            style={[styles.addPhotoButton, { flex: 1 }]}
+            style={[styles.addPhotoButton, { flex: 1, marginRight: 8 }]}
             onPress={() => pickMedia('video')}
           >
             <Text style={styles.photoIcon}>🎥</Text>
             <Text style={styles.addPhotoText}>Video</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.addPhotoButton, { flex: 1 }]}
+            onPress={handleAI}
+            disabled={aiLoading}
+          >
+            {aiLoading ? (
+              <ActivityIndicator size="small" color="#1877f2" />
+            ) : (
+              <>
+                <Ionicons name="sparkles" size={24} color="#1877f2" />
+                <Text style={[styles.addPhotoText, { color: '#1877f2' }]}>AI</Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
         
@@ -193,6 +263,55 @@ const CreatePostScreen = ({ navigation }) => {
           Đăng bài viết
         </Button>
       </View>
+
+      <Portal>
+        <Modal
+          visible={aiModalVisible}
+          onDismiss={() => setAiModalVisible(false)}
+          contentContainerStyle={styles.aiModal}
+        >
+          <View style={styles.aiModalContent}>
+            <Text style={styles.aiModalTitle}>✨ Tạo nội dung với AI</Text>
+            <Text style={styles.aiModalSubtitle}>Nhập yêu cầu của bạn và AI sẽ tạo nội dung cho bạn</Text>
+            
+            <TextInput
+              placeholder="Ví dụ: Viết bài về chuyến du lịch Đà Lạt..."
+              value={aiPrompt}
+              onChangeText={setAiPrompt}
+              style={styles.aiInput}
+              multiline
+              numberOfLines={4}
+              mode="outlined"
+              outlineColor="#e4e6eb"
+              activeOutlineColor="#1877f2"
+            />
+            
+            <View style={styles.aiModalButtons}>
+              <Button
+                mode="outlined"
+                onPress={() => {
+                  setAiModalVisible(false);
+                  setAiPrompt('');
+                }}
+                style={styles.aiCancelButton}
+                disabled={aiLoading}
+              >
+                Hủy
+              </Button>
+              <Button
+                mode="contained"
+                onPress={handleGenerateText}
+                loading={aiLoading}
+                disabled={aiLoading || !aiPrompt.trim()}
+                style={styles.aiGenerateButton}
+                buttonColor="#1877f2"
+              >
+                Tạo nội dung
+              </Button>
+            </View>
+          </View>
+        </Modal>
+      </Portal>
     </View>
   );
 };
@@ -304,6 +423,43 @@ const styles = StyleSheet.create({
   postButton: {
     borderRadius: 8,
     paddingVertical: 4,
+  },
+  aiModal: {
+    backgroundColor: 'white',
+    margin: 20,
+    borderRadius: 16,
+    padding: 24,
+  },
+  aiModalContent: {
+    gap: 16,
+  },
+  aiModalTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#050505',
+    textAlign: 'center',
+  },
+  aiModalSubtitle: {
+    fontSize: 14,
+    color: '#65676b',
+    textAlign: 'center',
+    marginTop: -8,
+  },
+  aiInput: {
+    backgroundColor: '#fff',
+    minHeight: 100,
+  },
+  aiModalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  aiCancelButton: {
+    flex: 1,
+    borderRadius: 8,
+  },
+  aiGenerateButton: {
+    flex: 1,
+    borderRadius: 8,
   },
 });
 

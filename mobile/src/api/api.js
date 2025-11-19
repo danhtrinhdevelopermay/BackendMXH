@@ -184,4 +184,8 @@ export const streakAPI = {
   getUserStreaks: () => api.get('/streaks'),
 };
 
+export const aiAPI = {
+  generateText: (data) => api.post('/ai/generate-text', data),
+};
+
 export default api;
