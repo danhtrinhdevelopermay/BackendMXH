@@ -160,11 +160,13 @@ const ColoredBlob = ({ color, delay, size }) => {
   });
 
   return (
-    <View
-      style={{
-        position: 'absolute',
-        transform: [{ translateX }, { translateY }],
-      }}
+    <Animated.View
+      style={[
+        styles.blobWrapper,
+        {
+          transform: [{ translateX }, { translateY }],
+        },
+      ]}
     >
       <BlurView intensity={50} tint="light" style={{ borderRadius: 9999, overflow: 'hidden' }}>
         <Animated.View
@@ -179,7 +181,7 @@ const ColoredBlob = ({ color, delay, size }) => {
           ]}
         />
       </BlurView>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -291,6 +293,9 @@ const styles = StyleSheet.create({
   },
   blobContainer: {
     ...StyleSheet.absoluteFillObject,
+  },
+  blobWrapper: {
+    position: 'absolute',
   },
   blob: {
     borderRadius: 9999,
