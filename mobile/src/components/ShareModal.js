@@ -27,9 +27,12 @@ const ShareModal = ({ visible, onDismiss, post }) => {
     try {
       setLoading(true);
       const response = await friendshipAPI.getFriends();
-      setFriends(response.data);
+      console.log('Friends response:', response.data);
+      setFriends(response.data || []);
     } catch (error) {
       console.error('Error fetching friends:', error);
+      Alert.alert('Lỗi', 'Không thể tải danh sách bạn bè');
+      setFriends([]);
     } finally {
       setLoading(false);
     }
@@ -274,6 +277,7 @@ const ShareModal = ({ visible, onDismiss, post }) => {
             {loading ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="small" color="#667eea" />
+                <Text style={styles.loadingText}>Đang tải...</Text>
               </View>
             ) : (
               <View style={styles.friendsList}>
@@ -297,7 +301,10 @@ const ShareModal = ({ visible, onDismiss, post }) => {
                     </View>
                   </TouchableOpacity>
                 ))}
-                {filteredFriends.length === 0 && (
+                {!loading && filteredFriends.length === 0 && friends.length === 0 && (
+                  <Text style={styles.emptyText}>Bạn chưa có bạn bè nào</Text>
+                )}
+                {!loading && filteredFriends.length === 0 && friends.length > 0 && (
                   <Text style={styles.emptyText}>Không tìm thấy bạn bè</Text>
                 )}
               </View>
@@ -419,6 +426,11 @@ const styles = StyleSheet.create({
   loadingContainer: {
     padding: 20,
     alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: '#6b7280',
   },
   friendsList: {
     gap: 8,
