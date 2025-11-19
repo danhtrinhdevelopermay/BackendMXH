@@ -205,7 +205,7 @@ const AILoadingOverlay = ({ visible }) => {
   ];
 
   return (
-    <Animated.View style={[styles.overlay, { opacity: fadeAnim }]} pointerEvents="box-none">
+    <Animated.View style={[styles.overlay, { opacity: fadeAnim }]} pointerEvents="auto">
       <View style={styles.blobContainer}>
         {blobs.map((blob, i) => (
           <ColoredBlob
