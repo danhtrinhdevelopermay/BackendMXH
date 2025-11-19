@@ -102,17 +102,14 @@ const LikeButton = ({ isLiked, reactionType, onPress, onLongPress, style }) => {
     >
       <View style={styles.buttonContent}>
         {isLiked ? (
-          <LinearGradient
-            colors={['#667eea', '#764ba2']}
-            style={styles.actionGradient}
-          >
+          <View style={styles.actionNormal}>
             <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
               <Text style={styles.actionIconEmoji}>{getReactionIcon(reactionType)}</Text>
             </Animated.View>
-            <Text style={styles.actionTextActive}>
+            <Text style={styles.actionTextLiked}>
               {getReactionText(reactionType)}
             </Text>
-          </LinearGradient>
+          </View>
         ) : (
           <View style={styles.actionNormal}>
             <Ionicons name="heart-outline" size={22} color="#6b7280" />
@@ -167,9 +164,9 @@ const styles = StyleSheet.create({
   actionIconEmoji: {
     fontSize: 18,
   },
-  actionTextActive: {
+  actionTextLiked: {
     fontSize: 15,
-    color: '#ffffff',
+    color: '#667eea',
     fontWeight: '600',
   },
   actionText: {
