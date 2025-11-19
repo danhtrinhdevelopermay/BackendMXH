@@ -4,13 +4,14 @@ import Constants from 'expo-constants';
 import UpdateModal from './UpdateModal';
 
 const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000';
+const DEBUG_MODE = __DEV__;
 
 const UpdateChecker = () => {
   const [updateInfo, setUpdateInfo] = useState(null);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
 
   useEffect(() => {
-    if (Platform.OS === 'android') {
+    if (Platform.OS === 'android' || DEBUG_MODE) {
       checkForUpdate();
     }
   }, []);
@@ -18,9 +19,14 @@ const UpdateChecker = () => {
   const checkForUpdate = async () => {
     try {
       const currentVersionCode = Constants.expoConfig?.android?.versionCode || 1;
+      const testVersionCode = DEBUG_MODE ? 1 : currentVersionCode;
       
-      const response = await fetch(`${API_URL}/api/app-versions/check/${currentVersionCode}`);
+      console.log(`📱 Checking update for version code: ${testVersionCode} (DEBUG: ${DEBUG_MODE})`);
+      
+      const response = await fetch(`${API_URL}/api/app-versions/check/${testVersionCode}`);
       const data = await response.json();
+
+      console.log('📦 Update check response:', data);
 
       if (data.success && data.hasUpdate) {
         console.log('🔄 New update available:', data.update.versionName);

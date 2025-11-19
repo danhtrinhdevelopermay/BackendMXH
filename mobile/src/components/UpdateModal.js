@@ -21,7 +21,11 @@ const UpdateModal = ({ visible, updateInfo, onUpdateLater }) => {
   const [downloading, setDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
 
+  console.log('🎨 UpdateModal render:', { visible, hasUpdateInfo: !!updateInfo });
+
   const handleDownloadAndInstall = async () => {
+    console.log('🔽 Download button pressed', Platform.OS);
+    
     if (Platform.OS !== 'android') {
       Alert.alert('Thông báo', 'Tính năng này chỉ hỗ trợ Android');
       return;
