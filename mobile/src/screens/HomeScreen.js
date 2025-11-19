@@ -190,10 +190,14 @@ const HomeScreen = ({ navigation }) => {
 
   const renderHeader = () => (
     <View style={styles.headerContainer}>
-      <View style={styles.fbHeader}>
-        <Text style={styles.fbLogo}>Shatter xin chào</Text>
-        
-      </View>
+      <LinearGradient
+        colors={['#667eea', '#764ba2']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.gradientHeader}
+      >
+        <Text style={styles.appTitle}>Shatter</Text>
+      </LinearGradient>
       
       <Pressable 
         style={styles.createPostContainer}
@@ -202,10 +206,10 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.createPostTop}>
           <UserAvatar 
             user={user} 
-            size={40}
+            size={44}
           />
           <View style={styles.createPostInput}>
-            <Text style={styles.createPostText}>Bạn đang nghĩ gì?</Text>
+            <Text style={styles.createPostText}>Chia sẻ điều gì đó...</Text>
           </View>
         </View>
         <View style={styles.createPostDivider} />
@@ -214,12 +218,22 @@ const HomeScreen = ({ navigation }) => {
             style={styles.createPostAction}
             onPress={() => navigation.navigate('Camera')}
           >
-            <Ionicons name="camera" size={24} color="#1D9BF0" />
+            <LinearGradient
+              colors={['#667eea', '#764ba2']}
+              style={styles.actionIconGradient}
+            >
+              <Ionicons name="camera" size={20} color="#fff" />
+            </LinearGradient>
             <Text style={styles.createActionText}>Camera</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.createPostAction}>
-            <Ionicons name="image" size={24} color="#45bd62" />
-            <Text style={styles.createActionText}>Ảnh/video</Text>
+            <LinearGradient
+              colors={['#f093fb', '#f5576c']}
+              style={styles.actionIconGradient}
+            >
+              <Ionicons name="image" size={20} color="#fff" />
+            </LinearGradient>
+            <Text style={styles.createActionText}>Ảnh/Video</Text>
           </TouchableOpacity>
         </View>
       </Pressable>
@@ -235,219 +249,230 @@ const HomeScreen = ({ navigation }) => {
 
   const renderPost = ({ item }) => (
     <View style={styles.cardWrapper}>
-      <Card style={styles.card} elevation={2}>
-        <View style={styles.postHeader}>
-          <TouchableOpacity 
-            style={styles.postHeaderLeft}
-            onPress={() => navigation.navigate('Profile', { userId: item.user_id })}
-          >
-            <UserAvatar 
-              user={item}
-              size={48}
-              style={styles.avatar}
-            />
-            <View style={styles.postHeaderInfo}>
-              <View style={styles.authorNameContainer}>
-                <Text style={styles.authorName}>{item.full_name || item.username}</Text>
-                <VerifiedBadge isVerified={item.is_verified} size={16} />
-              </View>
-              <View style={styles.timeContainer}>
-                <Ionicons name="time-outline" size={12} color="#8e8e93" />
-                <Text style={styles.postTime}>{formatTimeAgo(item.created_at)}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-          {user?.id === item.user_id && (
-            <Menu
-              visible={menuVisible[item.id] || false}
-              onDismiss={() => toggleMenu(item.id)}
-              anchor={
-                <TouchableOpacity
-                  style={styles.menuButton}
-                  onPress={() => toggleMenu(item.id)}
-                >
-                  <Ionicons name="ellipsis-horizontal" size={20} color="#8e8e93" />
-                </TouchableOpacity>
-              }
+      <LinearGradient
+        colors={['rgba(102, 126, 234, 0.05)', 'rgba(118, 75, 162, 0.05)']}
+        style={styles.cardGradientBorder}
+      >
+        <View style={styles.card}>
+          <View style={styles.postHeader}>
+            <TouchableOpacity 
+              style={styles.postHeaderLeft}
+              onPress={() => navigation.navigate('Profile', { userId: item.user_id })}
             >
-              <Menu.Item
-                leadingIcon="delete"
-                onPress={() => {
-                  toggleMenu(item.id);
-                  handleDeletePost(item.id);
-                }}
-                title="Xóa bài viết"
+              <UserAvatar 
+                user={item}
+                size={50}
+                style={styles.avatar}
               />
-            </Menu>
-          )}
-        </View>
-
-        {item.content && (
-          <TouchableOpacity 
-            activeOpacity={0.9}
-            onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
-          >
-            <Text style={styles.postContent}>{item.content}</Text>
-          </TouchableOpacity>
-        )}
-        
-        {item.media_type && item.media_url && (() => {
-          const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
-          const mediaUrl = item.media_url.startsWith('http') ? item.media_url : `${API_URL}${item.media_url}`;
-          const isVideo = item.media_type?.startsWith('video/');
-          const isVisible = visibleItems.includes(item.id);
-          const hasError = mediaErrors[item.id];
-          
-          const aspectRatio = (item.media_width && item.media_height) 
-            ? item.media_width / item.media_height 
-            : 16/9;
-          
-          const mediaStyle = {
-            width: '100%',
-            aspectRatio: aspectRatio,
-            backgroundColor: '#f3f4f6',
-          };
-          
-          const handleMediaError = () => {
-            setMediaErrors(prev => ({ ...prev, [item.id]: true }));
-          };
-          
-          if (hasError) {
-            return (
-              <View style={styles.mediaErrorContainer}>
-                <Ionicons name="image-outline" size={48} color="#d1d5db" />
-                <Text style={styles.mediaErrorText}>Không thể tải media</Text>
-              </View>
-            );
-          }
-          
-          return (
-            <View style={styles.mediaContainer}>
-              {isVideo ? (
-                <TouchableOpacity 
-                  activeOpacity={1}
-                  onPress={() => handleVideoPress(item.id)}
-                >
-                  <Video
-                    ref={(ref) => {
-                      if (ref) {
-                        videoRefs.current[item.id] = ref;
-                      }
-                    }}
-                    source={{ uri: mediaUrl }}
-                    style={mediaStyle}
-                    resizeMode="cover"
-                    shouldPlay={isVisible}
-                    isLooping
-                    isMuted={false}
-                    onError={(error) => {
-                      console.log('Video error:', error);
-                      handleMediaError();
-                    }}
-                  />
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity 
-                  activeOpacity={1}
-                  onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
-                >
-                  <Card.Cover 
-                    source={{ uri: mediaUrl }} 
-                    style={mediaStyle}
-                    onError={handleMediaError}
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
-          );
-        })()}
-
-        {(item.reaction_count > 0 || item.comment_count > 0) && (
-          <View style={styles.statsContainer}>
-            {item.reaction_count > 0 && (
-              <TouchableOpacity 
-                style={styles.reactionStats}
-                onPress={() => {
-                  setSelectedPostId(item.id);
-                  setReactionsModalVisible(true);
-                }}
-                activeOpacity={0.7}
-              >
-                <View style={styles.reactionBubblesContainer}>
-                  {item.user_reaction && (
-                    <View style={[styles.reactionBubble, { zIndex: 3 }]}>
-                      <Text style={styles.reactionIcon}>{getReactionIcon(item.user_reaction)}</Text>
-                    </View>
-                  )}
-                  {!item.user_reaction && (
-                    <View style={[styles.reactionBubble, { zIndex: 3 }]}>
-                      <Text style={styles.reactionIcon}>👍</Text>
-                    </View>
-                  )}
+              <View style={styles.postHeaderInfo}>
+                <View style={styles.authorNameContainer}>
+                  <Text style={styles.authorName}>{item.full_name || item.username}</Text>
+                  <VerifiedBadge isVerified={item.is_verified} size={16} />
                 </View>
-                <Text style={styles.statsText}>{item.reaction_count}</Text>
-              </TouchableOpacity>
-            )}
-            <View style={{ flex: 1 }} />
-            {item.comment_count > 0 && (
-              <Text style={styles.statsText}>{item.comment_count} bình luận</Text>
+                <View style={styles.timeContainer}>
+                  <Ionicons name="time-outline" size={13} color="#9ca3af" />
+                  <Text style={styles.postTime}>{formatTimeAgo(item.created_at)}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+            {user?.id === item.user_id && (
+              <Menu
+                visible={menuVisible[item.id] || false}
+                onDismiss={() => toggleMenu(item.id)}
+                anchor={
+                  <TouchableOpacity
+                    style={styles.menuButton}
+                    onPress={() => toggleMenu(item.id)}
+                  >
+                    <Ionicons name="ellipsis-horizontal" size={22} color="#9ca3af" />
+                  </TouchableOpacity>
+                }
+              >
+                <Menu.Item
+                  leadingIcon="delete"
+                  onPress={() => {
+                    toggleMenu(item.id);
+                    handleDeletePost(item.id);
+                  }}
+                  title="Xóa bài viết"
+                />
+              </Menu>
             )}
           </View>
-        )}
 
-        <Divider style={styles.actionsDivider} />
-
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity 
-            style={styles.fbActionButton}
-            onLongPress={() => toggleReactionMenu(item.id)}
-            onPress={() => handleReaction(item.id, 'like', item.user_reaction)}
-          >
-            {item.user_reaction ? (
-              <>
-                <Text style={styles.fbActionIcon}>{getReactionIcon(item.user_reaction)}</Text>
-                <Text style={[styles.fbActionText, { color: getReactionColor(item.user_reaction) }]}>
-                  {item.user_reaction.charAt(0).toUpperCase() + item.user_reaction.slice(1)}
-                </Text>
-              </>
-            ) : (
-              <>
-                <Ionicons name="thumbs-up-outline" size={20} color="#65676b" />
-                <Text style={styles.fbActionText}>Thích</Text>
-              </>
-            )}
-          </TouchableOpacity>
-
-          {reactionMenuVisible[item.id] && (
-            <View style={styles.fbReactionMenu}>
-              <View style={styles.fbReactionMenuContent}>
-                {['like', 'love', 'haha', 'wow', 'sad', 'angry'].map((reaction) => (
-                  <TouchableOpacity
-                    key={reaction}
-                    onPress={() => handleReaction(item.id, reaction, item.user_reaction)}
-                    style={styles.fbReactionOption}
+          {item.content && (
+            <TouchableOpacity 
+              activeOpacity={0.9}
+              onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
+            >
+              <Text style={styles.postContent}>{item.content}</Text>
+            </TouchableOpacity>
+          )}
+          
+          {item.media_type && item.media_url && (() => {
+            const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
+            const mediaUrl = item.media_url.startsWith('http') ? item.media_url : `${API_URL}${item.media_url}`;
+            const isVideo = item.media_type?.startsWith('video/');
+            const isVisible = visibleItems.includes(item.id);
+            const hasError = mediaErrors[item.id];
+            
+            const aspectRatio = (item.media_width && item.media_height) 
+              ? item.media_width / item.media_height 
+              : 16/9;
+            
+            const mediaStyle = {
+              width: '100%',
+              aspectRatio: aspectRatio,
+              backgroundColor: '#f3f4f6',
+              borderRadius: 16,
+            };
+            
+            const handleMediaError = () => {
+              setMediaErrors(prev => ({ ...prev, [item.id]: true }));
+            };
+            
+            if (hasError) {
+              return (
+                <View style={styles.mediaErrorContainer}>
+                  <Ionicons name="image-outline" size={48} color="#d1d5db" />
+                  <Text style={styles.mediaErrorText}>Không thể tải media</Text>
+                </View>
+              );
+            }
+            
+            return (
+              <View style={styles.mediaContainer}>
+                {isVideo ? (
+                  <TouchableOpacity 
+                    activeOpacity={1}
+                    onPress={() => handleVideoPress(item.id)}
                   >
-                    <Text style={styles.fbReactionIcon}>{getReactionIcon(reaction)}</Text>
+                    <Video
+                      ref={(ref) => {
+                        if (ref) {
+                          videoRefs.current[item.id] = ref;
+                        }
+                      }}
+                      source={{ uri: mediaUrl }}
+                      style={mediaStyle}
+                      resizeMode="cover"
+                      shouldPlay={isVisible}
+                      isLooping
+                      isMuted={false}
+                      onError={(error) => {
+                        console.log('Video error:', error);
+                        handleMediaError();
+                      }}
+                    />
                   </TouchableOpacity>
-                ))}
+                ) : (
+                  <TouchableOpacity 
+                    activeOpacity={1}
+                    onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
+                  >
+                    <Card.Cover 
+                      source={{ uri: mediaUrl }} 
+                      style={mediaStyle}
+                      onError={handleMediaError}
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
+            );
+          })()}
+
+          {(item.reaction_count > 0 || item.comment_count > 0) && (
+            <View style={styles.statsContainer}>
+              {item.reaction_count > 0 && (
+                <TouchableOpacity 
+                  style={styles.reactionStats}
+                  onPress={() => {
+                    setSelectedPostId(item.id);
+                    setReactionsModalVisible(true);
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <LinearGradient
+                    colors={['#667eea', '#764ba2']}
+                    style={styles.reactionCountBadge}
+                  >
+                    <Text style={styles.reactionIcon}>{getReactionIcon(item.user_reaction || 'like')}</Text>
+                    <Text style={styles.reactionCountText}>{item.reaction_count}</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              )}
+              <View style={{ flex: 1 }} />
+              {item.comment_count > 0 && (
+                <View style={styles.commentBadge}>
+                  <Ionicons name="chatbubble" size={14} color="#667eea" />
+                  <Text style={styles.commentCountText}>{item.comment_count} bình luận</Text>
+                </View>
+              )}
             </View>
           )}
 
-          <TouchableOpacity 
-            style={styles.fbActionButton}
-            onPress={() => navigation.navigate('Comments', { postId: item.id })}
-          >
-            <Ionicons name="chatbubble-outline" size={20} color="#65676b" />
-            <Text style={styles.fbActionText}>Bình luận</Text>
-          </TouchableOpacity>
+          <View style={styles.actionsContainer}>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onLongPress={() => toggleReactionMenu(item.id)}
+              onPress={() => handleReaction(item.id, 'like', item.user_reaction)}
+            >
+              {item.user_reaction ? (
+                <LinearGradient
+                  colors={['#667eea', '#764ba2']}
+                  style={styles.actionGradient}
+                >
+                  <Text style={styles.actionIconEmoji}>{getReactionIcon(item.user_reaction)}</Text>
+                  <Text style={styles.actionTextActive}>
+                    {item.user_reaction.charAt(0).toUpperCase() + item.user_reaction.slice(1)}
+                  </Text>
+                </LinearGradient>
+              ) : (
+                <View style={styles.actionNormal}>
+                  <Ionicons name="heart-outline" size={22} color="#6b7280" />
+                  <Text style={styles.actionText}>Thích</Text>
+                </View>
+              )}
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.fbActionButton}>
-            <Ionicons name="arrow-redo-outline" size={20} color="#65676b" />
-            <Text style={styles.fbActionText}>Chia sẻ</Text>
-          </TouchableOpacity>
+            {reactionMenuVisible[item.id] && (
+              <View style={styles.reactionMenu}>
+                <LinearGradient
+                  colors={['#ffffff', '#f9fafb']}
+                  style={styles.reactionMenuContent}
+                >
+                  {['like', 'love', 'haha', 'wow', 'sad', 'angry'].map((reaction) => (
+                    <TouchableOpacity
+                      key={reaction}
+                      onPress={() => handleReaction(item.id, reaction, item.user_reaction)}
+                      style={styles.reactionOption}
+                    >
+                      <Text style={styles.reactionOptionIcon}>{getReactionIcon(reaction)}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </LinearGradient>
+              </View>
+            )}
+
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => navigation.navigate('Comments', { postId: item.id })}
+            >
+              <View style={styles.actionNormal}>
+                <Ionicons name="chatbubble-outline" size={22} color="#6b7280" />
+                <Text style={styles.actionText}>Bình luận</Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.actionButton}>
+              <View style={styles.actionNormal}>
+                <Ionicons name="share-outline" size={22} color="#6b7280" />
+                <Text style={styles.actionText}>Chia sẻ</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
-      </Card>
+      </LinearGradient>
     </View>
   );
 
@@ -461,14 +486,19 @@ const HomeScreen = ({ navigation }) => {
           <RefreshControl 
             refreshing={refreshing} 
             onRefresh={onRefresh}
-            colors={['#1877f2']}
-            tintColor="#1877f2"
+            colors={['#667eea', '#764ba2']}
+            tintColor="#667eea"
           />
         }
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Ionicons name="newspaper-outline" size={64} color="#d1d5db" />
+            <LinearGradient
+              colors={['#667eea', '#764ba2']}
+              style={styles.emptyIconContainer}
+            >
+              <Ionicons name="newspaper-outline" size={48} color="#fff" />
+            </LinearGradient>
             <Text style={styles.emptyTitle}>Chưa có bài viết</Text>
             <Text style={styles.emptyText}>Hãy bắt đầu chia sẻ khoảnh khắc của bạn!</Text>
           </View>
@@ -491,7 +521,7 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f2f5',
+    backgroundColor: '#f8f9fa',
   },
   listContent: {
     flexGrow: 1,
@@ -499,50 +529,39 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     backgroundColor: '#fff',
-    paddingBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 3,
+    paddingBottom: 16,
+    shadowColor: '#667eea',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  fbHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    backgroundColor: '#fff',
+  gradientHeader: {
+    paddingHorizontal: 20,
+    paddingVertical: 18,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
-  fbLogo: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#1877f2',
-    letterSpacing: -0.5,
-  },
-  fbHeaderIcons: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  fbIconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#e4e6eb',
-    justifyContent: 'center',
-    alignItems: 'center',
+  appTitle: {
+    fontSize: 34,
+    fontWeight: '900',
+    color: '#ffffff',
+    letterSpacing: -1,
+    textShadowColor: 'rgba(0, 0, 0, 0.1)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   createPostContainer: {
     backgroundColor: '#fff',
     marginHorizontal: 16,
-    marginVertical: 12,
-    borderRadius: 12,
-    padding: 14,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 3,
-    elevation: 2,
+    marginTop: 16,
+    borderRadius: 20,
+    padding: 16,
+    shadowColor: '#667eea',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
   createPostTop: {
     flexDirection: 'row',
@@ -550,21 +569,21 @@ const styles = StyleSheet.create({
   },
   createPostInput: {
     flex: 1,
-    marginLeft: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 24,
-    backgroundColor: '#f0f2f5',
+    marginLeft: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 25,
+    backgroundColor: '#f3f4f6',
   },
   createPostText: {
-    color: '#65676b',
+    color: '#6b7280',
     fontSize: 16,
     fontWeight: '400',
   },
   createPostDivider: {
     height: 1,
-    backgroundColor: '#e4e6eb',
-    marginVertical: 12,
+    backgroundColor: '#e5e7eb',
+    marginVertical: 14,
   },
   createPostActions: {
     flexDirection: 'row',
@@ -573,26 +592,32 @@ const styles = StyleSheet.create({
   createPostAction: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
+  },
+  actionIconGradient: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   createActionText: {
     fontSize: 15,
-    color: '#65676b',
-    fontWeight: '500',
+    color: '#4b5563',
+    fontWeight: '600',
   },
   cardWrapper: {
-    marginTop: 12,
+    marginTop: 16,
+    marginHorizontal: 12,
+  },
+  cardGradientBorder: {
+    borderRadius: 24,
+    padding: 2,
   },
   card: {
     backgroundColor: '#fff',
-    borderTopWidth: 8,
-    borderTopColor: '#f0f2f5',
+    borderRadius: 22,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
   },
   postHeader: {
     flexDirection: 'row',
@@ -606,7 +631,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatar: {
-    backgroundColor: '#1877f2',
+    backgroundColor: '#667eea',
+    borderWidth: 2,
+    borderColor: '#f3f4f6',
   },
   postHeaderInfo: {
     marginLeft: 12,
@@ -617,9 +644,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   authorName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#050505',
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1f2937',
     letterSpacing: 0,
   },
   timeContainer: {
@@ -628,29 +655,24 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   postTime: {
-    fontSize: 12,
-    color: '#65676b',
+    fontSize: 13,
+    color: '#9ca3af',
     marginLeft: 4,
   },
   menuButton: {
-    padding: 6,
+    padding: 8,
     borderRadius: 20,
   },
   postContent: {
-    fontSize: 15,
-    lineHeight: 20,
-    color: '#050505',
+    fontSize: 16,
+    lineHeight: 22,
+    color: '#374151',
     paddingHorizontal: 16,
     paddingBottom: 12,
   },
   mediaContainer: {
     marginTop: 8,
-    overflow: 'hidden',
-  },
-  postMedia: {
-    width: '100%',
-    height: 300,
-    backgroundColor: '#f3f4f6',
+    paddingHorizontal: 16,
   },
   mediaErrorContainer: {
     width: '100%',
@@ -659,6 +681,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
+    borderRadius: 16,
+    marginHorizontal: 16,
   },
   mediaErrorText: {
     fontSize: 14,
@@ -669,108 +693,131 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
   },
   reactionStats: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  reactionBubblesContainer: {
+  reactionCountBadge: {
     flexDirection: 'row',
-    marginRight: 6,
-  },
-  reactionBubble: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#e4e6eb',
-    justifyContent: 'center',
     alignItems: 'center',
-    marginRight: -8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    gap: 6,
   },
   reactionIcon: {
-    fontSize: 13,
+    fontSize: 14,
   },
-  statsText: {
+  reactionCountText: {
     fontSize: 13,
-    color: '#65676b',
-    fontWeight: '400',
+    color: '#ffffff',
+    fontWeight: '600',
   },
-  actionsDivider: {
-    height: 1,
-    backgroundColor: '#f3f4f6',
-    marginHorizontal: 16,
+  commentBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  commentCountText: {
+    fontSize: 13,
+    color: '#667eea',
+    fontWeight: '600',
   },
   actionsContainer: {
     flexDirection: 'row',
+    paddingVertical: 8,
+    paddingHorizontal: 8,
     borderTopWidth: 1,
-    borderTopColor: '#e4e6eb',
-    paddingVertical: 4,
-    paddingHorizontal: 4,
+    borderTopColor: '#f3f4f6',
     position: 'relative',
   },
-  fbActionButton: {
+  actionButton: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  actionGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 8,
-    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
     gap: 6,
   },
-  fbActionIcon: {
+  actionNormal: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    gap: 6,
+  },
+  actionIconEmoji: {
     fontSize: 18,
   },
-  fbActionText: {
+  actionTextActive: {
     fontSize: 15,
-    color: '#65676b',
-    fontWeight: '500',
+    color: '#ffffff',
+    fontWeight: '600',
   },
-  fbReactionMenu: {
+  actionText: {
+    fontSize: 15,
+    color: '#6b7280',
+    fontWeight: '600',
+  },
+  reactionMenu: {
     position: 'absolute',
-    bottom: 50,
-    left: 16,
+    bottom: 60,
+    left: 20,
     zIndex: 1000,
-  },
-  fbReactionMenuContent: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 25,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+    borderRadius: 30,
+    shadowColor: '#667eea',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
     elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
+  },
+  reactionMenuContent: {
+    flexDirection: 'row',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 30,
+    gap: 8,
     borderWidth: 1,
-    borderColor: '#e4e6eb',
+    borderColor: '#e5e7eb',
   },
-  fbReactionOption: {
-    padding: 6,
-    marginHorizontal: 2,
+  reactionOption: {
+    padding: 8,
   },
-  fbReactionIcon: {
-    fontSize: 34,
+  reactionOptionIcon: {
+    fontSize: 28,
   },
   emptyContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 60,
-    paddingHorizontal: 32,
+    paddingHorizontal: 30,
+  },
+  emptyIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#6b7280',
-    marginTop: 16,
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#1f2937',
+    marginBottom: 8,
   },
   emptyText: {
     fontSize: 15,
     color: '#9ca3af',
-    marginTop: 8,
     textAlign: 'center',
   },
 });
