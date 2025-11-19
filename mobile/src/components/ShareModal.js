@@ -8,7 +8,7 @@ import * as Sharing from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
 import { Share } from 'react-native';
 import Constants from 'expo-constants';
-import { friendshipAPI } from '../api/api';
+import { friendshipAPI, messageAPI } from '../api/api';
 import UserAvatar from './UserAvatar';
 
 const ShareModal = ({ visible, onDismiss, post }) => {
@@ -152,17 +152,40 @@ const ShareModal = ({ visible, onDismiss, post }) => {
     );
   };
 
-  const handleSendToFriends = () => {
+  const handleSendToFriends = async () => {
     if (selectedFriends.length === 0) {
       Alert.alert('Thông báo', 'Vui lòng chọn ít nhất một người bạn');
       return;
     }
 
-    Alert.alert(
-      'Thành công',
-      `Đã gửi bài viết đến ${selectedFriends.length} người bạn`,
-      [{ text: 'OK', onPress: onDismiss }]
-    );
+    try {
+      setLoading(true);
+      const postUrl = getPostUrl();
+      const messageContent = post.content 
+        ? `📮 Chia sẻ bài viết:\n${post.content}\n\n${postUrl}`
+        : `📮 Chia sẻ bài viết: ${postUrl}`;
+
+      const sendPromises = selectedFriends.map(friendId =>
+        messageAPI.sendMessage({
+          receiver_id: friendId,
+          content: messageContent
+        })
+      );
+
+      await Promise.all(sendPromises);
+
+      Alert.alert(
+        'Thành công',
+        `Đã gửi bài viết đến ${selectedFriends.length} người bạn`,
+        [{ text: 'OK', onPress: onDismiss }]
+      );
+      setSelectedFriends([]);
+    } catch (error) {
+      console.error('Error sending to friends:', error);
+      Alert.alert('Lỗi', 'Không thể gửi tin nhắn đến bạn bè');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filteredFriends = friends.filter(friend =>
