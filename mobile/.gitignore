@@ -12,3 +12,6 @@ npm-debug.*
 web-build/
 .DS_Store
 *.log
+credentials.json
+*.keystore
+android/app/*.keystore
