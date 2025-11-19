@@ -11,7 +11,7 @@ Văn bản gốc: "${text}"
 Chỉ trả về văn bản đã được cải thiện, không thêm bất kỳ giải thích nào.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-1.5-flash',
       contents: prompt,
     });
 
@@ -31,7 +31,7 @@ Yêu cầu: "${prompt}"
 Chỉ trả về nội dung bài viết, không thêm bất kỳ tiêu đề hay giải thích nào.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-1.5-flash',
       contents: fullPrompt,
     });
 
