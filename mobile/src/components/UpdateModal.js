@@ -9,6 +9,7 @@ import {
   Platform,
   Alert,
   Dimensions,
+  Linking,
 } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import * as IntentLauncher from 'expo-intent-launcher';
@@ -31,13 +32,35 @@ const UpdateModal = ({ visible, updateInfo, onUpdateLater }) => {
       return;
     }
 
+    const apkUrl = updateInfo.apkUrl.startsWith('http://') || updateInfo.apkUrl.startsWith('https://') 
+      ? updateInfo.apkUrl 
+      : `${API_URL}${updateInfo.apkUrl}`;
+
+    if (Constants.appOwnership === 'expo') {
+      Alert.alert(
+        'Tải APK',
+        'Bạn đang dùng Expo Go. Vui lòng tải APK bằng trình duyệt.',
+        [
+          { text: 'Hủy', style: 'cancel' },
+          {
+            text: 'Mở trình duyệt',
+            onPress: () => {
+              console.log('🌐 Opening browser:', apkUrl);
+              Linking.openURL(apkUrl).catch(err => {
+                console.error('Error opening URL:', err);
+                Alert.alert('Lỗi', 'Không thể mở trình duyệt');
+              });
+            }
+          }
+        ]
+      );
+      return;
+    }
+
     setDownloading(true);
     setDownloadProgress(0);
 
     try {
-      const apkUrl = updateInfo.apkUrl.startsWith('http://') || updateInfo.apkUrl.startsWith('https://') 
-        ? updateInfo.apkUrl 
-        : `${API_URL}${updateInfo.apkUrl}`;
       const fileName = `shatter-${updateInfo.versionName}.apk`;
       const fileUri = FileSystem.documentDirectory + fileName;
 
@@ -74,7 +97,7 @@ const UpdateModal = ({ visible, updateInfo, onUpdateLater }) => {
       setDownloadProgress(0);
       Alert.alert(
         'Lỗi',
-        'Không thể tải xuống bản cập nhật. Vui lòng thử lại sau.',
+        'Không thể tải xuống: ' + error.message,
         [{ text: 'OK' }]
       );
     }
