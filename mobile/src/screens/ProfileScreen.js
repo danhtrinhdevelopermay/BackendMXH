@@ -11,7 +11,8 @@ import { Ionicons } from '@expo/vector-icons';
 import VerifiedBadge from '../components/VerifiedBadge';
 
 const { width } = Dimensions.get('window');
-const ITEM_SIZE = width / 3;
+const GRID_GAP = 2;
+const ITEM_SIZE = (width - GRID_GAP * 4) / 3;
 
 const ProfileScreen = ({ route, navigation }) => {
   const { user: currentUser } = useContext(AuthContext);
@@ -447,6 +448,7 @@ const styles = StyleSheet.create({
   gridItem: {
     width: ITEM_SIZE,
     height: ITEM_SIZE,
+    margin: GRID_GAP / 2,
   },
   gridImage: {
     width: '100%',
