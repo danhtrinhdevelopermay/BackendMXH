@@ -242,6 +242,24 @@ const HomeScreen = ({ navigation }) => {
 
   const renderHeader = () => (
     <View style={styles.headerWrapper}>
+      <View style={styles.appHeader}>
+        <Text style={styles.appLogo}>Social</Text>
+        <View style={styles.headerActions}>
+          <TouchableOpacity 
+            style={styles.headerButton}
+            onPress={() => navigation.navigate('Search')}
+          >
+            <Ionicons name="search" size={24} color="#1a1a1a" />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.headerButton}
+            onPress={() => navigation.navigate('Thông báo')}
+          >
+            <Ionicons name="notifications-outline" size={24} color="#1a1a1a" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <Pressable
         style={styles.createPostBox}
         onPress={() => navigation.navigate("CreatePost")}
@@ -534,6 +552,33 @@ const styles = StyleSheet.create({
   },
   headerWrapper: {
     backgroundColor: '#fff',
+    paddingTop: 50,
+  },
+  appHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
+  },
+  appLogo: {
+    fontSize: 28,
+    fontWeight: '900',
+    color: '#1877f2',
+    letterSpacing: -0.5,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  headerButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f0f2f5',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   topGradient: {
     position: 'absolute',
