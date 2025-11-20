@@ -580,7 +580,7 @@ const styles = StyleSheet.create({
   listContent: {
     flexGrow: 1,
     paddingTop: 112,
-    paddingBottom: 20,
+    paddingBottom: 85,
   },
   headerWrapper: {
     backgroundColor: '#fff',
