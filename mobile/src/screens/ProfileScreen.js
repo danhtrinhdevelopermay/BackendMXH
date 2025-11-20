@@ -126,7 +126,10 @@ const ProfileScreen = ({ route, navigation }) => {
             {friendshipStatus === 'friends' ? (
               <TouchableOpacity 
                 style={styles.messageBtn}
-                onPress={() => navigation.navigate('Messages', { userId: profileUser.id })}
+                onPress={() => navigation.navigate('Chat', { 
+                  userId: profileUser.id,
+                  userName: profileUser.full_name || profileUser.username 
+                })}
               >
                 <Ionicons name="chatbubble" size={18} color="#fff" />
                 <Text style={styles.messageBtnText}>Nhắn tin</Text>
