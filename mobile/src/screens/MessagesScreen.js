@@ -4,7 +4,7 @@ import { Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { messageAPI, thoughtAPI } from '../api/api';
+import { messageAPI, thoughtAPI, friendshipAPI } from '../api/api';
 import { useAlert } from '../context/AlertContext';
 import { AuthContext } from '../context/AuthContext';
 import UserAvatar from '../components/UserAvatar';
@@ -23,8 +23,33 @@ const MessagesScreen = ({ navigation }) => {
 
   const fetchConversations = async () => {
     try {
-      const response = await messageAPI.getConversations();
-      setConversations(response.data);
+      const [conversationsResponse, friendsResponse] = await Promise.all([
+        messageAPI.getConversations(),
+        friendshipAPI.getFriends()
+      ]);
+      
+      const existingConversations = conversationsResponse.data;
+      const friends = friendsResponse.data;
+      
+      const conversationUserIds = new Set(
+        existingConversations.map(conv => conv.other_user_id)
+      );
+      
+      const newFriendConversations = friends
+        .filter(friend => !conversationUserIds.has(friend.id))
+        .map(friend => ({
+          other_user_id: friend.id,
+          username: friend.username,
+          full_name: friend.full_name,
+          avatar_url: friend.avatar_url,
+          last_message: null,
+          last_message_time: null,
+          is_read: true,
+          streak_count: 0,
+          sender_id: null
+        }));
+      
+      setConversations([...existingConversations, ...newFriendConversations]);
     } catch (error) {
       console.log('Failed to fetch messages');
     } finally {
