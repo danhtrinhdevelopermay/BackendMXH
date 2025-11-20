@@ -289,7 +289,7 @@ const HomeTabs = () => {
       }}
       tabBar={(props) => (
         <BlurView 
-          intensity={80}
+          intensity={100}
           tint="light"
           style={{
             position: 'absolute',
@@ -299,7 +299,8 @@ const HomeTabs = () => {
             height: 65 + insets.bottom,
             paddingBottom: insets.bottom,
             borderTopWidth: 0.5,
-            borderTopColor: 'rgba(0, 0, 0, 0.1)',
+            borderTopColor: 'rgba(255, 255, 255, 0.3)',
+            backgroundColor: 'rgba(255, 255, 255, 0.7)',
           }}
         >
           <View style={{
