@@ -136,7 +136,7 @@ const ReactionsModal = ({ visible, onClose, postId }) => {
 
           {loading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#667eea" />
+              <ActivityIndicator size="large" color="#FF6B35" />
             </View>
           ) : (
             <FlatList

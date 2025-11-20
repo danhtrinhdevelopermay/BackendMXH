@@ -214,7 +214,7 @@ const ShareModal = ({ visible, onDismiss, post }) => {
             
             <TouchableOpacity style={styles.option} onPress={handleShareLink}>
               <LinearGradient
-                colors={['#667eea', '#764ba2']}
+                colors={['#FF6B35', '#F7931E']}
                 style={styles.optionIcon}
               >
                 <Ionicons name="link" size={22} color="#fff" />
@@ -276,7 +276,7 @@ const ShareModal = ({ visible, onDismiss, post }) => {
 
             {loading ? (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="small" color="#667eea" />
+                <ActivityIndicator size="small" color="#FF6B35" />
                 <Text style={styles.loadingText}>Đang tải...</Text>
               </View>
             ) : (
@@ -292,7 +292,7 @@ const ShareModal = ({ visible, onDismiss, post }) => {
                     <View style={styles.checkbox}>
                       {selectedFriends.includes(friend.id) && (
                         <LinearGradient
-                          colors={['#667eea', '#764ba2']}
+                          colors={['#FF6B35', '#F7931E']}
                           style={styles.checkboxFilled}
                         >
                           <Ionicons name="checkmark" size={16} color="#fff" />
@@ -316,7 +316,7 @@ const ShareModal = ({ visible, onDismiss, post }) => {
           <View style={styles.footer}>
             <TouchableOpacity onPress={handleSendToFriends} disabled={loading}>
               <LinearGradient
-                colors={['#667eea', '#764ba2']}
+                colors={['#FF6B35', '#F7931E']}
                 style={styles.sendButton}
               >
                 {loading ? (

@@ -18,7 +18,7 @@ const ThoughtsBar = ({ thoughts, currentUserId, onCreateThought }) => {
       <View style={styles.thoughtContainer}>
         {isCurrentUser && !currentUserThought ? (
           <LinearGradient
-            colors={['#667eea', '#764ba2']}
+            colors={['#FF6B35', '#F7931E']}
             style={styles.addThoughtGradient}
           >
             <Ionicons name="add" size={24} color="#fff" />

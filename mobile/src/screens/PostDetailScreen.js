@@ -133,7 +133,7 @@ const PostDetailScreen = ({ route, navigation }) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#667eea" />
+        <ActivityIndicator size="large" color="#FF6B35" />
       </View>
     );
   }
@@ -237,7 +237,7 @@ const PostDetailScreen = ({ route, navigation }) => {
               <>
                 {imageLoading && !imageError && (
                   <View style={[mediaStyle, styles.loadingContainer]}>
-                    <ActivityIndicator size="large" color="#667eea" />
+                    <ActivityIndicator size="large" color="#FF6B35" />
                   </View>
                 )}
                 {!imageError ? (
@@ -329,14 +329,14 @@ const PostDetailScreen = ({ route, navigation }) => {
             onPress={() => navigation.navigate('Comments', { postId: post.id })}
           >
             <View style={styles.actionIconContainer}>
-              <Ionicons name="chatbubble-outline" size={20} color="#667eea" />
+              <Ionicons name="chatbubble-outline" size={20} color="#FF6B35" />
             </View>
             <Text style={styles.actionText}>Bình luận</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.actionButton}>
             <View style={styles.actionIconContainer}>
-              <Ionicons name="arrow-redo-outline" size={20} color="#667eea" />
+              <Ionicons name="arrow-redo-outline" size={20} color="#FF6B35" />
             </View>
             <Text style={styles.actionText}>Chia sẻ</Text>
           </TouchableOpacity>
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatar: {
-    backgroundColor: '#667eea',
+    backgroundColor: '#FF6B35',
     borderWidth: 2,
     borderColor: '#f0f0f0',
   },

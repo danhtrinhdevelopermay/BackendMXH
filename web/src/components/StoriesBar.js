@@ -28,7 +28,7 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
             </View>
             <View style={styles.addButton}>
               <LinearGradient
-                colors={['#667eea', '#764ba2']}
+                colors={['#FF6B35', '#F7931E']}
                 style={styles.addButtonGradient}
               >
                 <Ionicons name="add" size={16} color="#fff" />
@@ -49,7 +49,7 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
           activeOpacity={0.7}
         >
           <LinearGradient
-            colors={['#667eea', '#764ba2']}
+            colors={['#FF6B35', '#F7931E']}
             style={styles.storyRing}
           >
             <View style={styles.avatarContainer}>
@@ -74,7 +74,7 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
           activeOpacity={0.7}
         >
           <LinearGradient
-            colors={['#667eea', '#764ba2']}
+            colors={['#FF6B35', '#F7931E']}
             style={styles.storyRing}
           >
             <View style={styles.avatarContainer}>

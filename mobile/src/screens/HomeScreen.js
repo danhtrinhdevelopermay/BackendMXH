@@ -235,7 +235,7 @@ const HomeScreen = ({ navigation }) => {
             onPress={() => navigation.navigate("Camera")}
           >
             <LinearGradient
-              colors={["#667eea", "#764ba2"]}
+              colors={["#FF6B35", "#F7931E"]}
               style={styles.actionIconGradient}
             >
               <Ionicons name="camera" size={20} color="#fff" />
@@ -427,7 +427,7 @@ const HomeScreen = ({ navigation }) => {
                   activeOpacity={0.7}
                 >
                   <LinearGradient
-                    colors={["#667eea", "#764ba2"]}
+                    colors={["#FF6B35", "#F7931E"]}
                     style={styles.reactionCountBadge}
                   >
                     <Text style={styles.reactionIcon}>
@@ -442,7 +442,7 @@ const HomeScreen = ({ navigation }) => {
               <View style={{ flex: 1 }} />
               {item.comment_count > 0 && (
                 <View style={styles.commentBadge}>
-                  <Ionicons name="chatbubble" size={14} color="#667eea" />
+                  <Ionicons name="chatbubble" size={14} color="#FF6B35" />
                   <Text style={styles.commentCountText}>
                     {item.comment_count} bình luận
                   </Text>
@@ -526,15 +526,15 @@ const HomeScreen = ({ navigation }) => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#667eea", "#764ba2"]}
-            tintColor="#667eea"
+            colors={["#FF6B35", "#F7931E"]}
+            tintColor="#FF6B35"
           />
         }
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <LinearGradient
-              colors={["#667eea", "#764ba2"]}
+              colors={["#FF6B35", "#F7931E"]}
               style={styles.emptyIconContainer}
             >
               <Ionicons name="newspaper-outline" size={48} color="#fff" />
@@ -581,7 +581,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     backgroundColor: "#fff",
     paddingBottom: 16,
-    shadowColor: "#667eea",
+    shadowColor: "#FF6B35",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -608,7 +608,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     borderRadius: 20,
     padding: 16,
-    shadowColor: "#667eea",
+    shadowColor: "#FF6B35",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
@@ -682,7 +682,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatar: {
-    backgroundColor: "#667eea",
+    backgroundColor: "#FF6B35",
     borderWidth: 2,
     borderColor: "#f3f4f6",
   },
@@ -773,7 +773,7 @@ const styles = StyleSheet.create({
   },
   commentCountText: {
     fontSize: 13,
-    color: "#667eea",
+    color: "#FF6B35",
     fontWeight: "600",
   },
   actionsContainer: {
@@ -824,7 +824,7 @@ const styles = StyleSheet.create({
     left: 20,
     zIndex: 1000,
     borderRadius: 30,
-    shadowColor: "#667eea",
+    shadowColor: "#FF6B35",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 12,

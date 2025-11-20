@@ -100,7 +100,7 @@ const CreateStoryScreen = ({ navigation }) => {
               disabled={loading}
             >
               <LinearGradient
-                colors={['#667eea', '#764ba2']}
+                colors={['#FF6B35', '#F7931E']}
                 style={styles.shareGradient}
               >
                 {loading ? (
@@ -125,7 +125,7 @@ const CreateStoryScreen = ({ navigation }) => {
                 onPress={() => pickMedia('image')}
               >
                 <LinearGradient
-                  colors={['#667eea', '#764ba2']}
+                  colors={['#FF6B35', '#F7931E']}
                   style={styles.pickGradient}
                 >
                   <Ionicons name="image" size={32} color="#fff" />
@@ -138,7 +138,7 @@ const CreateStoryScreen = ({ navigation }) => {
                 onPress={() => pickMedia('video')}
               >
                 <LinearGradient
-                  colors={['#764ba2', '#667eea']}
+                  colors={['#F7931E', '#FF6B35']}
                   style={styles.pickGradient}
                 >
                   <Ionicons name="videocam" size={32} color="#fff" />
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   pickButton: {
-    shadowColor: '#667eea',
+    shadowColor: '#FF6B35',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

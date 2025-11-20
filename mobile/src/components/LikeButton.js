@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   },
   actionTextLiked: {
     fontSize: 15,
-    color: '#667eea',
+    color: '#FF6B35',
     fontWeight: '600',
   },
   actionText: {

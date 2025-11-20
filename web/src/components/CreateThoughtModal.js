@@ -103,7 +103,7 @@ const CreateThoughtModal = ({ visible, onDismiss, onSave, initialThought }) => {
                   style={styles.saveButtonWrapper}
                 >
                   <LinearGradient
-                    colors={content.trim() ? ['#667eea', '#764ba2'] : ['#ccc', '#999']}
+                    colors={content.trim() ? ['#FF6B35', '#F7931E'] : ['#ccc', '#999']}
                     style={styles.saveButton}
                   >
                     <Text style={styles.saveButtonText}>

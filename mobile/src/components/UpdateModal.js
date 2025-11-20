@@ -140,7 +140,7 @@ const UpdateModal = ({ visible, updateInfo, onUpdateLater }) => {
 
           {downloading ? (
             <View style={styles.downloadingContainer}>
-              <ActivityIndicator size="large" color="#667eea" />
+              <ActivityIndicator size="large" color="#FF6B35" />
               <Text style={styles.downloadingText}>
                 Đang tải xuống... {downloadProgress}%
               </Text>
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   downloadingText: {
     marginTop: 15,
     fontSize: 16,
-    color: '#667eea',
+    color: '#FF6B35',
     fontWeight: '600',
   },
   progressBar: {
@@ -263,14 +263,14 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#667eea',
+    backgroundColor: '#FF6B35',
     borderRadius: 4,
   },
   buttonsContainer: {
     width: '100%',
   },
   updateButton: {
-    backgroundColor: '#667eea',
+    backgroundColor: '#FF6B35',
     paddingVertical: 15,
     borderRadius: 12,
     alignItems: 'center',

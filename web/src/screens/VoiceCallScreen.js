@@ -115,7 +115,7 @@ const VoiceCallScreen = ({ route, navigation }) => {
 
   return (
     <LinearGradient
-      colors={['#667eea', '#764ba2']}
+      colors={['#FF6B35', '#F7931E']}
       style={styles.container}
     >
       <View style={styles.content}>

@@ -33,7 +33,7 @@ const WelcomeScreen = ({ navigation }) => {
 
   return (
     <LinearGradient
-      colors={['#667eea', '#764ba2', '#f093fb']}
+      colors={['#FF6B35', '#F7931E', '#f093fb']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.container}
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   createButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#667eea',
+    color: '#FF6B35',
     letterSpacing: 0.5,
   },
   loginButton: {
