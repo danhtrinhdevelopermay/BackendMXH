@@ -274,6 +274,7 @@ const HomeTabs = () => {
       })}
       sceneContainerStyle={{
         backgroundColor: 'transparent',
+        paddingBottom: 90,
       }}
     >
       <Tab.Screen 
