@@ -517,6 +517,12 @@ const HomeScreen = ({ navigation }) => {
         viewabilityConfig={viewabilityConfig}
       />
 
+      <LinearGradient
+        colors={['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 0.8)', 'rgba(255, 255, 255, 0)']}
+        style={styles.topGradient}
+        pointerEvents="none"
+      />
+
       <ReactionsModal
         visible={reactionsModalVisible}
         onClose={() => setReactionsModalVisible(false)}
@@ -578,6 +584,14 @@ const styles = StyleSheet.create({
   },
   headerWrapper: {
     backgroundColor: '#fff',
+  },
+  topGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 120,
+    zIndex: 999,
   },
   createPostBox: {
     flexDirection: 'row',
