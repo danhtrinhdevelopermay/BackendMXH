@@ -27,7 +27,6 @@ import {
 import { Video } from "expo-av";
 import Constants from "expo-constants";
 import { LinearGradient } from "expo-linear-gradient";
-import { BlurView } from "expo-blur";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { postAPI, reactionAPI, storyAPI } from "../api/api";
@@ -472,35 +471,23 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <BlurView 
-        intensity={95} 
-        tint="light" 
-        experimentalBlurMethod="dimezisBlurView"
-        style={styles.fixedHeader}
-      >
-        <View style={styles.headerContent}>
-          <Text style={styles.appLogo}>Layedia</Text>
-          <View style={styles.headerActions}>
-            <TouchableOpacity 
-              style={styles.headerButton}
-              onPress={() => navigation.navigate('Search')}
-            >
-              <Ionicons name="search" size={24} color="#1a1a1a" />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.headerButton}
-              onPress={() => navigation.navigate('Thông báo')}
-            >
-              <Ionicons name="notifications-outline" size={24} color="#1a1a1a" />
-            </TouchableOpacity>
-          </View>
+      <View style={styles.fixedHeader}>
+        <Text style={styles.appLogo}>Layedia</Text>
+        <View style={styles.headerActions}>
+          <TouchableOpacity 
+            style={styles.headerButton}
+            onPress={() => navigation.navigate('Search')}
+          >
+            <Ionicons name="search" size={24} color="#1a1a1a" />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.headerButton}
+            onPress={() => navigation.navigate('Thông báo')}
+          >
+            <Ionicons name="notifications-outline" size={24} color="#1a1a1a" />
+          </TouchableOpacity>
         </View>
-        <LinearGradient
-          colors={['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 1)']}
-          style={styles.headerGradient}
-          pointerEvents="none"
-        />
-      </BlurView>
+      </View>
 
       <FlatList
         data={posts}
@@ -528,6 +515,12 @@ const HomeScreen = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
+      />
+
+      <LinearGradient
+        colors={['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 0.8)', 'rgba(255, 255, 255, 0)']}
+        style={styles.topGradient}
+        pointerEvents="none"
       />
 
       <ReactionsModal
@@ -558,23 +551,13 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    zIndex: 1000,
-    overflow: 'hidden',
-  },
-  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 50,
     paddingBottom: 12,
-  },
-  headerGradient: {
-    position: 'absolute',
-    bottom: -30,
-    left: 0,
-    right: 0,
-    height: 30,
+    zIndex: 1000,
   },
   appLogo: {
     fontSize: 28,
@@ -601,6 +584,14 @@ const styles = StyleSheet.create({
   },
   headerWrapper: {
     backgroundColor: '#fff',
+  },
+  topGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 120,
+    zIndex: 999,
   },
   createPostBox: {
     flexDirection: 'row',
