@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { TouchableOpacity, Animated, Easing, View } from 'react-native';
+import { TouchableOpacity, Animated, Easing, View, Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, CardStyleInterpolators, TransitionPresets } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -289,8 +289,9 @@ const HomeTabs = () => {
       }}
       tabBar={(props) => (
         <BlurView 
-          intensity={80}
-          tint="systemMaterial"
+          intensity={95}
+          tint="light"
+          experimentalBlurMethod={Platform.OS === 'android' ? 'dimezisBlurView' : undefined}
           style={{
             position: 'absolute',
             bottom: 0,
@@ -298,6 +299,7 @@ const HomeTabs = () => {
             right: 0,
             height: 65 + insets.bottom,
             paddingBottom: insets.bottom,
+            backgroundColor: 'rgba(255, 255, 255, 0.5)',
           }}
         >
           <View style={{
