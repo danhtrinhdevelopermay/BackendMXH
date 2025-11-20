@@ -292,7 +292,7 @@ const HomeTabs = () => {
           bottom: 0,
           left: 0,
           right: 0,
-          backgroundColor: '#fff',
+          backgroundColor: 'transparent',
         }}>
           <View style={{
             backgroundColor: 'transparent',
