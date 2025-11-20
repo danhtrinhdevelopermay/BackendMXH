@@ -472,7 +472,12 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <BlurView intensity={80} tint="light" style={styles.fixedHeader}>
+      <BlurView 
+        intensity={60} 
+        tint="light" 
+        experimentalBlurMethod="dimezisBlurView"
+        style={styles.fixedHeader}
+      >
         <View style={styles.headerContent}>
           <Text style={styles.appLogo}>Layedia</Text>
           <View style={styles.headerActions}>
