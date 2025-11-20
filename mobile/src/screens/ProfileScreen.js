@@ -33,27 +33,23 @@ const ProfileScreen = ({ route, navigation }) => {
     try {
       if (isOwnProfile) {
         setProfileUser(currentUser);
-        const [postsResponse, likedPostsResponse, statsResponse, storiesResponse] = await Promise.all([
+        const [postsResponse, statsResponse, storiesResponse] = await Promise.all([
           postAPI.getUserPosts(currentUser.id),
-          postAPI.getLikedPosts(currentUser.id),
           userAPI.getUserStats(currentUser.id),
           storyAPI.getUserStories(currentUser.id).catch(() => ({ data: [] }))
         ]);
         setPosts(postsResponse.data);
-        setLikedPosts(likedPostsResponse.data);
         setStats(statsResponse.data);
         setStories(storiesResponse.data || []);
       } else {
-        const [userResponse, postsResponse, likedPostsResponse, statsResponse, storiesResponse] = await Promise.all([
+        const [userResponse, postsResponse, statsResponse, storiesResponse] = await Promise.all([
           userAPI.getUserById(userId),
           postAPI.getUserPosts(userId),
-          postAPI.getLikedPosts(userId),
           userAPI.getUserStats(userId),
           storyAPI.getUserStories(userId).catch(() => ({ data: [] }))
         ]);
         setProfileUser(userResponse.data);
         setPosts(postsResponse.data);
-        setLikedPosts(likedPostsResponse.data);
         setStats(statsResponse.data);
         setStories(storiesResponse.data || []);
       }
