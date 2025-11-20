@@ -20,7 +20,6 @@ const addReaction = async (req, res) => {
       );
       cacheService.delPattern('newsfeed:');
       cacheService.delPattern('userposts:');
-      cacheService.delPattern('likedposts:');
       return res.json(result.rows[0]);
     }
 
@@ -74,7 +73,6 @@ const addReaction = async (req, res) => {
 
     cacheService.delPattern('newsfeed:');
     cacheService.delPattern('userposts:');
-    cacheService.delPattern('likedposts:');
     
     res.status(201).json(result.rows[0]);
   } catch (error) {
@@ -99,7 +97,6 @@ const removeReaction = async (req, res) => {
 
     cacheService.delPattern('newsfeed:');
     cacheService.delPattern('userposts:');
-    cacheService.delPattern('likedposts:');
 
     res.json({ message: 'Reaction removed successfully' });
   } catch (error) {
