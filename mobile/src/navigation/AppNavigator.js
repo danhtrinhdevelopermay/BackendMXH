@@ -284,7 +284,7 @@ const HomeTabs = () => {
       })}
       sceneContainerStyle={{
         backgroundColor: '#fff',
-        paddingBottom: 90,
+        paddingBottom: 0,
       }}
       tabBar={(props) => (
         <View style={{
@@ -347,7 +347,7 @@ const HomeTabs = () => {
                     alignItems: 'center',
                     paddingTop: 8,
                     paddingBottom: 10,
-                    backgroundColor: 'transparent',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
                   }}
                 >
                   <TabBarIcon
