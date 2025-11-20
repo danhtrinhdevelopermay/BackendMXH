@@ -289,8 +289,8 @@ const HomeTabs = () => {
       }}
       tabBar={(props) => (
         <BlurView 
-          intensity={95}
-          tint="light"
+          intensity={80}
+          tint="dark"
           experimentalBlurMethod={Platform.OS === 'android' ? 'dimezisBlurView' : undefined}
           style={{
             position: 'absolute',
@@ -299,7 +299,6 @@ const HomeTabs = () => {
             right: 0,
             height: 65 + insets.bottom,
             paddingBottom: insets.bottom,
-            backgroundColor: 'transparent',
           }}
         >
           <View style={{
