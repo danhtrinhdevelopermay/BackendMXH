@@ -77,7 +77,7 @@ const ProfileScreen = ({ route, navigation }) => {
     return num.toString();
   };
 
-  const renderHeader = () => (
+  const renderHeader = React.useCallback(() => (
     <ImageBackground
       source={{ uri: profileUser?.id ? `${API_URL}/api/avatar/${profileUser.id}?${Date.now()}` : undefined }}
       style={styles.headerContainer}
@@ -197,7 +197,7 @@ const ProfileScreen = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
     </ImageBackground>
-  );
+  ), [profileUser, API_URL, navigation, activeTab, stats, stories]);
 
   const renderPost = ({ item }) => {
     const mediaUrl = item.media_url || `${API_URL}/api/media/${item.id}`;
