@@ -405,6 +405,67 @@ const HomeScreen = ({ navigation }) => {
             </View>
           );
         })()}
+
+      <View style={styles.actionsContainer}>
+        <LikeButton
+          isLiked={!!item.user_reaction}
+          reactionType={item.user_reaction}
+          onPress={() =>
+            handleReaction(item.id, "like", item.user_reaction)
+          }
+          onLongPress={() => toggleReactionMenu(item.id)}
+        />
+
+        {reactionMenuVisible[item.id] && (
+          <View style={styles.reactionMenu}>
+            <LinearGradient
+              colors={["#ffffff", "#f9fafb"]}
+              style={styles.reactionMenuContent}
+            >
+              {["like", "love", "haha", "wow", "sad", "angry"].map(
+                (reaction) => (
+                  <TouchableOpacity
+                    key={reaction}
+                    onPress={() =>
+                      handleReaction(item.id, reaction, item.user_reaction)
+                    }
+                    style={styles.reactionOption}
+                  >
+                    <Text style={styles.reactionOptionIcon}>
+                      {getReactionIcon(reaction)}
+                    </Text>
+                  </TouchableOpacity>
+                ),
+              )}
+            </LinearGradient>
+          </View>
+        )}
+
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() =>
+            navigation.navigate("Comments", { postId: item.id })
+          }
+        >
+          <View style={styles.actionNormal}>
+            <Ionicons name="chatbubble-outline" size={22} color="#6b7280" />
+            <Text style={styles.actionText}>Bình luận</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => {
+            setSelectedPost(item);
+            setShareModalVisible(true);
+          }}
+        >
+          <View style={styles.actionNormal}>
+            <Ionicons name="share-outline" size={22} color="#6b7280" />
+            <Text style={styles.actionText}>Chia sẻ</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -609,6 +670,54 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#9ca3af',
     marginTop: 8,
+  },
+  actionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingTop: 12,
+    marginTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+  },
+  actionButton: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  actionNormal: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  actionText: {
+    fontSize: 14,
+    color: '#6b7280',
+    fontWeight: '500',
+  },
+  reactionMenu: {
+    position: 'absolute',
+    bottom: 50,
+    left: 20,
+    zIndex: 1000,
+    borderRadius: 30,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  reactionMenuContent: {
+    flexDirection: 'row',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 8,
+  },
+  reactionOption: {
+    padding: 4,
+  },
+  reactionOptionIcon: {
+    fontSize: 28,
   },
   emptyContainer: {
     flex: 1,
