@@ -243,9 +243,9 @@ const HomeTabs = () => {
           height: 65,
           paddingBottom: 10,
           paddingTop: 8,
-          marginHorizontal: 16,
-          marginBottom: insets.bottom + 16,
-          borderRadius: 20,
+          marginHorizontal: 0,
+          marginBottom: insets.bottom,
+          borderRadius: 0,
           shadowColor: 'transparent',
           shadowOffset: {
             width: 0,
@@ -296,9 +296,9 @@ const HomeTabs = () => {
         }}>
           <View style={{
             backgroundColor: 'transparent',
-            marginHorizontal: 16,
-            marginBottom: insets.bottom + 16,
-            borderRadius: 20,
+            marginHorizontal: 0,
+            marginBottom: insets.bottom,
+            borderRadius: 0,
             height: 65,
             flexDirection: 'row',
             shadowColor: 'transparent',
