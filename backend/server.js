@@ -20,6 +20,7 @@ const storyRoutes = require('./src/routes/stories');
 const streakRoutes = require('./src/routes/streaks');
 const appVersionsRoutes = require('./src/routes/appVersions');
 const aiRoutes = require('./src/routes/ai');
+const archiveRoutes = require('./src/routes/archive');
 const { authenticateToken } = require('./src/middleware/auth');
 const pool = require('./src/config/database');
 const cloudinary = require('./src/config/cloudinary');
@@ -96,6 +97,7 @@ app.use('/api/stories', storyRoutes);
 app.use('/api/streaks', streakRoutes);
 app.use('/api/app-versions', appVersionsRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api', archiveRoutes);
 
 app.get('/api/auto-reactions/status', authenticateToken, (req, res) => {
   res.json(autoReactionService.getStats());
