@@ -268,21 +268,9 @@ const HomeTabs = () => {
       <Tab.Screen 
         name="Home" 
         component={AnimatedHome}
-        options={({ navigation }) => ({
-          headerShown: true,
-          title: 'Trang chủ',
-          headerRight: () => (
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 8 }}>
-              <NotificationBell navigation={navigation} />
-              <TouchableOpacity
-                onPress={() => navigation.navigate('Search')}
-                style={{ marginRight: 16 }}
-              >
-                <Ionicons name="search" size={24} color="#050505" />
-              </TouchableOpacity>
-            </View>
-          ),
-        })}
+        options={{
+          headerShown: false,
+        }}
       />
       <Tab.Screen 
         name="Bạn bè" 
