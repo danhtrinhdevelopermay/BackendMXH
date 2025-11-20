@@ -255,4 +255,74 @@ const searchPosts = async (req, res) => {
   }
 };
 
-module.exports = { createPost, getNewsFeed, getUserPosts, deletePost, searchPosts };
+const getLikedPosts = async (req, res) => {
+  const user_id = req.user.id;
+
+  const cacheKey = cacheService.getCacheKey('likedposts', user_id);
+
+  try {
+    const cachedData = cacheService.get(cacheKey);
+    if (cachedData) {
+      return res.json(cachedData);
+    }
+
+    const result = await pool.queryAll(
+      `WITH liked_post_ids AS (
+         SELECT post_id
+         FROM reactions
+         WHERE user_id = $1
+       ),
+       visible_posts AS (
+         SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.media_width, p.media_height, p.privacy, p.created_at, p.updated_at
+         FROM posts p
+         WHERE p.id IN (SELECT post_id FROM liked_post_ids)
+         AND (
+           p.user_id = $1
+           OR p.privacy = 'public'
+           OR (p.privacy = 'friends' AND EXISTS (
+             SELECT 1 FROM friendships 
+             WHERE status = 'accepted' 
+             AND ((requester_id = p.user_id AND addressee_id = $1) OR (requester_id = $1 AND addressee_id = p.user_id))
+           ))
+         )
+       ),
+       reaction_counts AS (
+         SELECT post_id, COUNT(*) as count
+         FROM reactions
+         WHERE post_id IN (SELECT id FROM visible_posts)
+         GROUP BY post_id
+       ),
+       comment_counts AS (
+         SELECT post_id, COUNT(*) as count
+         FROM comments
+         WHERE post_id IN (SELECT id FROM visible_posts)
+         GROUP BY post_id
+       ),
+       user_reactions AS (
+         SELECT post_id, reaction_type
+         FROM reactions
+         WHERE user_id = $1 AND post_id IN (SELECT id FROM visible_posts)
+       )
+       SELECT p.id, p.user_id, p.content, p.media_url, p.media_type, p.media_width, p.media_height, p.privacy, p.created_at, p.updated_at,
+         u.username, u.full_name, u.avatar_url, u.is_verified,
+         COALESCE(rc.count, 0) as reaction_count,
+         COALESCE(cc.count, 0) as comment_count,
+         ur.reaction_type as user_reaction
+       FROM visible_posts p
+       JOIN users u ON p.user_id = u.id
+       LEFT JOIN reaction_counts rc ON rc.post_id = p.id
+       LEFT JOIN comment_counts cc ON cc.post_id = p.id
+       LEFT JOIN user_reactions ur ON ur.post_id = p.id
+       ORDER BY p.created_at DESC`,
+      [user_id]
+    );
+
+    cacheService.set(cacheKey, result.rows, 180);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Get liked posts error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+module.exports = { createPost, getNewsFeed, getUserPosts, deletePost, searchPosts, getLikedPosts };

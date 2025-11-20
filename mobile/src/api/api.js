@@ -66,6 +66,7 @@ export const postAPI = {
   createPost: (data) => api.post('/posts', data),
   getNewsFeed: (params) => api.get('/posts/feed', { params }),
   getUserPosts: (userId) => api.get(`/posts/user/${userId}`),
+  getLikedPosts: () => api.get('/posts/liked'),
   deletePost: (postId) => api.delete(`/posts/${postId}`),
   searchPosts: (query) => api.get('/posts/search', { params: { query } }),
 };
