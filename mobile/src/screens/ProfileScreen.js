@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, FlatList, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions, StatusBar } from 'react-native';
+import { View, FlatList, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions, StatusBar, ImageBackground } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import { Video } from 'expo-av';
@@ -8,7 +8,6 @@ import { useAlert } from '../context/AlertContext';
 import { postAPI, userAPI, friendshipAPI, storyAPI } from '../api/api';
 import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
 const ITEM_SIZE = width / 3;
@@ -74,12 +73,12 @@ const ProfileScreen = ({ route, navigation }) => {
   };
 
   const renderHeader = () => (
-    <LinearGradient
-      colors={['#9FE8DA', '#7ED9CC', '#5DCABF']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
+    <ImageBackground
+      source={{ uri: profileUser?.id ? `${API_URL}/api/avatar/${profileUser.id}?${Date.now()}` : undefined }}
       style={styles.headerContainer}
+      blurRadius={30}
     >
+      <View style={styles.overlay} />
       <View style={styles.topBar}>
         <TouchableOpacity style={styles.nameDropdown}>
           <Text style={styles.headerName}>{profileUser?.full_name || profileUser?.username}</Text>
@@ -143,7 +142,7 @@ const ProfileScreen = ({ route, navigation }) => {
         >
           <View style={styles.addStoryBorder}>
             <View style={styles.addStoryInner}>
-              <Ionicons name="add" size={28} color="#5DCABF" />
+              <Ionicons name="add" size={28} color="#666" />
             </View>
           </View>
           <Text style={styles.storyLabel}>Add Story</Text>
@@ -189,7 +188,7 @@ const ProfileScreen = ({ route, navigation }) => {
           <Text style={[styles.tabText, activeTab === 'mention' && styles.activeTabText]}>Mention</Text>
         </TouchableOpacity>
       </View>
-    </LinearGradient>
+    </ImageBackground>
   );
 
   const renderPost = ({ item }) => {
@@ -222,7 +221,7 @@ const ProfileScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#9FE8DA" />
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       <FlatList
         data={posts.filter(p => p.media_url || p.media_type)}
         renderItem={renderPost}
@@ -249,6 +248,10 @@ const styles = StyleSheet.create({
   headerContainer: {
     paddingTop: 50,
     paddingBottom: 0,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
   },
   topBar: {
     flexDirection: 'row',
@@ -316,7 +319,7 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 44,
     fontWeight: '700',
-    color: '#5DCABF',
+    color: '#999',
   },
   displayName: {
     fontSize: 24,
