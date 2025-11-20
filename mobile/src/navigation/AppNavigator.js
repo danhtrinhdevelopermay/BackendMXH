@@ -238,7 +238,7 @@ const HomeTabs = () => {
         ),
         tabBarStyle: {
           position: 'absolute',
-          backgroundColor: '#fff',
+          backgroundColor: 'transparent',
           borderTopWidth: 0,
           height: 65,
           paddingBottom: 10,
@@ -295,7 +295,7 @@ const HomeTabs = () => {
           backgroundColor: 'transparent',
         }}>
           <View style={{
-            backgroundColor: '#fff',
+            backgroundColor: 'transparent',
             marginHorizontal: 16,
             marginBottom: insets.bottom + 16,
             borderRadius: 20,
