@@ -663,9 +663,14 @@ const styles = StyleSheet.create({
   postCard: {
     backgroundColor: '#fff',
     marginHorizontal: 16,
-    marginBottom: 12,
+    marginBottom: 16,
     borderRadius: 16,
     padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
   },
   postHeader: {
     flexDirection: 'row',
