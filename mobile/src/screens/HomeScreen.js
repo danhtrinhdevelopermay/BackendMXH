@@ -241,11 +241,6 @@ const HomeScreen = ({ navigation }) => {
 
   const renderHeader = () => (
     <View style={styles.headerWrapper}>
-      <LinearGradient
-        colors={['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 0)']}
-        style={styles.topGradient}
-        pointerEvents="none"
-      />
       <Pressable
         style={styles.createPostBox}
         onPress={() => navigation.navigate("CreatePost")}
@@ -442,6 +437,12 @@ const HomeScreen = ({ navigation }) => {
         viewabilityConfig={viewabilityConfig}
       />
 
+      <LinearGradient
+        colors={['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 0)']}
+        style={styles.topGradient}
+        pointerEvents="none"
+      />
+
       <ReactionsModal
         visible={reactionsModalVisible}
         onClose={() => setReactionsModalVisible(false)}
@@ -471,14 +472,13 @@ const styles = StyleSheet.create({
   },
   headerWrapper: {
     backgroundColor: '#fff',
-    position: 'relative',
   },
   topGradient: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: 60,
+    height: 80,
     zIndex: 10,
   },
   createPostBox: {
