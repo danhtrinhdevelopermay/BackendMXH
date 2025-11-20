@@ -246,14 +246,14 @@ const HomeTabs = () => {
           marginHorizontal: 16,
           marginBottom: insets.bottom + 16,
           borderRadius: 20,
-          shadowColor: '#000',
+          shadowColor: 'transparent',
           shadowOffset: {
             width: 0,
-            height: 4,
+            height: 0,
           },
-          shadowOpacity: 0.15,
-          shadowRadius: 8,
-          elevation: 8,
+          shadowOpacity: 0,
+          shadowRadius: 0,
+          elevation: 0,
         },
         tabBarLabelStyle: {
           fontSize: 12,
@@ -284,7 +284,7 @@ const HomeTabs = () => {
       })}
       sceneContainerStyle={{
         backgroundColor: '#fff',
-        paddingBottom: 0,
+        paddingBottom: 90,
       }}
       tabBar={(props) => (
         <View style={{
@@ -301,11 +301,11 @@ const HomeTabs = () => {
             borderRadius: 20,
             height: 65,
             flexDirection: 'row',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.15,
-            shadowRadius: 8,
-            elevation: 8,
+            shadowColor: 'transparent',
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: 0,
+            shadowRadius: 0,
+            elevation: 0,
           }}>
             {props.state.routes.map((route, index) => {
               const { options } = props.descriptors[route.key];
