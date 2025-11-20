@@ -438,7 +438,7 @@ const HomeScreen = ({ navigation }) => {
       />
 
       <LinearGradient
-        colors={['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 0)']}
+        colors={['rgba(255, 255, 255, 0.95)', 'rgba(255, 255, 255, 0.7)', 'rgba(255, 255, 255, 0)']}
         style={styles.topGradient}
         pointerEvents="none"
       />
