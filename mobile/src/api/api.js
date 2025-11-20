@@ -109,6 +109,15 @@ export const messageBackupAPI = {
   getBackupHistory: () => api.get('/message-backup/history'),
 };
 
+export const archiveAPI = {
+  archiveMessages: () => api.post('/archive/messages'),
+  archiveNotifications: () => api.post('/archive/notifications'),
+  runFullArchive: () => api.post('/archive/run'),
+  getArchiveStatus: () => api.get('/archive/status'),
+  getArchivedMessages: () => api.get('/archive/messages'),
+  getArchivedNotifications: () => api.get('/archive/notifications'),
+};
+
 export const notificationAPI = {
   getNotifications: () => api.get('/notifications'),
   markAsRead: (notificationId) => api.put(`/notifications/${notificationId}/read`),

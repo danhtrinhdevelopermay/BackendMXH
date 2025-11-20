@@ -1,6 +1,7 @@
 const pool = require('../config/database');
 const { sendPushNotification } = require('./pushTokenController');
 const { updateStreak } = require('./streakController');
+const { getArchivedMessages } = require('../services/googleDriveService');
 
 const sendMessage = async (req, res) => {
   const { receiver_id, content } = req.body;
@@ -132,7 +133,24 @@ const getMessages = async (req, res) => {
       [userId, current_user_id]
     );
 
-    res.json(result.rows);
+    let allMessages = result.rows;
+
+    try {
+      const archivedData = await getArchivedMessages(current_user_id);
+      if (archivedData && archivedData.length > 0) {
+        const relevantArchived = archivedData.filter(msg => 
+          (msg.sender_id === current_user_id && msg.receiver_id == userId) || 
+          (msg.sender_id == userId && msg.receiver_id === current_user_id)
+        );
+        allMessages = [...relevantArchived, ...allMessages].sort((a, b) => 
+          new Date(a.created_at) - new Date(b.created_at)
+        );
+      }
+    } catch (archiveError) {
+      console.log('No archived messages or error fetching:', archiveError.message);
+    }
+
+    res.json(allMessages);
   } catch (error) {
     console.error('Get messages error:', error);
     res.status(500).json({ error: 'Server error' });

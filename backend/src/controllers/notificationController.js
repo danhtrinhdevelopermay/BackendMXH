@@ -1,4 +1,5 @@
 const pool = require('../config/database');
+const { getArchivedNotifications } = require('../services/googleDriveService');
 
 const getNotifications = async (req, res) => {
   const user_id = req.user.id;
@@ -14,7 +15,20 @@ const getNotifications = async (req, res) => {
       [user_id]
     );
 
-    res.json(result.rows);
+    let allNotifications = result.rows;
+
+    try {
+      const archivedData = await getArchivedNotifications(user_id);
+      if (archivedData && archivedData.length > 0) {
+        allNotifications = [...archivedData, ...allNotifications].sort((a, b) => 
+          new Date(b.created_at) - new Date(a.created_at)
+        ).slice(0, 50);
+      }
+    } catch (archiveError) {
+      console.log('No archived notifications or error fetching:', archiveError.message);
+    }
+
+    res.json(allNotifications);
   } catch (error) {
     console.error('Get notifications error:', error);
     res.status(500).json({ error: 'Server error' });
