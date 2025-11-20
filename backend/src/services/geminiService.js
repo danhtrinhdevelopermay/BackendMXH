@@ -45,7 +45,45 @@ Chỉ trả về nội dung bài viết, không thêm bất kỳ tiêu đề hay
   }
 }
 
+async function generateIceBreaker(userName, otherUserName) {
+  try {
+    const prompt = `Bạn là một trợ lý thông minh giúp tạo tin nhắn phá băng cho 2 người bạn mới kết bạn trên mạng xã hội.
+
+${userName} vừa kết bạn với ${otherUserName}. Hãy tạo 3 gợi ý tin nhắn ngắn gọn, thân thiện, tự nhiên để ${userName} có thể bắt đầu cuộc trò chuyện với ${otherUserName}.
+
+Yêu cầu:
+- Mỗi gợi ý từ 5-15 từ
+- Thân thiện, tự nhiên, không quá trang trọng
+- Phù hợp với văn hóa Việt Nam
+- Không dùng emoji
+
+Chỉ trả về 3 gợi ý, mỗi gợi ý trên 1 dòng, không đánh số, không thêm giải thích.`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents: prompt,
+    });
+
+    const text = response.text || '';
+    const suggestions = text.split('\n').filter(line => line.trim()).slice(0, 3);
+    
+    return suggestions.length > 0 ? suggestions : [
+      `Chào ${otherUserName}, rất vui được kết bạn với bạn!`,
+      `Hi ${otherUserName}, mình thấy profile bạn thú vị quá!`,
+      `Chào bạn! Chúng ta có bạn chung không nhỉ?`
+    ];
+  } catch (error) {
+    console.error('Error generating ice breaker with Gemini:', error);
+    return [
+      `Chào ${otherUserName}, rất vui được kết bạn với bạn!`,
+      `Hi ${otherUserName}, mình thấy profile bạn thú vị quá!`,
+      `Chào bạn! Chúng ta có bạn chung không nhỉ?`
+    ];
+  }
+}
+
 module.exports = {
   improveText,
   generateText,
+  generateIceBreaker,
 };

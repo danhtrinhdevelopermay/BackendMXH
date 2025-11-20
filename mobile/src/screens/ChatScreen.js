@@ -5,7 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
-import { messageAPI, userAPI } from '../api/api';
+import { messageAPI, userAPI, aiAPI } from '../api/api';
 import { AuthContext } from '../context/AuthContext';
 import UserAvatar from '../components/UserAvatar';
 import SocketService from '../services/SocketService';
@@ -31,6 +31,7 @@ const ChatScreen = ({ route, navigation }) => {
     avatar_url: userAvatar,
     username: userName
   });
+  const [iceBreakerSuggestions, setIceBreakerSuggestions] = useState([]);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const typingAnim = useRef(new Animated.Value(0)).current;
   const typingTimeoutRef = useRef(null);
@@ -110,12 +111,30 @@ const ChatScreen = ({ route, navigation }) => {
     }
   };
 
+  const fetchIceBreakerSuggestions = async () => {
+    try {
+      const response = await aiAPI.generateIceBreaker({
+        userName: user.full_name || user.username,
+        otherUserName: userName
+      });
+      setIceBreakerSuggestions(response.data.suggestions || []);
+    } catch (error) {
+      console.error('Failed to fetch ice breaker suggestions');
+    }
+  };
+
   useEffect(() => {
     fetchMessages();
     fetchUserStatus();
     const interval = setInterval(fetchMessages, 3000);
     return () => clearInterval(interval);
   }, [userId]);
+
+  useEffect(() => {
+    if (messages.length === 0) {
+      fetchIceBreakerSuggestions();
+    }
+  }, [messages.length]);
 
   useEffect(() => {
     if (isTyping) {
@@ -448,6 +467,45 @@ const ChatScreen = ({ route, navigation }) => {
           inverted
           contentContainerStyle={styles.messagesList}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            messages.length === 0 && (
+              <View style={styles.emptyContainer}>
+                <View style={styles.welcomeSection}>
+                  <UserAvatar user={otherUser} size={80} />
+                  <Text style={styles.welcomeTitle}>
+                    Bắt đầu trò chuyện với {userName}
+                  </Text>
+                  <Text style={styles.welcomeSubtitle}>
+                    Hãy gửi tin nhắn để bắt đầu cuộc trò chuyện
+                  </Text>
+                </View>
+
+                {iceBreakerSuggestions.length > 0 && (
+                  <View style={styles.suggestionsSection}>
+                    <View style={styles.suggestionHeader}>
+                      <Ionicons name="sparkles" size={16} color="#0084FF" />
+                      <Text style={styles.suggestionHeaderText}>
+                        Gợi ý từ AI
+                      </Text>
+                    </View>
+                    {iceBreakerSuggestions.map((suggestion, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.suggestionItem}
+                        onPress={() => {
+                          setNewMessage(suggestion);
+                          handleSend();
+                        }}
+                      >
+                        <Text style={styles.suggestionText}>{suggestion}</Text>
+                        <Ionicons name="send-outline" size={18} color="#0084FF" />
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )
+          }
         />
 
         {isTyping && (
@@ -901,6 +959,64 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#65676B',
+  },
+  emptyContainer: {
+    flex: 1,
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    transform: [{ scaleY: -1 }],
+  },
+  welcomeSection: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  welcomeTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#050505',
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  welcomeSubtitle: {
+    fontSize: 14,
+    color: '#65676B',
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  suggestionsSection: {
+    width: '100%',
+    backgroundColor: '#F8F9FA',
+    borderRadius: 16,
+    padding: 16,
+  },
+  suggestionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 12,
+  },
+  suggestionHeaderText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#0084FF',
+  },
+  suggestionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#E4E6EB',
+  },
+  suggestionText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#050505',
+    marginRight: 12,
   },
 });
 

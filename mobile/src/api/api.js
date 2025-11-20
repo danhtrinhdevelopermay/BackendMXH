@@ -187,6 +187,7 @@ export const streakAPI = {
 
 export const aiAPI = {
   generateText: (data) => api.post('/ai/generate-text', data),
+  generateIceBreaker: (data) => api.post('/ai/generate-ice-breaker', data),
 };
 
 export default api;
