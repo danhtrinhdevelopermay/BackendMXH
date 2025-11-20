@@ -36,7 +36,7 @@ const LoginScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#667eea', '#764ba2']}
+        colors={['#FF6B35', '#F7931E']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradientTop}
@@ -106,7 +106,7 @@ const LoginScreen = ({ navigation }) => {
             <Checkbox
               status={rememberMe ? 'checked' : 'unchecked'}
               onPress={() => setRememberMe(!rememberMe)}
-              color="#9C7BB0"
+              color="#FF6B35"
             />
             <Text style={styles.rememberText}>Nhớ tôi nhé</Text>
           </View>
@@ -121,7 +121,7 @@ const LoginScreen = ({ navigation }) => {
           activeOpacity={0.9}
         >
           <LinearGradient
-            colors={['#667eea', '#764ba2']}
+            colors={['#FF6B35', '#F7931E']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.gradientButton}
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   },
   forgotText: {
     fontSize: 14,
-    color: '#667eea',
+    color: '#FF6B35',
     fontWeight: '600',
   },
   gradientButton: {
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     alignItems: 'center',
     marginBottom: 28,
-    shadowColor: '#667eea',
+    shadowColor: '#FF6B35',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
     shadowRadius: 12,
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   },
   signupLink: {
     fontSize: 15,
-    color: '#667eea',
+    color: '#FF6B35',
     fontWeight: '700',
   },
 });

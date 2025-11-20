@@ -37,7 +37,7 @@ const RegisterScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#667eea', '#764ba2']}
+        colors={['#FF6B35', '#F7931E']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradientTop}
@@ -129,7 +129,7 @@ const RegisterScreen = ({ navigation }) => {
           activeOpacity={0.9}
         >
           <LinearGradient
-            colors={['#667eea', '#764ba2']}
+            colors={['#FF6B35', '#F7931E']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.gradientButton}
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 28,
     marginTop: 12,
-    shadowColor: '#667eea',
+    shadowColor: '#FF6B35',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.4,
     shadowRadius: 12,
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
   },
   loginLink: {
     fontSize: 15,
-    color: '#667eea',
+    color: '#FF6B35',
     fontWeight: '700',
   },
 });
