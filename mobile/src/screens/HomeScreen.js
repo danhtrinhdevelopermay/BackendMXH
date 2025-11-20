@@ -55,7 +55,6 @@ const HomeScreen = ({ navigation }) => {
   const [mediaErrors, setMediaErrors] = useState({});
   const [shareModalVisible, setShareModalVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
-  const [activeTab, setActiveTab] = useState('discover');
   const videoRefs = useRef({});
 
   const API_URL = Constants.expoConfig?.extra?.apiUrl || "http://localhost:5000";
@@ -242,27 +241,6 @@ const HomeScreen = ({ navigation }) => {
 
   const renderHeader = () => (
     <View style={styles.headerWrapper}>
-      <View style={styles.tabsContainer}>
-        <TouchableOpacity 
-          style={styles.tab}
-          onPress={() => setActiveTab('discover')}
-        >
-          <Text style={[styles.tabText, activeTab === 'discover' && styles.activeTabText]}>
-            Discover
-          </Text>
-          {activeTab === 'discover' && <View style={styles.tabIndicator} />}
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.tab}
-          onPress={() => setActiveTab('following')}
-        >
-          <Text style={[styles.tabText, activeTab === 'following' && styles.inactiveTabText]}>
-            Following
-          </Text>
-          {activeTab === 'following' && <View style={styles.tabIndicator} />}
-        </TouchableOpacity>
-      </View>
-
       <Pressable
         style={styles.createPostBox}
         onPress={() => navigation.navigate("CreatePost")}
@@ -488,35 +466,6 @@ const styles = StyleSheet.create({
   },
   headerWrapper: {
     backgroundColor: '#fff',
-  },
-  tabsContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 8,
-    backgroundColor: '#fff',
-  },
-  tab: {
-    marginRight: 24,
-  },
-  tabText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#6b7280',
-    paddingBottom: 8,
-  },
-  activeTabText: {
-    color: '#1a1a1a',
-    fontWeight: '700',
-  },
-  inactiveTabText: {
-    color: '#6b7280',
-  },
-  tabIndicator: {
-    height: 3,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 2,
-    marginTop: 4,
   },
   createPostBox: {
     flexDirection: 'row',
