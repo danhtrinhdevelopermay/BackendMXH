@@ -299,7 +299,7 @@ const HomeTabs = () => {
             right: 0,
             height: 65 + insets.bottom,
             paddingBottom: insets.bottom,
-            backgroundColor: 'rgba(255, 255, 255, 0.5)',
+            backgroundColor: 'transparent',
           }}
         >
           <View style={{
