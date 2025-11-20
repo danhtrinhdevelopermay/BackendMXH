@@ -220,7 +220,6 @@ const PostDetailScreen = ({ route, navigation }) => {
                     resizeMode="contain"
                     isLooping
                     shouldPlay={true}
-                    renderToHardwareTextureAndroid={true}
                     onLoad={handleVideoLoad}
                     onError={(error) => {
                       console.log('Video error:', error);

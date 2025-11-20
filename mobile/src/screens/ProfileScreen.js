@@ -107,7 +107,6 @@ const ProfileScreen = ({ route, navigation }) => {
             <Image
               source={{ uri: `${API_URL}/api/avatar/${profileUser.id}?${Date.now()}` }}
               style={styles.avatarLarge}
-              renderToHardwareTextureAndroid={true}
             />
           ) : (
             <View style={styles.avatarPlaceholder}>
@@ -239,14 +238,12 @@ const ProfileScreen = ({ route, navigation }) => {
             resizeMode="cover"
             shouldPlay={false}
             isMuted={true}
-            renderToHardwareTextureAndroid={true}
           />
         ) : (
           <Image 
             source={{ uri: mediaUrl }} 
             style={styles.gridImage}
             resizeMode="cover"
-            renderToHardwareTextureAndroid={true}
           />
         )}
       </TouchableOpacity>

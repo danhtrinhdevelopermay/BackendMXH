@@ -135,7 +135,6 @@ const ViewStoryScreen = ({ route, navigation }) => {
           resizeMode="contain"
           shouldPlay
           isLooping={false}
-          renderToHardwareTextureAndroid={true}
           onPlaybackStatusUpdate={(status) => {
             if (status.didJustFinish) {
               handleNext();
@@ -147,7 +146,6 @@ const ViewStoryScreen = ({ route, navigation }) => {
           source={{ uri: currentStory.media_url }} 
           style={styles.media}
           resizeMode="contain"
-          renderToHardwareTextureAndroid={true}
         />
       )}
 
