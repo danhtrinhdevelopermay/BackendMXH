@@ -241,24 +241,7 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const renderHeader = () => (
-    <View>
-      <View style={styles.topBar}>
-        <View style={styles.topBarLeft}>
-          <TouchableOpacity style={styles.notificationButton}>
-            <Ionicons name="notifications-outline" size={24} color="#1a1a1a" />
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>3</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.searchButton}>
-            <Ionicons name="search-outline" size={24} color="#1a1a1a" />
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-          <UserAvatar user={user} size={40} />
-        </TouchableOpacity>
-      </View>
-
+    <View style={styles.headerWrapper}>
       <View style={styles.tabsContainer}>
         <TouchableOpacity 
           style={styles.tab}
@@ -497,53 +480,21 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f0f9f4",
+    backgroundColor: "#f8f9fa",
   },
   listContent: {
     flexGrow: 1,
     paddingBottom: 20,
   },
-  topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 16,
-    backgroundColor: '#a7e4c4',
-  },
-  topBarLeft: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  notificationButton: {
-    position: 'relative',
-  },
-  badge: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  badgeText: {
-    color: '#fff',
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  searchButton: {
-    padding: 4,
+  headerWrapper: {
+    backgroundColor: '#fff',
   },
   tabsContainer: {
     flexDirection: 'row',
     paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingTop: 12,
     paddingBottom: 8,
-    backgroundColor: '#a7e4c4',
+    backgroundColor: '#fff',
   },
   tab: {
     marginRight: 24,
@@ -587,9 +538,9 @@ const styles = StyleSheet.create({
     color: '#9ca3af',
   },
   storiesContainer: {
-    backgroundColor: '#a7e4c4',
-    paddingTop: 16,
-    paddingBottom: 20,
+    backgroundColor: '#fff',
+    paddingTop: 12,
+    paddingBottom: 16,
   },
   storiesContent: {
     paddingHorizontal: 16,
