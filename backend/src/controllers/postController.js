@@ -255,30 +255,4 @@ const searchPosts = async (req, res) => {
   }
 };
 
-const getUserLikedPosts = async (req, res) => {
-  const { userId } = req.params;
-  const requesting_user_id = req.user.id;
-
-  try {
-    const result = await pool.queryAll(
-      `SELECT DISTINCT p.id, p.user_id, p.content, p.media_url, p.media_type, p.media_width, p.media_height, p.privacy, p.created_at, p.updated_at,
-       u.username, u.full_name, u.avatar_url, u.is_verified,
-       (SELECT COUNT(*) FROM reactions WHERE post_id = p.id) as reaction_count,
-       (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count,
-       EXISTS(SELECT 1 FROM reactions WHERE post_id = p.id AND user_id = $1) as user_reacted
-       FROM posts p
-       JOIN users u ON p.user_id = u.id
-       JOIN reactions r ON p.id = r.post_id
-       WHERE r.user_id = $2
-       ORDER BY r.created_at DESC`,
-      [requesting_user_id, userId]
-    );
-
-    res.json(result.rows);
-  } catch (error) {
-    console.error('Get user liked posts error:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-};
-
-module.exports = { createPost, getNewsFeed, getUserPosts, deletePost, searchPosts, getUserLikedPosts };
+module.exports = { createPost, getNewsFeed, getUserPosts, deletePost, searchPosts };
