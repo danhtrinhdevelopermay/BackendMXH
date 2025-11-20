@@ -241,6 +241,11 @@ const HomeScreen = ({ navigation }) => {
 
   const renderHeader = () => (
     <View style={styles.headerWrapper}>
+      <LinearGradient
+        colors={['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 0)']}
+        style={styles.topGradient}
+        pointerEvents="none"
+      />
       <Pressable
         style={styles.createPostBox}
         onPress={() => navigation.navigate("CreatePost")}
@@ -466,6 +471,15 @@ const styles = StyleSheet.create({
   },
   headerWrapper: {
     backgroundColor: '#fff',
+    position: 'relative',
+  },
+  topGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 60,
+    zIndex: 10,
   },
   createPostBox: {
     flexDirection: 'row',
