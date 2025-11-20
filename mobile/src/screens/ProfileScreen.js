@@ -21,6 +21,7 @@ const ProfileScreen = ({ route, navigation }) => {
   
   const [profileUser, setProfileUser] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [likedPosts, setLikedPosts] = useState([]);
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('post');
@@ -181,15 +182,15 @@ const ProfileScreen = ({ route, navigation }) => {
           <Text style={[styles.tabText, activeTab === 'post' && styles.activeTabText]}>Post</Text>
         </TouchableOpacity>
         <TouchableOpacity 
-          style={[styles.tab, activeTab === 'mention' && styles.activeTab]}
-          onPress={() => setActiveTab('mention')}
+          style={[styles.tab, activeTab === 'liked' && styles.activeTab]}
+          onPress={() => setActiveTab('liked')}
         >
           <Ionicons 
-            name="at-circle" 
+            name="heart" 
             size={22} 
-            color={activeTab === 'mention' ? '#1a1a1a' : '#666'} 
+            color={activeTab === 'liked' ? '#1a1a1a' : '#666'} 
           />
-          <Text style={[styles.tabText, activeTab === 'mention' && styles.activeTabText]}>Mention</Text>
+          <Text style={[styles.tabText, activeTab === 'liked' && styles.activeTabText]}>Liked</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -223,18 +224,24 @@ const ProfileScreen = ({ route, navigation }) => {
     );
   };
 
+  const displayData = activeTab === 'liked' 
+    ? likedPosts.filter(p => p.media_url || p.media_type)
+    : posts.filter(p => p.media_url || p.media_type);
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       <FlatList
-        data={posts.filter(p => p.media_url || p.media_type)}
+        data={displayData}
         renderItem={renderPost}
         keyExtractor={(item) => item.id.toString()}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="images-outline" size={64} color="#ccc" />
-            <Text style={styles.emptyText}>Chưa có bài viết nào</Text>
+            <Text style={styles.emptyText}>
+              {activeTab === 'liked' ? 'Chưa có bài viết đã thích' : 'Chưa có bài viết nào'}
+            </Text>
           </View>
         }
         numColumns={3}
