@@ -473,7 +473,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <BlurView 
-        intensity={60} 
+        intensity={95} 
         tint="light" 
         experimentalBlurMethod="dimezisBlurView"
         style={styles.fixedHeader}
