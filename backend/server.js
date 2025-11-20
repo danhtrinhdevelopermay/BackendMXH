@@ -26,6 +26,7 @@ const pool = require('./src/config/database');
 const cloudinary = require('./src/config/cloudinary');
 const autoReactionService = require('./src/services/autoReactionService');
 const messageCleanupService = require('./src/services/messageCleanupService');
+const archiveService = require('./src/services/archiveService');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -409,6 +410,7 @@ server.listen(PORT, '0.0.0.0', () => {
   });
 
   messageCleanupService.start();
+  archiveService.start();
   
   if (process.env.RENDER_EXTERNAL_URL) {
     const axios = require('axios');

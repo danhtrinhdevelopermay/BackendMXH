@@ -5,6 +5,7 @@ const {
   getArchivedMessages,
   getArchivedNotifications
 } = require('../services/googleDriveService');
+const archiveService = require('../services/archiveService');
 
 const archiveMessages = async (req, res) => {
   try {
@@ -34,6 +35,26 @@ const archiveNotifications = async (req, res) => {
   }
 };
 
+const runFullArchive = async (req, res) => {
+  try {
+    const result = await archiveService.runArchive();
+    res.json(result);
+  } catch (error) {
+    console.error('Run archive error:', error);
+    res.status(500).json({ error: 'Failed to run archive' });
+  }
+};
+
+const getArchiveStatus = async (req, res) => {
+  try {
+    const status = archiveService.getStatus();
+    res.json(status);
+  } catch (error) {
+    console.error('Get archive status error:', error);
+    res.status(500).json({ error: 'Failed to get archive status' });
+  }
+};
+
 const getOldMessages = async (req, res) => {
   try {
     const user_id = req.user.id;
@@ -59,6 +80,8 @@ const getOldNotifications = async (req, res) => {
 module.exports = {
   archiveMessages,
   archiveNotifications,
+  runFullArchive,
+  getArchiveStatus,
   getOldMessages,
   getOldNotifications
 };
