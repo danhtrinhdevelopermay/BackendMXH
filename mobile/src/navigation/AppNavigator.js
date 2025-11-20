@@ -314,12 +314,7 @@ const HomeTabs = () => {
         name="Hồ sơ" 
         component={AnimatedProfile}
         options={({ navigation }) => ({
-          headerShown: true,
-          headerRight: () => (
-            <View style={{ marginRight: 16 }}>
-              <NotificationBell navigation={navigation} />
-            </View>
-          ),
+          headerShown: false,
         })}
       />
     </Tab.Navigator>
