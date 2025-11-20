@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, FlatList, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { View, FlatList, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions, StatusBar } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 import { Video } from 'expo-av';
@@ -7,11 +7,11 @@ import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
 import { postAPI, userAPI, friendshipAPI, storyAPI } from '../api/api';
 import Constants from 'expo-constants';
-import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
-const ITEM_SIZE = (width - 3) / 3;
+const ITEM_SIZE = width / 3;
 
 const ProfileScreen = ({ route, navigation }) => {
   const { user: currentUser } = useContext(AuthContext);
@@ -68,14 +68,14 @@ const ProfileScreen = ({ route, navigation }) => {
   );
 
   const formatNumber = (num) => {
-    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}m`;
-    if (num >= 1000) return `${(num / 1000).toFixed(0)}k`;
+    if (num >= 1000000) return `${(num / 1000000).toFixed(0)}m`;
+    if (num >= 1000) return `${Math.floor(num / 1000)}k`;
     return num.toString();
   };
 
   const renderHeader = () => (
     <LinearGradient
-      colors={['#B2F5EA', '#81E6D9', '#4FD1C5']}
+      colors={['#9FE8DA', '#7ED9CC', '#5DCABF']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.headerContainer}
@@ -83,7 +83,7 @@ const ProfileScreen = ({ route, navigation }) => {
       <View style={styles.topBar}>
         <TouchableOpacity style={styles.nameDropdown}>
           <Text style={styles.headerName}>{profileUser?.full_name || profileUser?.username}</Text>
-          <Ionicons name="chevron-down" size={20} color="#000" />
+          <Ionicons name="chevron-down" size={18} color="#1a1a1a" />
         </TouchableOpacity>
         <View style={styles.topActions}>
           <TouchableOpacity 
@@ -93,7 +93,7 @@ const ProfileScreen = ({ route, navigation }) => {
             <Text style={styles.editBtnText}>Edit</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuBtn}>
-            <Ionicons name="menu" size={24} color="#000" />
+            <Ionicons name="menu" size={28} color="#1a1a1a" />
           </TouchableOpacity>
         </View>
       </View>
@@ -141,21 +141,21 @@ const ProfileScreen = ({ route, navigation }) => {
           style={styles.storyItem}
           onPress={() => navigation.navigate('CreateStory')}
         >
-          <View style={styles.addStoryCircle}>
+          <View style={styles.addStoryBorder}>
             <View style={styles.addStoryInner}>
-              <Ionicons name="add" size={24} color="#4FD1C5" />
+              <Ionicons name="add" size={28} color="#5DCABF" />
             </View>
           </View>
           <Text style={styles.storyLabel}>Add Story</Text>
         </TouchableOpacity>
 
-        {stories.map((story, index) => (
+        {stories.slice(0, 3).map((story, index) => (
           <TouchableOpacity 
             key={story.id || index}
             style={styles.storyItem}
             onPress={() => navigation.navigate('ViewStory', { storyId: story.id })}
           >
-            <View style={styles.storyCircle}>
+            <View style={styles.storyBorder}>
               <Image
                 source={{ uri: story.media_url || `${API_URL}/api/story/${story.id}` }}
                 style={styles.storyImage}
@@ -171,9 +171,9 @@ const ProfileScreen = ({ route, navigation }) => {
           onPress={() => setActiveTab('post')}
         >
           <Ionicons 
-            name="add-circle-outline" 
-            size={20} 
-            color={activeTab === 'post' ? '#000' : '#666'} 
+            name="add-circle" 
+            size={22} 
+            color={activeTab === 'post' ? '#1a1a1a' : '#666'} 
           />
           <Text style={[styles.tabText, activeTab === 'post' && styles.activeTabText]}>Post</Text>
         </TouchableOpacity>
@@ -182,9 +182,9 @@ const ProfileScreen = ({ route, navigation }) => {
           onPress={() => setActiveTab('mention')}
         >
           <Ionicons 
-            name="at-circle-outline" 
-            size={20} 
-            color={activeTab === 'mention' ? '#000' : '#666'} 
+            name="at-circle" 
+            size={22} 
+            color={activeTab === 'mention' ? '#1a1a1a' : '#666'} 
           />
           <Text style={[styles.tabText, activeTab === 'mention' && styles.activeTabText]}>Mention</Text>
         </TouchableOpacity>
@@ -192,16 +192,13 @@ const ProfileScreen = ({ route, navigation }) => {
     </LinearGradient>
   );
 
-  const renderPost = ({ item, index }) => {
+  const renderPost = ({ item }) => {
     const mediaUrl = item.media_url || `${API_URL}/api/media/${item.id}`;
     const isVideo = item.media_type?.startsWith('video/');
     
     return (
       <TouchableOpacity 
-        style={[
-          styles.gridItem,
-          index % 3 === 1 && styles.gridItemMiddle
-        ]}
+        style={styles.gridItem}
         onPress={() => navigation.navigate('PostDetail', { postId: item.id })}
       >
         {isVideo ? (
@@ -225,8 +222,9 @@ const ProfileScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#9FE8DA" />
       <FlatList
-        data={posts}
+        data={posts.filter(p => p.media_url || p.media_type)}
         renderItem={renderPost}
         keyExtractor={(item) => item.id.toString()}
         ListHeaderComponent={renderHeader}
@@ -237,7 +235,6 @@ const ProfileScreen = ({ route, navigation }) => {
           </View>
         }
         numColumns={3}
-        columnWrapperStyle={styles.row}
         showsVerticalScrollIndicator={false}
       />
     </View>
@@ -251,138 +248,139 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     paddingTop: 50,
-    paddingBottom: 20,
+    paddingBottom: 0,
   },
   topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginBottom: 30,
+    marginBottom: 20,
   },
   nameDropdown: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
   },
   headerName: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
-    color: '#000',
+    color: '#1a1a1a',
   },
   topActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
   },
   editBtn: {
     backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingVertical: 8,
+    paddingHorizontal: 22,
+    paddingVertical: 7,
     borderRadius: 20,
   },
   editBtnText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000',
+    color: '#1a1a1a',
   },
   menuBtn: {
-    width: 40,
-    height: 40,
+    width: 36,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },
   profileInfo: {
     alignItems: 'center',
-    marginBottom: 25,
+    marginBottom: 24,
   },
   avatarWrapper: {
-    marginBottom: 15,
+    marginBottom: 12,
   },
   avatarLarge: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 4,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    borderWidth: 5,
     borderColor: '#fff',
   },
   avatarPlaceholder: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 4,
+    borderWidth: 5,
     borderColor: '#fff',
   },
   avatarText: {
-    fontSize: 40,
+    fontSize: 44,
     fontWeight: '700',
-    color: '#4FD1C5',
+    color: '#5DCABF',
   },
   displayName: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '700',
-    color: '#000',
-    marginBottom: 4,
+    color: '#1a1a1a',
+    marginBottom: 2,
   },
   username: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 20,
+    fontSize: 13,
+    color: '#555',
+    marginBottom: 18,
   },
   statsContainer: {
     flexDirection: 'row',
-    gap: 40,
+    gap: 50,
   },
   statBox: {
     alignItems: 'center',
   },
   statNumber: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '700',
-    color: '#000',
+    color: '#1a1a1a',
   },
   statLabel: {
-    fontSize: 13,
-    color: '#666',
+    fontSize: 12,
+    color: '#555',
     marginTop: 2,
   },
   storiesContainer: {
+    marginTop: 10,
     marginBottom: 20,
-    paddingLeft: 20,
+    paddingLeft: 16,
   },
   storiesContent: {
-    paddingRight: 20,
-    gap: 12,
+    paddingRight: 16,
+    alignItems: 'center',
   },
   storyItem: {
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
-  addStoryCircle: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    borderWidth: 2,
+  addStoryBorder: {
+    width: 72,
+    height: 72,
+    borderRadius: 18,
+    borderWidth: 3,
     borderColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent',
   },
   addStoryInner: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 64,
+    height: 64,
+    borderRadius: 15,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  storyCircle: {
-    width: 68,
-    height: 68,
-    borderRadius: 34,
+  storyBorder: {
+    width: 72,
+    height: 72,
+    borderRadius: 18,
     borderWidth: 3,
     borderColor: '#fff',
     overflow: 'hidden',
@@ -392,48 +390,42 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   storyLabel: {
-    fontSize: 11,
-    color: '#000',
+    fontSize: 10,
+    color: '#1a1a1a',
     marginTop: 6,
+    fontWeight: '500',
   },
   tabsContainer: {
     flexDirection: 'row',
     backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingTop: 16,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: 2,
   },
   tab: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
-    gap: 6,
+    paddingVertical: 14,
+    gap: 8,
   },
   activeTab: {
-    borderBottomWidth: 2,
-    borderBottomColor: '#000',
+    borderBottomWidth: 3,
+    borderBottomColor: '#1a1a1a',
   },
   tabText: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '500',
     color: '#666',
   },
   activeTabText: {
-    color: '#000',
+    color: '#1a1a1a',
     fontWeight: '700',
-  },
-  row: {
-    justifyContent: 'flex-start',
   },
   gridItem: {
     width: ITEM_SIZE,
     height: ITEM_SIZE,
-    marginBottom: 1,
-  },
-  gridItemMiddle: {
-    marginHorizontal: 1,
   },
   gridImage: {
     width: '100%',
@@ -442,6 +434,7 @@ const styles = StyleSheet.create({
   emptyContainer: {
     padding: 48,
     alignItems: 'center',
+    backgroundColor: '#fff',
   },
   emptyText: {
     fontSize: 15,
