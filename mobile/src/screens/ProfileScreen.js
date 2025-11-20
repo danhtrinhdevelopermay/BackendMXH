@@ -8,6 +8,7 @@ import { useAlert } from '../context/AlertContext';
 import { postAPI, userAPI, friendshipAPI, storyAPI } from '../api/api';
 import Constants from 'expo-constants';
 import { Ionicons } from '@expo/vector-icons';
+import VerifiedBadge from '../components/VerifiedBadge';
 
 const { width } = Dimensions.get('window');
 const ITEM_SIZE = width / 3;
@@ -111,7 +112,10 @@ const ProfileScreen = ({ route, navigation }) => {
           )}
         </View>
 
-        <Text style={styles.displayName}>{profileUser?.full_name || profileUser?.username}</Text>
+        <View style={styles.nameRow}>
+          <Text style={styles.displayName}>{profileUser?.full_name || profileUser?.username}</Text>
+          <VerifiedBadge isVerified={profileUser?.is_verified} size={20} />
+        </View>
         <Text style={styles.username}>@{profileUser?.username}</Text>
 
         <View style={styles.statsContainer}>
@@ -321,11 +325,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#999',
   },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 2,
+  },
   displayName: {
     fontSize: 24,
     fontWeight: '700',
     color: '#1a1a1a',
-    marginBottom: 2,
   },
   username: {
     fontSize: 13,
