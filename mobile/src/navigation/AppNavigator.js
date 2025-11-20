@@ -347,7 +347,7 @@ const HomeTabs = () => {
                     alignItems: 'center',
                     paddingTop: 8,
                     paddingBottom: 10,
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    backgroundColor: 'transparent',
                   }}
                 >
                   <TabBarIcon
