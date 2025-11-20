@@ -281,7 +281,7 @@ const HomeScreen = ({ navigation }) => {
               <VerifiedBadge isVerified={item.is_verified} size={14} />
             </View>
             <Text style={styles.postMeta}>
-              Posted in u88 - {formatTimeAgo(item.created_at)} ago
+              {formatTimeAgo(item.created_at)}
             </Text>
           </View>
         </TouchableOpacity>
