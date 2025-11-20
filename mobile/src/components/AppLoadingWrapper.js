@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import SplashScreen from '../screens/SplashScreen';
-import { postsAPI, storiesAPI, notificationsAPI, friendshipAPI, thoughtsAPI, messagesAPI } from '../api/api';
+import { postAPI, storyAPI, notificationAPI, friendshipAPI, thoughtAPI, messageAPI } from '../api/api';
 
 const AppLoadingWrapper = ({ children, isAuthenticated }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -18,13 +18,13 @@ const AppLoadingWrapper = ({ children, isAuthenticated }) => {
   const preloadData = async () => {
     try {
       const loadPromises = [
-        postsAPI.getFeed().catch(() => ({ data: [] })),
-        storiesAPI.getStories().catch(() => ({ data: [] })),
-        notificationsAPI.getNotifications().catch(() => ({ data: [] })),
+        postAPI.getNewsFeed().catch(() => ({ data: [] })),
+        storyAPI.getAllStories().catch(() => ({ data: [] })),
+        notificationAPI.getNotifications().catch(() => ({ data: [] })),
         friendshipAPI.getFriendRequests().catch(() => ({ data: [] })),
         friendshipAPI.getSuggestedFriends().catch(() => ({ data: [] })),
-        thoughtsAPI.getThoughts().catch(() => ({ data: [] })),
-        messagesAPI.getConversations().catch(() => ({ data: [] })),
+        thoughtAPI.getAllThoughts().catch(() => ({ data: [] })),
+        messageAPI.getConversations().catch(() => ({ data: [] })),
       ];
 
       const [
