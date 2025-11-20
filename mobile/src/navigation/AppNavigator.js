@@ -226,6 +226,7 @@ const HomeTabs = () => {
         },
         tabBarActiveTintColor: '#1877f2',
         tabBarInactiveTintColor: '#65676b',
+        tabBarBackground: () => null,
         tabBarStyle: {
           position: 'absolute',
           backgroundColor: '#fff',
