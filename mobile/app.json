@@ -55,7 +55,7 @@
               "appExtensions": [
                 {
                   "targetName": "OneSignalNotificationServiceExtension",
-                  "bundleIdentifier": "com.shatter.app.OneSignalNotificationServiceExtension",
+                  "bundleIdentifiser": "com.shatter.app.OneSignalNotificationServiceExtension",
                   "entitlements": {
                     "com.apple.security.application-groups": [
                       "group.com.shatter.app.onesignal"
