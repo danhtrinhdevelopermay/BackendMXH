@@ -280,6 +280,16 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
+      <Pressable
+        style={styles.createPostBox}
+        onPress={() => navigation.navigate("CreatePost")}
+      >
+        <UserAvatar user={user} size={40} />
+        <View style={styles.createPostInput}>
+          <Text style={styles.createPostPlaceholder}>What's on your mind?</Text>
+        </View>
+      </Pressable>
+
       <ScrollView 
         horizontal 
         showsHorizontalScrollIndicator={false}
@@ -289,13 +299,6 @@ const HomeScreen = ({ navigation }) => {
         {renderStoryItem({ user_id: user?.id }, 0)}
         {stories.map((story, index) => renderStoryItem(story, index + 1))}
       </ScrollView>
-
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Recently Post</Text>
-        <TouchableOpacity>
-          <Ionicons name="ellipsis-horizontal" size={20} color="#9ca3af" />
-        </TouchableOpacity>
-      </View>
     </View>
   );
 
@@ -564,6 +567,25 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     marginTop: 4,
   },
+  createPostBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    gap: 12,
+  },
+  createPostInput: {
+    flex: 1,
+  },
+  createPostPlaceholder: {
+    fontSize: 15,
+    color: '#9ca3af',
+  },
   storiesContainer: {
     backgroundColor: '#a7e4c4',
     paddingTop: 16,
@@ -611,19 +633,6 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
     marginTop: 6,
     textAlign: 'center',
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#6b7280',
   },
   postCard: {
     backgroundColor: '#fff',
