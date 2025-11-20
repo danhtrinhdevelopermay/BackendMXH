@@ -90,12 +90,14 @@ const ProfileScreen = ({ route, navigation }) => {
           <Ionicons name="chevron-down" size={18} color="#1a1a1a" />
         </TouchableOpacity>
         <View style={styles.topActions}>
-          <TouchableOpacity 
-            style={styles.editBtn}
-            onPress={() => navigation.navigate('EditProfile')}
-          >
-            <Text style={styles.editBtnText}>Edit</Text>
-          </TouchableOpacity>
+          {isOwnProfile && (
+            <TouchableOpacity 
+              style={styles.editBtn}
+              onPress={() => navigation.navigate('EditProfile')}
+            >
+              <Text style={styles.editBtnText}>Edit</Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity style={styles.menuBtn}>
             <Ionicons name="menu" size={28} color="#1a1a1a" />
           </TouchableOpacity>
@@ -197,7 +199,7 @@ const ProfileScreen = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
     </ImageBackground>
-  ), [profileUser, API_URL, navigation, activeTab, stats, stories]);
+  ), [profileUser, API_URL, navigation, activeTab, stats, stories, isOwnProfile]);
 
   const renderPost = ({ item }) => {
     const mediaUrl = item.media_url || `${API_URL}/api/media/${item.id}`;
