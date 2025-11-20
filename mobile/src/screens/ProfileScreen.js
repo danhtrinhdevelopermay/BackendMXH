@@ -181,15 +181,15 @@ const ProfileScreen = ({ route, navigation }) => {
 
         <View style={styles.statsContainer}>
           <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{stats.posts_count || 360}</Text>
+            <Text style={styles.statNumber}>{stats.posts_count ?? 0}</Text>
             <Text style={styles.statLabel}>Post</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{formatNumber(stats.friends_count || 160000)}</Text>
+            <Text style={styles.statNumber}>{formatNumber(stats.friends_count ?? 0)}</Text>
             <Text style={styles.statLabel}>Follower</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={styles.statNumber}>{formatNumber(stats.photos_count || 140000)}</Text>
+            <Text style={styles.statNumber}>{formatNumber(stats.photos_count ?? 0)}</Text>
             <Text style={styles.statLabel}>Following</Text>
           </View>
         </View>
