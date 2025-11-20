@@ -151,9 +151,177 @@ async function deleteBackupFromDrive(fileId) {
   }
 }
 
+async function archiveOldMessagesToDrive(pool) {
+  try {
+    const drive = await getUncachableGoogleDriveClient();
+    
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const result = await pool.query(
+      'SELECT * FROM messages WHERE created_at < $1 ORDER BY created_at',
+      [thirtyDaysAgo]
+    );
+    
+    if (result.rows.length === 0) {
+      return { success: true, archived: 0 };
+    }
+    
+    const fileName = `archived_messages_${Date.now()}.json`;
+    const fileMetadata = {
+      name: fileName,
+      description: 'Archived Messages (>30 days)',
+      appProperties: {
+        type: 'messages',
+        archiveDate: new Date().toISOString(),
+        count: result.rows.length.toString()
+      }
+    };
+    
+    const media = {
+      mimeType: 'application/json',
+      body: JSON.stringify(result.rows)
+    };
+    
+    const response = await drive.files.create({
+      requestBody: fileMetadata,
+      media: media,
+      fields: 'id, name, size'
+    });
+    
+    await pool.query(
+      'DELETE FROM messages WHERE created_at < $1',
+      [thirtyDaysAgo]
+    );
+    
+    return {
+      success: true,
+      archived: result.rows.length,
+      fileId: response.data.id
+    };
+  } catch (error) {
+    console.error('Error archiving messages:', error);
+    throw error;
+  }
+}
+
+async function archiveOldNotificationsToDrive(pool) {
+  try {
+    const drive = await getUncachableGoogleDriveClient();
+    
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const result = await pool.query(
+      'SELECT * FROM notifications WHERE created_at < $1 ORDER BY created_at',
+      [thirtyDaysAgo]
+    );
+    
+    if (result.rows.length === 0) {
+      return { success: true, archived: 0 };
+    }
+    
+    const fileName = `archived_notifications_${Date.now()}.json`;
+    const fileMetadata = {
+      name: fileName,
+      description: 'Archived Notifications (>30 days)',
+      appProperties: {
+        type: 'notifications',
+        archiveDate: new Date().toISOString(),
+        count: result.rows.length.toString()
+      }
+    };
+    
+    const media = {
+      mimeType: 'application/json',
+      body: JSON.stringify(result.rows)
+    };
+    
+    const response = await drive.files.create({
+      requestBody: fileMetadata,
+      media: media,
+      fields: 'id, name, size'
+    });
+    
+    await pool.query(
+      'DELETE FROM notifications WHERE created_at < $1',
+      [thirtyDaysAgo]
+    );
+    
+    return {
+      success: true,
+      archived: result.rows.length,
+      fileId: response.data.id
+    };
+  } catch (error) {
+    console.error('Error archiving notifications:', error);
+    throw error;
+  }
+}
+
+async function getArchivedMessages(userId) {
+  try {
+    const drive = await getUncachableGoogleDriveClient();
+    
+    const response = await drive.files.list({
+      q: `appProperties has { key='type' and value='messages' } and trashed=false`,
+      fields: 'files(id, name, createdTime, size, appProperties)',
+      orderBy: 'createdTime desc'
+    });
+    
+    const allMessages = [];
+    for (const file of response.data.files || []) {
+      const fileData = await downloadBackupFromDrive(file.id);
+      const messages = fileData.backup.filter(m => 
+        m.sender_id === userId || m.receiver_id === userId
+      );
+      allMessages.push(...messages);
+    }
+    
+    return {
+      success: true,
+      messages: allMessages
+    };
+  } catch (error) {
+    console.error('Error getting archived messages:', error);
+    throw error;
+  }
+}
+
+async function getArchivedNotifications(userId) {
+  try {
+    const drive = await getUncachableGoogleDriveClient();
+    
+    const response = await drive.files.list({
+      q: `appProperties has { key='type' and value='notifications' } and trashed=false`,
+      fields: 'files(id, name, createdTime, size, appProperties)',
+      orderBy: 'createdTime desc'
+    });
+    
+    const allNotifications = [];
+    for (const file of response.data.files || []) {
+      const fileData = await downloadBackupFromDrive(file.id);
+      const notifications = fileData.backup.filter(n => n.user_id === userId);
+      allNotifications.push(...notifications);
+    }
+    
+    return {
+      success: true,
+      notifications: allNotifications
+    };
+  } catch (error) {
+    console.error('Error getting archived notifications:', error);
+    throw error;
+  }
+}
+
 module.exports = {
   uploadBackupToDrive,
   listBackupsFromDrive,
   downloadBackupFromDrive,
-  deleteBackupFromDrive
+  deleteBackupFromDrive,
+  archiveOldMessagesToDrive,
+  archiveOldNotificationsToDrive,
+  getArchivedMessages,
+  getArchivedNotifications
 };
