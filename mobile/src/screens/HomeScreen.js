@@ -382,6 +382,7 @@ const HomeScreen = ({ navigation }) => {
                     shouldPlay={isVisible}
                     isLooping
                     isMuted={false}
+                    renderToHardwareTextureAndroid={true}
                     onError={(error) => {
                       console.log("Video error:", error);
                       handleMediaError();
@@ -399,6 +400,7 @@ const HomeScreen = ({ navigation }) => {
                     source={{ uri: mediaUrl }}
                     style={mediaStyle}
                     onError={handleMediaError}
+                    renderToHardwareTextureAndroid={true}
                   />
                 </TouchableOpacity>
               )}
