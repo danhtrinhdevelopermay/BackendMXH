@@ -27,6 +27,7 @@ import {
 import { Video } from "expo-av";
 import Constants from "expo-constants";
 import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { postAPI, reactionAPI, storyAPI } from "../api/api";
@@ -517,9 +518,10 @@ const HomeScreen = ({ navigation }) => {
         viewabilityConfig={viewabilityConfig}
       />
 
-      <LinearGradient
-        colors={['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 0.8)', 'rgba(255, 255, 255, 0)']}
-        style={styles.topGradient}
+      <BlurView
+        intensity={80}
+        tint="light"
+        style={styles.topBlur}
         pointerEvents="none"
       />
 
@@ -585,7 +587,7 @@ const styles = StyleSheet.create({
   headerWrapper: {
     backgroundColor: '#fff',
   },
-  topGradient: {
+  topBlur: {
     position: 'absolute',
     top: 0,
     left: 0,
