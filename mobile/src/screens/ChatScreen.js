@@ -26,15 +26,14 @@ const ChatScreen = ({ route, navigation }) => {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
   const [lastSeen, setLastSeen] = useState(null);
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const typingAnim = useRef(new Animated.Value(0)).current;
-  const typingTimeoutRef = useRef(null);
-
-  const otherUser = React.useMemo(() => ({
+  const [otherUser, setOtherUser] = useState({
     id: userId,
     avatar_url: userAvatar,
     username: userName
-  }), [userId, userAvatar, userName]);
+  });
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const typingAnim = useRef(new Animated.Value(0)).current;
+  const typingTimeoutRef = useRef(null);
 
   useEffect(() => {
     navigation.setOptions({ 
@@ -100,6 +99,12 @@ const ChatScreen = ({ route, navigation }) => {
       const response = await userAPI.getUserById(userId);
       setIsOnline(response.data.is_online || false);
       setLastSeen(response.data.last_seen ? new Date(response.data.last_seen) : null);
+      setOtherUser({
+        id: userId,
+        avatar_url: response.data.avatar_url,
+        username: response.data.username,
+        full_name: response.data.full_name
+      });
     } catch (error) {
       console.error('Failed to fetch user status');
     }
