@@ -4,7 +4,9 @@
 Layedia is a full-stack social media application, similar to Facebook, available on both mobile and web platforms. It provides essential social networking functionalities such as posts, reactions, comments, friend connections, direct messaging, and real-time notifications. The vision for Layedia is to create a dynamic and engaging platform for users to connect and share, leveraging a modern tech stack for scalability and a rich user experience.
 
 ## User Preferences
-Preferred communication style: Simple, everyday language.
+- Preferred communication style: Simple, everyday language.
+- Code preference: Only write/fix code, no code evaluation or comments.
+- Work style: Quick execution to save time.
 
 ## System Architecture
 
