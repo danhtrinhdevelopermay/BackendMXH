@@ -472,23 +472,30 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.fixedHeader}>
-        <Text style={styles.appLogo}>Layedia</Text>
-        <View style={styles.headerActions}>
-          <TouchableOpacity 
-            style={styles.headerButton}
-            onPress={() => navigation.navigate('Search')}
-          >
-            <Ionicons name="search" size={24} color="#1a1a1a" />
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.headerButton}
-            onPress={() => navigation.navigate('Thông báo')}
-          >
-            <Ionicons name="notifications-outline" size={24} color="#1a1a1a" />
-          </TouchableOpacity>
+      <BlurView intensity={80} tint="light" style={styles.fixedHeader}>
+        <View style={styles.headerContent}>
+          <Text style={styles.appLogo}>Layedia</Text>
+          <View style={styles.headerActions}>
+            <TouchableOpacity 
+              style={styles.headerButton}
+              onPress={() => navigation.navigate('Search')}
+            >
+              <Ionicons name="search" size={24} color="#1a1a1a" />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.headerButton}
+              onPress={() => navigation.navigate('Thông báo')}
+            >
+              <Ionicons name="notifications-outline" size={24} color="#1a1a1a" />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+        <LinearGradient
+          colors={['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.5)', 'rgba(255, 255, 255, 1)']}
+          style={styles.headerGradient}
+          pointerEvents="none"
+        />
+      </BlurView>
 
       <FlatList
         data={posts}
@@ -516,13 +523,6 @@ const HomeScreen = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
-      />
-
-      <BlurView
-        intensity={80}
-        tint="light"
-        style={styles.topBlur}
-        pointerEvents="none"
       />
 
       <ReactionsModal
@@ -553,13 +553,23 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
+    zIndex: 1000,
+    overflow: 'hidden',
+  },
+  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 50,
     paddingBottom: 12,
-    zIndex: 1000,
+  },
+  headerGradient: {
+    position: 'absolute',
+    bottom: -30,
+    left: 0,
+    right: 0,
+    height: 30,
   },
   appLogo: {
     fontSize: 28,
@@ -586,14 +596,6 @@ const styles = StyleSheet.create({
   },
   headerWrapper: {
     backgroundColor: '#fff',
-  },
-  topBlur: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 120,
-    zIndex: 999,
   },
   createPostBox: {
     flexDirection: 'row',
