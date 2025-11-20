@@ -133,8 +133,17 @@ export function setupNotificationListeners(navigation) {
 
   return {
     remove: () => {
-      Notifications.removeNotificationSubscription(notificationListener);
-      Notifications.removeNotificationSubscription(responseListener);
+      try {
+        if (Notifications.removeNotificationSubscription) {
+          Notifications.removeNotificationSubscription(notificationListener);
+          Notifications.removeNotificationSubscription(responseListener);
+        } else if (notificationListener?.remove && responseListener?.remove) {
+          notificationListener.remove();
+          responseListener.remove();
+        }
+      } catch (error) {
+        console.log('Error removing notification listeners:', error.message);
+      }
     }
   };
 }

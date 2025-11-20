@@ -17,35 +17,29 @@ const AppLoadingWrapper = ({ children, isAuthenticated }) => {
 
   const preloadData = async () => {
     try {
-      const loadPromises = [
-        postsAPI.getFeed().catch(() => ({ data: [] })),
-        storiesAPI.getStories().catch(() => ({ data: [] })),
-        notificationsAPI.getNotifications().catch(() => ({ data: [] })),
-        friendshipAPI.getFriendRequests().catch(() => ({ data: [] })),
-        friendshipAPI.getSuggestedFriends().catch(() => ({ data: [] })),
-        thoughtsAPI.getThoughts().catch(() => ({ data: [] })),
-        messagesAPI.getConversations().catch(() => ({ data: [] })),
-      ];
+      const loadPromises = [];
+      
+      if (postsAPI?.getFeed) loadPromises.push(postsAPI.getFeed().catch(() => ({ data: [] })));
+      if (storiesAPI?.getStories) loadPromises.push(storiesAPI.getStories().catch(() => ({ data: [] })));
+      if (notificationsAPI?.getNotifications) loadPromises.push(notificationsAPI.getNotifications().catch(() => ({ data: [] })));
+      if (friendshipAPI?.getFriendRequests) loadPromises.push(friendshipAPI.getFriendRequests().catch(() => ({ data: [] })));
+      if (friendshipAPI?.getSuggestedFriends) loadPromises.push(friendshipAPI.getSuggestedFriends().catch(() => ({ data: [] })));
+      if (thoughtsAPI?.getThoughts) loadPromises.push(thoughtsAPI.getThoughts().catch(() => ({ data: [] })));
+      if (messagesAPI?.getConversations) loadPromises.push(messagesAPI.getConversations().catch(() => ({ data: [] })));
 
-      const [
-        feedData,
-        storiesData,
-        notificationsData,
-        requestsData,
-        suggestionsData,
-        thoughtsData,
-        conversationsData,
-      ] = await Promise.all(loadPromises);
-
-      setPreloadedData({
-        feed: feedData.data,
-        stories: storiesData.data,
-        notifications: notificationsData.data,
-        friendRequests: requestsData.data,
-        suggestions: suggestionsData.data,
-        thoughts: thoughtsData.data,
-        conversations: conversationsData.data,
-      });
+      if (loadPromises.length > 0) {
+        const results = await Promise.all(loadPromises);
+        
+        setPreloadedData({
+          feed: results[0]?.data || [],
+          stories: results[1]?.data || [],
+          notifications: results[2]?.data || [],
+          friendRequests: results[3]?.data || [],
+          suggestions: results[4]?.data || [],
+          thoughts: results[5]?.data || [],
+          conversations: results[6]?.data || [],
+        });
+      }
 
       setTimeout(() => {
         setIsLoading(false);

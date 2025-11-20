@@ -361,17 +361,19 @@ const NavigationWrapper = () => {
 
   const preloadData = async () => {
     try {
-      const loadPromises = [
-        postsAPI.getFeed().catch(() => ({ data: [] })),
-        storiesAPI.getStories().catch(() => ({ data: [] })),
-        notificationsAPI.getNotifications().catch(() => ({ data: [] })),
-        friendshipAPI.getFriendRequests().catch(() => ({ data: [] })),
-        friendshipAPI.getSuggestedFriends().catch(() => ({ data: [] })),
-        thoughtsAPI.getThoughts().catch(() => ({ data: [] })),
-        messagesAPI.getConversations().catch(() => ({ data: [] })),
-      ];
+      const loadPromises = [];
+      
+      if (postsAPI?.getFeed) loadPromises.push(postsAPI.getFeed().catch(() => ({ data: [] })));
+      if (storiesAPI?.getStories) loadPromises.push(storiesAPI.getStories().catch(() => ({ data: [] })));
+      if (notificationsAPI?.getNotifications) loadPromises.push(notificationsAPI.getNotifications().catch(() => ({ data: [] })));
+      if (friendshipAPI?.getFriendRequests) loadPromises.push(friendshipAPI.getFriendRequests().catch(() => ({ data: [] })));
+      if (friendshipAPI?.getSuggestedFriends) loadPromises.push(friendshipAPI.getSuggestedFriends().catch(() => ({ data: [] })));
+      if (thoughtsAPI?.getThoughts) loadPromises.push(thoughtsAPI.getThoughts().catch(() => ({ data: [] })));
+      if (messagesAPI?.getConversations) loadPromises.push(messagesAPI.getConversations().catch(() => ({ data: [] })));
 
-      await Promise.all(loadPromises);
+      if (loadPromises.length > 0) {
+        await Promise.all(loadPromises);
+      }
       
       setTimeout(() => {
         setIsPreloading(false);
