@@ -286,6 +286,91 @@ const HomeTabs = () => {
         backgroundColor: 'transparent',
         paddingBottom: 90,
       }}
+      tabBar={(props) => (
+        <View style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: 'transparent',
+        }}>
+          <View style={{
+            backgroundColor: '#fff',
+            marginHorizontal: 16,
+            marginBottom: insets.bottom + 16,
+            borderRadius: 20,
+            height: 65,
+            flexDirection: 'row',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.15,
+            shadowRadius: 8,
+            elevation: 8,
+          }}>
+            {props.state.routes.map((route, index) => {
+              const { options } = props.descriptors[route.key];
+              const label = options.tabBarLabel !== undefined
+                ? options.tabBarLabel
+                : options.title !== undefined
+                ? options.title
+                : route.name;
+
+              const isFocused = props.state.index === index;
+
+              const onPress = () => {
+                const event = props.navigation.emit({
+                  type: 'tabPress',
+                  target: route.key,
+                  canPreventDefault: true,
+                });
+
+                if (!isFocused && !event.defaultPrevented) {
+                  props.navigation.navigate(route.name);
+                }
+              };
+
+              let iconName;
+              if (route.name === 'Home') iconName = isFocused ? 'home' : 'home-outline';
+              else if (route.name === 'Bạn bè') iconName = isFocused ? 'people' : 'people-outline';
+              else if (route.name === 'Tin nhắn') iconName = isFocused ? 'chatbubbles' : 'chatbubbles-outline';
+              else if (route.name === 'Thông báo') iconName = isFocused ? 'notifications' : 'notifications-outline';
+              else if (route.name === 'Hồ sơ') iconName = isFocused ? 'person' : 'person-outline';
+
+              return (
+                <TouchableOpacity
+                  key={route.key}
+                  activeOpacity={0.7}
+                  onPress={onPress}
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    paddingTop: 8,
+                    paddingBottom: 10,
+                  }}
+                >
+                  <TabBarIcon
+                    focused={isFocused}
+                    iconName={iconName}
+                    color={isFocused ? '#1877f2' : '#65676b'}
+                    size={24}
+                  />
+                  <Animated.Text
+                    style={{
+                      fontSize: 12,
+                      fontWeight: '500',
+                      color: isFocused ? '#1877f2' : '#65676b',
+                      marginTop: 4,
+                    }}
+                  >
+                    {label}
+                  </Animated.Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      )}
     >
       <Tab.Screen 
         name="Home" 
