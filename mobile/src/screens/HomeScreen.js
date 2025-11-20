@@ -242,24 +242,6 @@ const HomeScreen = ({ navigation }) => {
 
   const renderHeader = () => (
     <View style={styles.headerWrapper}>
-      <View style={styles.appHeader}>
-        <Text style={styles.appLogo}>Social</Text>
-        <View style={styles.headerActions}>
-          <TouchableOpacity 
-            style={styles.headerButton}
-            onPress={() => navigation.navigate('Search')}
-          >
-            <Ionicons name="search" size={24} color="#1a1a1a" />
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.headerButton}
-            onPress={() => navigation.navigate('Thông báo')}
-          >
-            <Ionicons name="notifications-outline" size={24} color="#1a1a1a" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
       <Pressable
         style={styles.createPostBox}
         onPress={() => navigation.navigate("CreatePost")}
@@ -489,6 +471,24 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.fixedHeader}>
+        <Text style={styles.appLogo}>Layedia</Text>
+        <View style={styles.headerActions}>
+          <TouchableOpacity 
+            style={styles.headerButton}
+            onPress={() => navigation.navigate('Search')}
+          >
+            <Ionicons name="search" size={24} color="#1a1a1a" />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.headerButton}
+            onPress={() => navigation.navigate('Thông báo')}
+          >
+            <Ionicons name="notifications-outline" size={24} color="#1a1a1a" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <FlatList
         data={posts}
         renderItem={renderPost}
@@ -517,12 +517,6 @@ const HomeScreen = ({ navigation }) => {
         viewabilityConfig={viewabilityConfig}
       />
 
-      <LinearGradient
-        colors={['rgba(255, 255, 255, 0.95)', 'rgba(255, 255, 255, 0.7)', 'rgba(255, 255, 255, 0)']}
-        style={styles.topGradient}
-        pointerEvents="none"
-      />
-
       <ReactionsModal
         visible={reactionsModalVisible}
         onClose={() => setReactionsModalVisible(false)}
@@ -546,21 +540,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f8f9fa",
   },
-  listContent: {
-    flexGrow: 1,
-    paddingBottom: 20,
-  },
-  headerWrapper: {
-    backgroundColor: '#fff',
-    paddingTop: 50,
-  },
-  appHeader: {
+  fixedHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingTop: 50,
+    paddingBottom: 12,
     backgroundColor: '#fff',
+    zIndex: 1000,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   appLogo: {
     fontSize: 28,
@@ -580,13 +577,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  topGradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 80,
-    zIndex: 10,
+  listContent: {
+    flexGrow: 1,
+    paddingTop: 112,
+    paddingBottom: 20,
+  },
+  headerWrapper: {
+    backgroundColor: '#fff',
   },
   createPostBox: {
     flexDirection: 'row',
