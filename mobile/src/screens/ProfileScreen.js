@@ -26,6 +26,7 @@ const ProfileScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('post');
   const [stats, setStats] = useState({ posts_count: 0, friends_count: 0, photos_count: 0 });
+  const [friendshipStatus, setFriendshipStatus] = useState(null);
   
   const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
 
@@ -50,6 +51,7 @@ const ProfileScreen = ({ route, navigation }) => {
         setProfileUser(userResponse.data);
         setPosts(postsResponse.data);
         setStats(statsResponse.data);
+        setFriendshipStatus(userResponse.data.friendship_status);
       }
     } catch (error) {
       showAlert('Lỗi', 'Không thể tải thông tin người dùng', 'error');
@@ -119,6 +121,61 @@ const ProfileScreen = ({ route, navigation }) => {
         </View>
         <Text style={styles.username}>@{profileUser?.username}</Text>
 
+        {!isOwnProfile && (
+          <View style={styles.actionButtons}>
+            {friendshipStatus === 'friends' ? (
+              <TouchableOpacity 
+                style={styles.messageBtn}
+                onPress={() => navigation.navigate('Messages', { userId: profileUser.id })}
+              >
+                <Ionicons name="chatbubble" size={18} color="#fff" />
+                <Text style={styles.messageBtnText}>Nhắn tin</Text>
+              </TouchableOpacity>
+            ) : friendshipStatus === 'request_sent' ? (
+              <TouchableOpacity style={[styles.addFriendBtn, styles.pendingBtn]} disabled>
+                <Ionicons name="hourglass-outline" size={18} color="#666" />
+                <Text style={styles.pendingBtnText}>Đã gửi lời mời</Text>
+              </TouchableOpacity>
+            ) : friendshipStatus === 'request_received' ? (
+              <TouchableOpacity 
+                style={styles.acceptBtn}
+                onPress={async () => {
+                  try {
+                    const requests = await friendshipAPI.getFriendRequests();
+                    const request = requests.data.find(r => r.user_id === profileUser.id);
+                    if (request) {
+                      await friendshipAPI.respondToFriendRequest(request.request_id, { status: 'accepted' });
+                      setFriendshipStatus('friends');
+                      showAlert('Thành công', 'Đã chấp nhận lời mời kết bạn', 'success');
+                    }
+                  } catch (error) {
+                    showAlert('Lỗi', 'Không thể chấp nhận lời mời', 'error');
+                  }
+                }}
+              >
+                <Ionicons name="checkmark-circle" size={18} color="#fff" />
+                <Text style={styles.acceptBtnText}>Chấp nhận</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity 
+                style={styles.addFriendBtn}
+                onPress={async () => {
+                  try {
+                    await friendshipAPI.sendFriendRequest({ addressee_id: profileUser.id });
+                    setFriendshipStatus('request_sent');
+                    showAlert('Thành công', 'Đã gửi lời mời kết bạn', 'success');
+                  } catch (error) {
+                    showAlert('Lỗi', 'Không thể gửi lời mời kết bạn', 'error');
+                  }
+                }}
+              >
+                <Ionicons name="person-add" size={18} color="#fff" />
+                <Text style={styles.addFriendBtnText}>Thêm bạn bè</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
         <View style={styles.statsContainer}>
           <View style={styles.statBox}>
             <Text style={styles.statNumber}>{stats.posts_count || 360}</Text>
@@ -160,7 +217,7 @@ const ProfileScreen = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
     </ImageBackground>
-  ), [profileUser, API_URL, navigation, activeTab, stats, isOwnProfile]);
+  ), [profileUser, API_URL, navigation, activeTab, stats, isOwnProfile, friendshipStatus]);
 
   const renderPost = ({ item }) => {
     const mediaUrl = item.media_url || `${API_URL}/api/media/${item.id}`;
@@ -312,7 +369,62 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 13,
     color: '#555',
+    marginBottom: 12,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 10,
     marginBottom: 18,
+  },
+  addFriendBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a1a1a',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    gap: 6,
+  },
+  addFriendBtnText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  messageBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a1a1a',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    gap: 6,
+  },
+  messageBtnText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  pendingBtn: {
+    backgroundColor: '#f0f0f0',
+  },
+  pendingBtnText: {
+    color: '#666',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  acceptBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#4CAF50',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    gap: 6,
+  },
+  acceptBtnText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   statsContainer: {
     flexDirection: 'row',
