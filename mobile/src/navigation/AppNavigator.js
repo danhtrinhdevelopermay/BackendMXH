@@ -5,6 +5,7 @@ import { createStackNavigator, CardStyleInterpolators, TransitionPresets } from 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
 import { AuthContext } from '../context/AuthContext';
 import { useIncomingCall } from '../hooks/useIncomingCall';
 import IncomingCallModal from '../components/IncomingCallModal';
@@ -287,17 +288,24 @@ const HomeTabs = () => {
         paddingBottom: 0,
       }}
       tabBar={(props) => (
-        <View style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: 'transparent',
-        }}>
+        <BlurView 
+          intensity={80}
+          tint="light"
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 65 + insets.bottom,
+            paddingBottom: insets.bottom,
+            borderTopWidth: 0.5,
+            borderTopColor: 'rgba(0, 0, 0, 0.1)',
+          }}
+        >
           <View style={{
             backgroundColor: 'transparent',
             marginHorizontal: 0,
-            marginBottom: insets.bottom,
+            marginBottom: 0,
             borderRadius: 0,
             height: 65,
             flexDirection: 'row',
@@ -370,7 +378,7 @@ const HomeTabs = () => {
               );
             })}
           </View>
-        </View>
+        </BlurView>
       )}
     >
       <Tab.Screen 
