@@ -6,7 +6,7 @@ const getUserById = async (req, res) => {
 
   try {
     const userResult = await pool.queryAll(
-      'SELECT id, username, email, full_name, avatar_url, cover_url, bio, is_verified, is_online, last_seen, created_at FROM users WHERE id = $1',
+      'SELECT id, username, email, full_name, avatar_url, bio, is_verified, is_online, last_seen, created_at FROM users WHERE id = $1',
       [userId]
     );
 

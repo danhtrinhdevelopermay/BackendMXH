@@ -233,12 +233,6 @@ app.get('/api/cover/:userId', async (req, res) => {
       return res.status(404).json({ error: 'Cover not found' });
     }
 
-    res.set({
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0'
-    });
-
     res.redirect(result.rows[0].cover_url);
   } catch (error) {
     console.error('Get cover error:', error);

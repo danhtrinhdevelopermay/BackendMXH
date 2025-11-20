@@ -9,7 +9,7 @@ import { useAlert } from '../context/AlertContext';
 const { width, height } = Dimensions.get('window');
 
 const LoginScreen = ({ navigation }) => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -18,16 +18,16 @@ const LoginScreen = ({ navigation }) => {
   const { showAlert } = useAlert();
 
   const handleLogin = async () => {
-    if (!username || !password) {
-      showAlert('Lỗi', 'Vui lòng điền đầy đủ thông tin', 'error');
+    if (!email || !password) {
+      showAlert('Error', 'Please fill in all fields', 'error');
       return;
     }
 
     setLoading(true);
     try {
-      await login(username, password);
+      await login(email, password);
     } catch (error) {
-      showAlert('Lỗi', error.response?.data?.error || 'Đăng nhập thất bại', 'error');
+      showAlert('Error', error.response?.data?.error || 'Login failed', 'error');
     } finally {
       setLoading(false);
     }
@@ -61,12 +61,13 @@ const LoginScreen = ({ navigation }) => {
         </Text>
 
         <TextInput
-          placeholder="Tên đăng nhập hoặc email"
-          value={username}
-          onChangeText={setUsername}
+          placeholder="Nhập email"
+          value={email}
+          onChangeText={setEmail}
           style={styles.input}
           mode="outlined"
           autoCapitalize="none"
+          keyboardType="email-address"
           outlineColor="transparent"
           activeOutlineColor="transparent"
           theme={{ 
