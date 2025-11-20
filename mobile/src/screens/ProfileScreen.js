@@ -23,7 +23,6 @@ const ProfileScreen = ({ route, navigation }) => {
   const [profileUser, setProfileUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [likedPosts, setLikedPosts] = useState([]);
-  const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('post');
   const [stats, setStats] = useState({ posts_count: 0, friends_count: 0, photos_count: 0 });
@@ -34,27 +33,23 @@ const ProfileScreen = ({ route, navigation }) => {
     try {
       if (isOwnProfile) {
         setProfileUser(currentUser);
-        const [postsResponse, likedResponse, statsResponse, storiesResponse] = await Promise.all([
+        const [postsResponse, likedResponse, statsResponse] = await Promise.all([
           postAPI.getUserPosts(currentUser.id),
           postAPI.getLikedPosts(),
-          userAPI.getUserStats(currentUser.id),
-          storyAPI.getUserStories(currentUser.id).catch(() => ({ data: [] }))
+          userAPI.getUserStats(currentUser.id)
         ]);
         setPosts(postsResponse.data);
         setLikedPosts(likedResponse.data);
         setStats(statsResponse.data);
-        setStories(storiesResponse.data || []);
       } else {
-        const [userResponse, postsResponse, statsResponse, storiesResponse] = await Promise.all([
+        const [userResponse, postsResponse, statsResponse] = await Promise.all([
           userAPI.getUserById(userId),
           postAPI.getUserPosts(userId),
-          userAPI.getUserStats(userId),
-          storyAPI.getUserStories(userId).catch(() => ({ data: [] }))
+          userAPI.getUserStats(userId)
         ]);
         setProfileUser(userResponse.data);
         setPosts(postsResponse.data);
         setStats(statsResponse.data);
-        setStories(storiesResponse.data || []);
       }
     } catch (error) {
       showAlert('Lỗi', 'Không thể tải thông tin người dùng', 'error');
@@ -140,40 +135,6 @@ const ProfileScreen = ({ route, navigation }) => {
         </View>
       </View>
 
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        style={styles.storiesContainer}
-        contentContainerStyle={styles.storiesContent}
-      >
-        <TouchableOpacity 
-          style={styles.storyItem}
-          onPress={() => navigation.navigate('CreateStory')}
-        >
-          <View style={styles.addStoryBorder}>
-            <View style={styles.addStoryInner}>
-              <Ionicons name="add" size={28} color="#666" />
-            </View>
-          </View>
-          <Text style={styles.storyLabel}>Add Story</Text>
-        </TouchableOpacity>
-
-        {stories.slice(0, 3).map((story, index) => (
-          <TouchableOpacity 
-            key={story.id || index}
-            style={styles.storyItem}
-            onPress={() => navigation.navigate('ViewStory', { storyId: story.id })}
-          >
-            <View style={styles.storyBorder}>
-              <Image
-                source={{ uri: story.media_url || `${API_URL}/api/story/${story.id}` }}
-                style={styles.storyImage}
-              />
-            </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
       <View style={styles.tabsContainer}>
         <TouchableOpacity 
           style={[styles.tab, activeTab === 'post' && styles.activeTab]}
@@ -199,7 +160,7 @@ const ProfileScreen = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
     </ImageBackground>
-  ), [profileUser, API_URL, navigation, activeTab, stats, stories, isOwnProfile]);
+  ), [profileUser, API_URL, navigation, activeTab, stats, isOwnProfile]);
 
   const renderPost = ({ item }) => {
     const mediaUrl = item.media_url || `${API_URL}/api/media/${item.id}`;
@@ -370,56 +331,8 @@ const styles = StyleSheet.create({
     color: '#555',
     marginTop: 2,
   },
-  storiesContainer: {
-    marginTop: 10,
-    marginBottom: 20,
-    paddingLeft: 16,
-  },
-  storiesContent: {
-    paddingRight: 16,
-    alignItems: 'center',
-  },
-  storyItem: {
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  addStoryBorder: {
-    width: 72,
-    height: 72,
-    borderRadius: 18,
-    borderWidth: 3,
-    borderColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
-  },
-  addStoryInner: {
-    width: 64,
-    height: 64,
-    borderRadius: 15,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  storyBorder: {
-    width: 72,
-    height: 72,
-    borderRadius: 18,
-    borderWidth: 3,
-    borderColor: '#fff',
-    overflow: 'hidden',
-  },
-  storyImage: {
-    width: '100%',
-    height: '100%',
-  },
-  storyLabel: {
-    fontSize: 10,
-    color: '#1a1a1a',
-    marginTop: 6,
-    fontWeight: '500',
-  },
   tabsContainer: {
+    marginTop: 20,
     flexDirection: 'row',
     backgroundColor: '#fff',
     borderTopLeftRadius: 24,
