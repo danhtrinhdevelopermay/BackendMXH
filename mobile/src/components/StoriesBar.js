@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, ScrollView, TouchableOpacity, StyleSheet, Text, Image, ImageBackground } from 'react-native';
-import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import UserAvatar from './UserAvatar';
@@ -26,32 +25,31 @@ const StoriesBar = ({ stories, currentUserId, currentUser, onCreateStory, onView
           source={currentUser?.avatar_url ? { uri: currentUser.avatar_url } : null}
           style={styles.createStoryCard}
           resizeMode="cover"
+          blurRadius={25}
         >
-          <BlurView intensity={80} style={styles.createStoryBlur}>
-            <View style={styles.createStoryOverlay} />
-            <View style={styles.createStoryContent}>
-              <View style={styles.createAvatarWithBadge}>
-                {currentUser?.avatar_url ? (
-                  <Image
-                    source={{ uri: currentUser.avatar_url }}
-                    style={styles.createAvatarImage}
-                  />
-                ) : (
-                  <View style={styles.createAvatarCircle}>
-                    <Ionicons name="person" size={32} color="#6B7280" />
-                  </View>
-                )}
-                <View style={styles.createAddBadge}>
-                  <Ionicons name="add" size={14} color="#fff" />
+          <View style={styles.createStoryOverlay} />
+          <View style={styles.createStoryContent}>
+            <View style={styles.createAvatarWithBadge}>
+              {currentUser?.avatar_url ? (
+                <Image
+                  source={{ uri: currentUser.avatar_url }}
+                  style={styles.createAvatarImage}
+                />
+              ) : (
+                <View style={styles.createAvatarCircle}>
+                  <Ionicons name="person" size={32} color="#6B7280" />
                 </View>
+              )}
+              <View style={styles.createAddBadge}>
+                <Ionicons name="add" size={14} color="#fff" />
               </View>
             </View>
-            <View style={styles.createStoryNameContainer}>
-              <Text style={styles.createStoryNameText} numberOfLines={1}>
-                Your Story
-              </Text>
-            </View>
-          </BlurView>
+          </View>
+          <View style={styles.createStoryNameContainer}>
+            <Text style={styles.createStoryNameText} numberOfLines={1}>
+              Your Story
+            </Text>
+          </View>
         </ImageBackground>
       </TouchableOpacity>
 
@@ -174,9 +172,6 @@ const styles = StyleSheet.create({
     position: 'relative',
     borderWidth: 1.5,
     borderColor: '#E5E7EB',
-  },
-  createStoryBlur: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -186,10 +181,10 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 1,
   },
   createStoryContent: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 5,
