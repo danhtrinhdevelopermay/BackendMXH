@@ -74,6 +74,7 @@ const HomeScreen = ({ navigation }) => {
   const fetchStories = async () => {
     try {
       const response = await storyAPI.getAllStories();
+      console.log('Stories from API:', JSON.stringify(response.data?.[0], null, 2));
       setStories(response.data);
     } catch (error) {
       console.error("Failed to fetch stories:", error);
@@ -207,6 +208,7 @@ const HomeScreen = ({ navigation }) => {
 
   const renderStoryItem = (item, index) => {
     const isOwnStory = index === 0;
+    console.log('renderStoryItem:', { index, isOwnStory, hasMediaUrl: !!item.media_url, mediaUrl: item.media_url?.substring(0, 50) });
     return (
       <TouchableOpacity 
         key={index}
@@ -225,16 +227,19 @@ const HomeScreen = ({ navigation }) => {
                   <Ionicons name="add" size={16} color="#fff" />
                 </View>
               </View>
-            ) : (
+            ) : item.media_url ? (
               <Image
                 source={{ uri: item.media_url }}
                 style={styles.storyImage}
+                onError={(error) => console.log('Image load error:', error)}
               />
+            ) : (
+              <UserAvatar user={item} userId={item.user_id} size={60} />
             )}
           </View>
         </LinearGradient>
         <Text style={styles.storyLabel} numberOfLines={1}>
-          {isOwnStory ? 'Your Story' : item.username}
+          {isOwnStory ? 'Bạn' : item.username}
         </Text>
       </TouchableOpacity>
     );
@@ -248,7 +253,7 @@ const HomeScreen = ({ navigation }) => {
       >
         <UserAvatar user={user} size={40} />
         <View style={styles.createPostInput}>
-          <Text style={styles.createPostPlaceholder}>What's on your mind?</Text>
+          <Text style={styles.createPostPlaceholder}>Bạn đang nghĩ gì vậy?</Text>
         </View>
       </Pressable>
 
@@ -472,7 +477,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.fixedHeader}>
-        <Text style={styles.appLogo}>Layedia</Text>
+        <Text style={styles.appLogo}>Shatter</Text>
         <View style={styles.headerActions}>
           <TouchableOpacity 
             style={styles.headerButton}
