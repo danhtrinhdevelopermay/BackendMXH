@@ -2,6 +2,7 @@ import React from 'react';
 import { View, ScrollView, TouchableOpacity, StyleSheet, Text, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { Video } from 'expo-av';
 import UserAvatar from './UserAvatar';
 
 const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
@@ -54,10 +55,21 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
           >
             <View style={styles.avatarContainer}>
               {story.media_url ? (
-                <Image
-                  source={{ uri: story.media_url }}
-                  style={styles.storyThumbnail}
-                />
+                story.media_type === 'video' ? (
+                  <Video
+                    source={{ uri: story.media_url }}
+                    style={styles.storyThumbnail}
+                    shouldPlay={false}
+                    resizeMode="cover"
+                    isLooping={false}
+                  />
+                ) : (
+                  <Image
+                    source={{ uri: story.media_url }}
+                    style={styles.storyThumbnail}
+                    resizeMode="cover"
+                  />
+                )
               ) : (
                 <UserAvatar 
                   user={story}
@@ -86,10 +98,21 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
           >
             <View style={styles.avatarContainer}>
               {story.media_url ? (
-                <Image
-                  source={{ uri: story.media_url }}
-                  style={styles.storyThumbnail}
-                />
+                story.media_type === 'video' ? (
+                  <Video
+                    source={{ uri: story.media_url }}
+                    style={styles.storyThumbnail}
+                    shouldPlay={false}
+                    resizeMode="cover"
+                    isLooping={false}
+                  />
+                ) : (
+                  <Image
+                    source={{ uri: story.media_url }}
+                    style={styles.storyThumbnail}
+                    resizeMode="cover"
+                  />
+                )
               ) : (
                 <UserAvatar 
                   user={story}
