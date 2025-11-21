@@ -265,10 +265,35 @@ const PostDetailScreen = ({ route, navigation }) => {
           <View style={styles.statsContainer}>
             {post.reaction_count > 0 && (
               <View style={styles.reactionStats}>
-                <View style={styles.reactionBubble}>
-                  <Text style={styles.reactionIcon}>{getReactionIcon(post.user_reaction || 'like')}</Text>
-                </View>
-                <Text style={styles.statsText}>{post.reaction_count}</Text>
+                {(() => {
+                  const reactionBreakdown = post.reaction_breakdown || {};
+                  const reactionTypes = ["like", "love", "haha", "wow", "sad", "angry"];
+                  const activeReactions = reactionTypes.filter(type => (reactionBreakdown[type] || 0) > 0);
+                  
+                  if (activeReactions.length > 0) {
+                    return (
+                      <>
+                        <View style={styles.reactionIconsContainer}>
+                          {activeReactions.slice(0, 3).map((type, index) => (
+                            <View key={type} style={[styles.reactionBubble, index > 0 && { marginLeft: -6 }]}>
+                              <Text style={styles.reactionIcon}>{getReactionIcon(type)}</Text>
+                            </View>
+                          ))}
+                        </View>
+                        <Text style={styles.statsText}>{post.reaction_count}</Text>
+                      </>
+                    );
+                  }
+                  
+                  return (
+                    <>
+                      <View style={styles.reactionBubble}>
+                        <Text style={styles.reactionIcon}>👍</Text>
+                      </View>
+                      <Text style={styles.statsText}>{post.reaction_count}</Text>
+                    </>
+                  );
+                })()}
               </View>
             )}
             <View style={{ flex: 1 }} />
@@ -444,15 +469,21 @@ const styles = StyleSheet.create({
   reactionStats: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
+  },
+  reactionIconsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   reactionBubble: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#1877f2',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#e8f3ff',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 6,
+    borderWidth: 1.5,
+    borderColor: '#fff',
   },
   reactionIcon: {
     fontSize: 12,
