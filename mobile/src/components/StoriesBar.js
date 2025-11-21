@@ -48,29 +48,43 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
           onPress={() => onViewStory(story.user_id)}
           activeOpacity={0.7}
         >
-          <LinearGradient
-            colors={['#FF6B35', '#F7931E']}
-            style={styles.storyRing}
-          >
-            <View style={styles.avatarContainer}>
-              {story.thumbnail_url || story.media_url ? (
+          <View style={styles.storyCard}>
+            {story.thumbnail_url || story.media_url ? (
+              <>
                 <Image
                   source={{ uri: story.thumbnail_url || story.media_url }}
-                  style={styles.storyThumbnail}
+                  style={styles.storyCardImage}
                   resizeMode="cover"
                 />
-              ) : (
+                <View style={styles.storyCardOverlay} />
+                <View style={styles.storyCardUserAvatar}>
+                  {story.avatar_url ? (
+                    <Image
+                      source={{ uri: story.avatar_url }}
+                      style={styles.storyCardUserAvatarImage}
+                    />
+                  ) : (
+                    <View style={styles.storyCardUserAvatarPlaceholder}>
+                      <Text style={styles.storyCardAvatarInitial}>
+                        {(story.full_name || story.username || '?')[0].toUpperCase()}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+                <Text style={styles.storyCardName} numberOfLines={1}>
+                  Story của bạn
+                </Text>
+              </>
+            ) : (
+              <View style={styles.storyCardEmpty}>
                 <UserAvatar 
                   user={story}
                   userId={story.user_id}
                   size={56}
                 />
-              )}
-            </View>
-          </LinearGradient>
-          <Text style={styles.storyName} numberOfLines={1}>
-            Story của bạn
-          </Text>
+              </View>
+            )}
+          </View>
         </TouchableOpacity>
       ))}
 
