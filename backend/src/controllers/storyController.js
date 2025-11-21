@@ -6,14 +6,9 @@ const createStory = async (req, res) => {
   const user_id = req.user.id;
 
   try {
-    console.log('Creating story - User:', user_id, 'MediaType:', media_type);
-    
     if (!req.file) {
-      console.log('No file in request');
       return res.status(400).json({ error: 'Media file is required' });
     }
-
-    console.log('File received:', req.file.size, 'bytes');
 
     const result = await new Promise((resolve, reject) => {
       const uploadOptions = {
@@ -23,16 +18,22 @@ const createStory = async (req, res) => {
 
       cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
         if (error) {
-          console.error('Cloudinary upload error:', error);
           reject(error);
         } else {
-          console.log('Cloudinary upload success:', result.secure_url);
           resolve(result);
         }
       }).end(req.file.buffer);
     });
 
-    console.log('Saving story to database...');
+    // Generate thumbnail URL for videos
+    let thumbnailUrl = result.secure_url;
+    if (media_type === 'video') {
+      // For videos, use Cloudinary to get first frame as thumbnail
+      thumbnailUrl = result.secure_url
+        .replace('/video/upload/', '/video/upload/so_0,w_150,h_150,c_thumb/')
+        .replace('.mp4', '.jpg');
+    }
+
     const storyResult = await pool.query(
       `INSERT INTO stories (user_id, media_url, media_type, caption) 
        VALUES ($1, $2, $3, $4) RETURNING *`,
@@ -40,8 +41,13 @@ const createStory = async (req, res) => {
     );
 
     const story = storyResult.rows[0];
-    console.log('Story saved with ID:', story.id);
     
+    // Return story with thumbnail
+    const response = {
+      ...story,
+      thumbnail_url: thumbnailUrl
+    };
+
     const storyWithUser = await pool.query(
       `SELECT s.*, u.username, u.full_name, u.avatar_url 
        FROM stories s 
@@ -50,8 +56,12 @@ const createStory = async (req, res) => {
       [story.id]
     );
 
-    console.log('Story created successfully');
-    res.status(201).json(storyWithUser.rows[0]);
+    const finalStory = {
+      ...storyWithUser.rows[0],
+      thumbnail_url: thumbnailUrl
+    };
+
+    res.status(201).json(finalStory);
   } catch (error) {
     console.error('Create story error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -76,7 +86,20 @@ const getAllStories = async (req, res) => {
       [current_user_id]
     );
 
-    res.json(result.rows);
+    // Add thumbnail URLs for video stories
+    const stories = result.rows.map(story => {
+      if (story.media_type === 'video') {
+        return {
+          ...story,
+          thumbnail_url: story.media_url
+            .replace('/video/upload/', '/video/upload/so_0,w_150,h_150,c_thumb/')
+            .replace('.mp4', '.jpg')
+        };
+      }
+      return { ...story, thumbnail_url: story.media_url };
+    });
+
+    res.json(stories);
   } catch (error) {
     console.error('Get all stories error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -96,7 +119,20 @@ const getUserStories = async (req, res) => {
       [userId]
     );
 
-    res.json(result.rows);
+    // Add thumbnail URLs for video stories
+    const stories = result.rows.map(story => {
+      if (story.media_type === 'video') {
+        return {
+          ...story,
+          thumbnail_url: story.media_url
+            .replace('/video/upload/', '/video/upload/so_0,w_150,h_150,c_thumb/')
+            .replace('.mp4', '.jpg')
+        };
+      }
+      return { ...story, thumbnail_url: story.media_url };
+    });
+
+    res.json(stories);
   } catch (error) {
     console.error('Get user stories error:', error);
     res.status(500).json({ error: 'Server error' });

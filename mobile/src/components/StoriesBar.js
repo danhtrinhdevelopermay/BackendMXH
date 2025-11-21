@@ -8,11 +8,6 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
   const hasOwnStory = stories.some(s => s.user_id === currentUserId);
   const ownStories = stories.filter(s => s.user_id === currentUserId);
   const otherStories = stories.filter(s => s.user_id !== currentUserId);
-  
-  const getThumbnail = (url, type) => {
-    if (!url || type !== 'video') return url;
-    return url.replace('/video/upload/', '/image/upload/') + '.jpg';
-  };
 
   return (
     <ScrollView 
@@ -58,19 +53,12 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
             style={styles.storyRing}
           >
             <View style={styles.avatarContainer}>
-              {story.media_url ? (
-                <>
-                  <Image
-                    source={{ uri: story.media_url }}
-                    style={styles.storyThumbnail}
-                    resizeMode="cover"
-                  />
-                  {story.media_type === 'video' && (
-                    <View style={styles.videoOverlay}>
-                      <Ionicons name="play-circle" size={24} color="#fff" />
-                    </View>
-                  )}
-                </>
+              {story.thumbnail_url || story.media_url ? (
+                <Image
+                  source={{ uri: story.thumbnail_url || story.media_url }}
+                  style={styles.storyThumbnail}
+                  resizeMode="cover"
+                />
               ) : (
                 <UserAvatar 
                   user={story}
@@ -98,19 +86,12 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
             style={styles.storyRing}
           >
             <View style={styles.avatarContainer}>
-              {story.media_url ? (
-                <>
-                  <Image
-                    source={{ uri: story.media_url }}
-                    style={styles.storyThumbnail}
-                    resizeMode="cover"
-                  />
-                  {story.media_type === 'video' && (
-                    <View style={styles.videoOverlay}>
-                      <Ionicons name="play-circle" size={24} color="#fff" />
-                    </View>
-                  )}
-                </>
+              {story.thumbnail_url || story.media_url ? (
+                <Image
+                  source={{ uri: story.thumbnail_url || story.media_url }}
+                  style={styles.storyThumbnail}
+                  resizeMode="cover"
+                />
               ) : (
                 <UserAvatar 
                   user={story}

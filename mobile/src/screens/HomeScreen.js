@@ -207,12 +207,7 @@ const HomeScreen = ({ navigation }) => {
 
   const renderStoryItem = (item, index) => {
     const isOwnStory = index === 0;
-    let displayUrl = item.media_url;
-    
-    // Convert video URL to image thumbnail
-    if (item.media_url && item.media_type === 'video') {
-      displayUrl = item.media_url.replace('/video/upload/', '/image/upload/') + '.jpg';
-    }
+    const displayUrl = item.thumbnail_url || item.media_url;
     
     return (
       <TouchableOpacity 
