@@ -186,6 +186,24 @@ const HomeScreen = ({ navigation }) => {
     setVisibleItems(visiblePostIds);
   }, []);
 
+  useEffect(() => {
+    const pauseAllVideos = async () => {
+      Object.entries(videoRefs.current).forEach(async ([postId, video]) => {
+        if (video && !visibleItems.includes(Number(postId))) {
+          try {
+            const status = await video.getStatusAsync();
+            if (status.isLoaded && status.isPlaying) {
+              await video.pauseAsync();
+            }
+          } catch (error) {
+            console.log("Error pausing video:", error);
+          }
+        }
+      });
+    };
+    pauseAllVideos();
+  }, [visibleItems]);
+
   const viewabilityConfig = {
     itemVisiblePercentThreshold: 50,
   };
