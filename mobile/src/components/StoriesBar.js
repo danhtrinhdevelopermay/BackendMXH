@@ -2,7 +2,6 @@ import React from 'react';
 import { View, ScrollView, TouchableOpacity, StyleSheet, Text, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { Video } from 'expo-av';
 import UserAvatar from './UserAvatar';
 
 const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
@@ -55,21 +54,18 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
           >
             <View style={styles.avatarContainer}>
               {story.media_url ? (
-                story.media_type === 'video' ? (
-                  <Video
-                    source={{ uri: story.media_url }}
-                    style={styles.storyThumbnail}
-                    shouldPlay={false}
-                    resizeMode="cover"
-                    isLooping={false}
-                  />
-                ) : (
+                <>
                   <Image
                     source={{ uri: story.media_url }}
                     style={styles.storyThumbnail}
                     resizeMode="cover"
                   />
-                )
+                  {story.media_type === 'video' && (
+                    <View style={styles.videoOverlay}>
+                      <Ionicons name="play-circle" size={24} color="#fff" />
+                    </View>
+                  )}
+                </>
               ) : (
                 <UserAvatar 
                   user={story}
@@ -98,21 +94,18 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
           >
             <View style={styles.avatarContainer}>
               {story.media_url ? (
-                story.media_type === 'video' ? (
-                  <Video
-                    source={{ uri: story.media_url }}
-                    style={styles.storyThumbnail}
-                    shouldPlay={false}
-                    resizeMode="cover"
-                    isLooping={false}
-                  />
-                ) : (
+                <>
                   <Image
                     source={{ uri: story.media_url }}
                     style={styles.storyThumbnail}
                     resizeMode="cover"
                   />
-                )
+                  {story.media_type === 'video' && (
+                    <View style={styles.videoOverlay}>
+                      <Ionicons name="play-circle" size={24} color="#fff" />
+                    </View>
+                  )}
+                </>
               ) : (
                 <UserAvatar 
                   user={story}
@@ -201,6 +194,15 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 29,
+  },
+  videoOverlay: {
+    position: 'absolute',
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
