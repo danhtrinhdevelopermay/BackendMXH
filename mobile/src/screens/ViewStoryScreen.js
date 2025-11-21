@@ -169,7 +169,7 @@ const ViewStoryScreen = ({ route, navigation }) => {
         </View>
 
         <View style={styles.userInfo}>
-          <UserAvatar user={currentStory} userId={currentStory.user_id} size={36} />
+          <UserAvatar user={currentStory} userId={currentStory.user_id} size={48} />
           <View style={styles.userText}>
             <Text style={styles.userName}>{currentStory.full_name || currentStory.username}</Text>
             <Text style={styles.timeText}>{formatTime(currentStory.created_at)}</Text>
