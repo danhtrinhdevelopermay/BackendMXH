@@ -21,24 +21,23 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
         onPress={onCreateStory}
         activeOpacity={0.7}
       >
-        <View style={styles.createStoryContainer}>
-          <View style={styles.createAvatarContainer}>
-            <View style={styles.avatarPlaceholder}>
-              <Ionicons name="person" size={28} color="#9CA3AF" />
-            </View>
-            <View style={styles.addButton}>
-              <LinearGradient
-                colors={['#FF6B35', '#F7931E']}
-                style={styles.addButtonGradient}
-              >
-                <Ionicons name="add" size={16} color="#fff" />
-              </LinearGradient>
+        <View style={styles.createStoryCard}>
+          <View style={styles.createStoryContent}>
+            <View style={styles.createAvatarWithBadge}>
+              <View style={styles.createAvatarCircle}>
+                <Ionicons name="person" size={32} color="#6B7280" />
+              </View>
+              <View style={styles.createAddBadge}>
+                <Ionicons name="add" size={14} color="#fff" />
+              </View>
             </View>
           </View>
+          <View style={styles.createStoryNameContainer}>
+            <Text style={styles.createStoryNameText} numberOfLines={1}>
+              Your Story
+            </Text>
+          </View>
         </View>
-        <Text style={styles.storyName} numberOfLines={1}>
-          Tạo story
-        </Text>
       </TouchableOpacity>
 
       {hasOwnStory && ownStories.map((story) => (
@@ -152,56 +151,60 @@ const styles = StyleSheet.create({
   storyItem: {
     alignItems: 'center',
   },
-  createStoryContainer: {
-    marginBottom: 0,
-  },
-  storyRing: {
+  createStoryCard: {
     width: 100,
     height: 160,
     borderRadius: 16,
-    padding: 0,
-    marginBottom: 4,
     overflow: 'hidden',
-    backgroundColor: '#f0f2f5',
-  },
-  avatarContainer: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 16,
-    backgroundColor: '#fff',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    overflow: 'hidden',
+    backgroundColor: '#F3F4F6',
     position: 'relative',
-    paddingTop: 8,
-    paddingLeft: 8,
+    borderWidth: 1.5,
+    borderColor: '#E5E7EB',
   },
-  createAvatarContainer: {
+  createStoryContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  createAvatarWithBadge: {
     position: 'relative',
-    marginBottom: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  avatarPlaceholder: {
+  createAvatarCircle: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#E0F7FA',
+    backgroundColor: '#E5E7EB',
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 20,
   },
-  addButton: {
+  createAddBadge: {
     position: 'absolute',
-    bottom: -5,
-    right: 15,
-  },
-  addButtonGradient: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    bottom: -2,
+    right: -2,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#3B82F6',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: '#F3F4F6',
+  },
+  createStoryNameContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+  },
+  createStoryNameText: {
+    fontSize: 11,
+    color: '#1F2937',
+    textAlign: 'center',
+    fontWeight: '500',
   },
   storyName: {
     fontSize: 11,
