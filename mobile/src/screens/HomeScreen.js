@@ -188,18 +188,20 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     const controlVideos = async () => {
+      const firstVisiblePostId = visibleItems[0];
+      
       for (const [postId, video] of Object.entries(videoRefs.current)) {
         if (!video) continue;
         
-        const isVisible = visibleItems.includes(Number(postId));
+        const shouldPlay = Number(postId) === firstVisiblePostId;
         
         try {
           const status = await video.getStatusAsync();
           if (!status.isLoaded) continue;
           
-          if (isVisible && !status.isPlaying) {
+          if (shouldPlay && !status.isPlaying) {
             await video.playAsync();
-          } else if (!isVisible && status.isPlaying) {
+          } else if (!shouldPlay && status.isPlaying) {
             await video.pauseAsync();
           }
         } catch (error) {
@@ -211,7 +213,7 @@ const HomeScreen = ({ navigation }) => {
   }, [visibleItems]);
 
   const viewabilityConfig = {
-    itemVisiblePercentThreshold: 50,
+    itemVisiblePercentThreshold: 80,
   };
 
   const handleVideoPress = async (postId) => {
