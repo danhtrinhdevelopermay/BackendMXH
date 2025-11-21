@@ -168,6 +168,38 @@ const HomeScreen = ({ navigation }) => {
     return icons[reactionType] || "👍";
   };
 
+  const renderReactionStats = (item) => {
+    const reactionBreakdown = item.reaction_breakdown || {};
+    const totalReactions = item.reaction_count || item.reactions_count || 0;
+    
+    if (totalReactions === 0) return <Text style={styles.statText}>Chưa có cảm xúc</Text>;
+    
+    const reactionTypes = ["like", "love", "haha", "wow", "sad", "angry"];
+    const hasReactions = reactionTypes.some(type => reactionBreakdown[type] > 0);
+    
+    if (hasReactions) {
+      return (
+        <View style={styles.reactionStatsWrapper}>
+          {reactionTypes.map((type) => {
+            const count = reactionBreakdown[type] || 0;
+            if (count > 0) {
+              return (
+                <View key={type} style={styles.reactionStat}>
+                  <Text style={styles.reactionIcon}>{getReactionIcon(type)}</Text>
+                  <Text style={styles.reactionStatCount}>{count}</Text>
+                </View>
+              );
+            }
+            return null;
+          })}
+          <Text style={styles.totalReactionCount}> {totalReactions}</Text>
+        </View>
+      );
+    }
+    
+    return <Text style={styles.statText}>{totalReactions} lượt cảm xúc</Text>;
+  };
+
   const formatTimeAgo = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -398,21 +430,21 @@ const HomeScreen = ({ navigation }) => {
         })()}
 
       <View style={styles.statsContainer}>
-        <TouchableOpacity style={styles.statItem} onPress={() => navigation.navigate("PostDetail", { postId: item.id })}>
-          <Text style={styles.statText}>
-            {item.reaction_count || item.reactions_count || 0} lượt thích
-          </Text>
+        <TouchableOpacity style={styles.statItemReactions} onPress={() => navigation.navigate("PostDetail", { postId: item.id })}>
+          {renderReactionStats(item)}
         </TouchableOpacity>
-        <TouchableOpacity style={styles.statItem} onPress={() => navigation.navigate("Comments", { postId: item.id })}>
-          <Text style={styles.statText}>
-            {item.comment_count || item.comments_count || 0} bình luận
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.statItem} onPress={() => { setSelectedPost(item); setShareModalVisible(true); }}>
-          <Text style={styles.statText}>
-            {item.share_count || item.shares_count || 0} chia sẻ
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.statsRight}>
+          <TouchableOpacity style={styles.statItem} onPress={() => navigation.navigate("Comments", { postId: item.id })}>
+            <Text style={styles.statText}>
+              {item.comment_count || item.comments_count || 0} bình luận
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.statItem} onPress={() => { setSelectedPost(item); setShareModalVisible(true); }}>
+            <Text style={styles.statText}>
+              {item.share_count || item.shares_count || 0} chia sẻ
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.actionsContainer}>
@@ -769,14 +801,52 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingVertical: 12,
     marginTop: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
+    paddingHorizontal: 4,
+  },
+  statItemReactions: {
+    flex: 1,
+    alignItems: 'flex-start',
+  },
+  reactionStatsWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  reactionStat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f3f4f6',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 12,
+    gap: 2,
+  },
+  reactionIcon: {
+    fontSize: 14,
+  },
+  reactionStatCount: {
+    fontSize: 12,
+    color: '#6b7280',
+    fontWeight: '600',
+  },
+  totalReactionCount: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginLeft: 2,
+  },
+  statsRight: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 16,
+    flex: 1,
   },
   statItem: {
-    flex: 1,
     alignItems: 'center',
   },
   statText: {
