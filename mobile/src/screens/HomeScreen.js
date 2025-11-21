@@ -397,6 +397,24 @@ const HomeScreen = ({ navigation }) => {
           );
         })()}
 
+      <View style={styles.statsContainer}>
+        <TouchableOpacity style={styles.statItem} onPress={() => navigation.navigate("PostDetail", { postId: item.id })}>
+          <Text style={styles.statText}>
+            {item.reaction_count || item.reactions_count || 0} lượt thích
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.statItem} onPress={() => navigation.navigate("Comments", { postId: item.id })}>
+          <Text style={styles.statText}>
+            {item.comment_count || item.comments_count || 0} bình luận
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.statItem} onPress={() => { setSelectedPost(item); setShareModalVisible(true); }}>
+          <Text style={styles.statText}>
+            {item.share_count || item.shares_count || 0} chia sẻ
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.actionsContainer}>
         <LikeButton
           isLiked={!!item.user_reaction}
@@ -749,13 +767,30 @@ const styles = StyleSheet.create({
     color: '#9ca3af',
     marginTop: 8,
   },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 12,
+    marginTop: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statText: {
+    fontSize: 13,
+    color: '#6b7280',
+    fontWeight: '500',
+  },
   actionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
     paddingTop: 12,
-    marginTop: 12,
-    borderTopWidth: 1,
+    marginTop: 0,
+    borderTopWidth: 0,
     borderTopColor: '#f0f0f0',
   },
   actionButton: {
