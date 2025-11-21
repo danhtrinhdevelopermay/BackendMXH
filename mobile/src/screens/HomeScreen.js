@@ -187,21 +187,27 @@ const HomeScreen = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
-    const pauseAllVideos = async () => {
-      Object.entries(videoRefs.current).forEach(async ([postId, video]) => {
-        if (video && !visibleItems.includes(Number(postId))) {
-          try {
-            const status = await video.getStatusAsync();
-            if (status.isLoaded && status.isPlaying) {
-              await video.pauseAsync();
-            }
-          } catch (error) {
-            console.log("Error pausing video:", error);
+    const controlVideos = async () => {
+      for (const [postId, video] of Object.entries(videoRefs.current)) {
+        if (!video) continue;
+        
+        const isVisible = visibleItems.includes(Number(postId));
+        
+        try {
+          const status = await video.getStatusAsync();
+          if (!status.isLoaded) continue;
+          
+          if (isVisible && !status.isPlaying) {
+            await video.playAsync();
+          } else if (!isVisible && status.isPlaying) {
+            await video.pauseAsync();
           }
+        } catch (error) {
+          console.log("Error controlling video:", error);
         }
-      });
+      }
     };
-    pauseAllVideos();
+    controlVideos();
   }, [visibleItems]);
 
   const viewabilityConfig = {
@@ -362,7 +368,7 @@ const HomeScreen = ({ navigation }) => {
                     source={{ uri: mediaUrl }}
                     style={mediaStyle}
                     resizeMode="cover"
-                    shouldPlay={isVisible}
+                    shouldPlay={false}
                     isLooping
                     isMuted={false}
                     onError={(error) => {
