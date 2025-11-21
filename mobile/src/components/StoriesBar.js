@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { View, ScrollView, TouchableOpacity, StyleSheet, Text, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import UserAvatar from './UserAvatar';
@@ -53,11 +53,18 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
             style={styles.storyRing}
           >
             <View style={styles.avatarContainer}>
-              <UserAvatar 
-                user={story}
-                userId={story.user_id}
-                size={56}
-              />
+              {story.media_url ? (
+                <Image
+                  source={{ uri: story.media_url }}
+                  style={styles.storyThumbnail}
+                />
+              ) : (
+                <UserAvatar 
+                  user={story}
+                  userId={story.user_id}
+                  size={56}
+                />
+              )}
             </View>
           </LinearGradient>
           <Text style={styles.storyName} numberOfLines={1}>
@@ -78,11 +85,18 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
             style={styles.storyRing}
           >
             <View style={styles.avatarContainer}>
-              <UserAvatar 
-                user={story}
-                userId={story.user_id}
-                size={56}
-              />
+              {story.media_url ? (
+                <Image
+                  source={{ uri: story.media_url }}
+                  style={styles.storyThumbnail}
+                />
+              ) : (
+                <UserAvatar 
+                  user={story}
+                  userId={story.user_id}
+                  size={56}
+                />
+              )}
             </View>
           </LinearGradient>
           <Text style={styles.storyName} numberOfLines={1}>
@@ -159,6 +173,11 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
     textAlign: 'center',
     fontWeight: '500',
+  },
+  storyThumbnail: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
   },
 });
 
