@@ -228,10 +228,26 @@ const HomeScreen = ({ navigation }) => {
                 </View>
               </View>
             ) : displayUrl ? (
-              <Image
-                source={{ uri: displayUrl }}
-                style={styles.storyImage}
-              />
+              <>
+                <Image
+                  source={{ uri: displayUrl }}
+                  style={styles.storyImage}
+                />
+                <View style={styles.storyAvatarBadge}>
+                  {item.avatar_url ? (
+                    <Image
+                      source={{ uri: item.avatar_url }}
+                      style={styles.storyAvatarImage}
+                    />
+                  ) : (
+                    <View style={styles.storyAvatarPlaceholder}>
+                      <Text style={styles.storyAvatarInitial}>
+                        {(item.full_name || item.username || '?')[0].toUpperCase()}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </>
             ) : (
               <UserAvatar user={item} userId={item.user_id} size={60} />
             )}
@@ -657,6 +673,38 @@ const styles = StyleSheet.create({
   storyImage: {
     width: 68,
     height: 88,
+  },
+  storyAvatarBadge: {
+    position: 'absolute',
+    bottom: 4,
+    left: 4,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#fff',
+    backgroundColor: '#f0f2f5',
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  storyAvatarImage: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+  },
+  storyAvatarPlaceholder: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#FF6B35',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  storyAvatarInitial: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   storyLabel: {
     fontSize: 11,

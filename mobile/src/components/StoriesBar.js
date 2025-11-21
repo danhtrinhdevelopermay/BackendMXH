@@ -87,11 +87,27 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
           >
             <View style={styles.avatarContainer}>
               {story.thumbnail_url || story.media_url ? (
-                <Image
-                  source={{ uri: story.thumbnail_url || story.media_url }}
-                  style={styles.storyThumbnail}
-                  resizeMode="cover"
-                />
+                <>
+                  <Image
+                    source={{ uri: story.thumbnail_url || story.media_url }}
+                    style={styles.storyThumbnail}
+                    resizeMode="cover"
+                  />
+                  <View style={styles.userAvatarBadge}>
+                    {story.avatar_url ? (
+                      <Image
+                        source={{ uri: story.avatar_url }}
+                        style={styles.userAvatarImage}
+                      />
+                    ) : (
+                      <View style={styles.userAvatarPlaceholder}>
+                        <Text style={styles.avatarInitial}>
+                          {(story.full_name || story.username || '?')[0].toUpperCase()}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                </>
               ) : (
                 <UserAvatar 
                   user={story}
@@ -180,6 +196,36 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 29,
+  },
+  userAvatarBadge: {
+    position: 'absolute',
+    bottom: 2,
+    left: 2,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: '#fff',
+    backgroundColor: '#f0f2f5',
+    overflow: 'hidden',
+  },
+  userAvatarImage: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+  },
+  userAvatarPlaceholder: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#FF6B35',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarInitial: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
 });
 
