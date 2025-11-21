@@ -437,7 +437,7 @@ const HomeScreen = ({ navigation }) => {
         })()}
 
       <View style={styles.statsContainer}>
-        <TouchableOpacity style={styles.statItemReactions} onPress={() => navigation.navigate("PostDetail", { postId: item.id })}>
+        <TouchableOpacity style={styles.statItemReactions} onPress={() => { setSelectedPostId(item.id); setReactionsModalVisible(true); }}>
           {renderReactionStats(item)}
         </TouchableOpacity>
         <View style={styles.statsRight}>
