@@ -222,6 +222,7 @@ const HomeScreen = ({ navigation }) => {
       <StoriesBar
         stories={stories}
         currentUserId={user?.id}
+        currentUser={user}
         onCreateStory={() => navigation.navigate("CreateStory")}
         onViewStory={(userId) => navigation.navigate("ViewStory", { userId })}
       />

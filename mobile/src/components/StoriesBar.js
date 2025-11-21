@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import UserAvatar from './UserAvatar';
 
-const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
+const StoriesBar = ({ stories, currentUserId, currentUser, onCreateStory, onViewStory }) => {
   const hasOwnStory = stories.some(s => s.user_id === currentUserId);
   const ownStories = stories.filter(s => s.user_id === currentUserId);
   const otherStories = stories.filter(s => s.user_id !== currentUserId);
@@ -24,9 +24,16 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
         <View style={styles.createStoryCard}>
           <View style={styles.createStoryContent}>
             <View style={styles.createAvatarWithBadge}>
-              <View style={styles.createAvatarCircle}>
-                <Ionicons name="person" size={32} color="#6B7280" />
-              </View>
+              {currentUser?.avatar_url ? (
+                <Image
+                  source={{ uri: currentUser.avatar_url }}
+                  style={styles.createAvatarImage}
+                />
+              ) : (
+                <View style={styles.createAvatarCircle}>
+                  <Ionicons name="person" size={32} color="#6B7280" />
+                </View>
+              )}
               <View style={styles.createAddBadge}>
                 <Ionicons name="add" size={14} color="#fff" />
               </View>
@@ -178,6 +185,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#E5E7EB',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  createAvatarImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#E5E7EB',
   },
   createAddBadge: {
     position: 'absolute',
