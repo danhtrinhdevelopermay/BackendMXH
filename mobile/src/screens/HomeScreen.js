@@ -205,14 +205,15 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate("PostDetail", { postId, videoPosition });
   };
 
-  const getStoryThumbnail = (mediaUrl, mediaType) => {
-    if (!mediaUrl || mediaType !== 'video') return mediaUrl;
-    return mediaUrl.replace('/video/upload/', '/video/upload/so_0,w_100,h_100,c_thumb/');
-  };
-
   const renderStoryItem = (item, index) => {
     const isOwnStory = index === 0;
-    const thumbnailUrl = getStoryThumbnail(item.media_url, item.media_type);
+    let displayUrl = item.media_url;
+    
+    // Convert video URL to image thumbnail
+    if (item.media_url && item.media_type === 'video') {
+      displayUrl = item.media_url.replace('/video/upload/', '/image/upload/') + '.jpg';
+    }
+    
     return (
       <TouchableOpacity 
         key={index}
@@ -231,9 +232,9 @@ const HomeScreen = ({ navigation }) => {
                   <Ionicons name="add" size={16} color="#fff" />
                 </View>
               </View>
-            ) : item.media_url ? (
+            ) : displayUrl ? (
               <Image
-                source={{ uri: thumbnailUrl }}
+                source={{ uri: displayUrl }}
                 style={styles.storyImage}
               />
             ) : (

@@ -8,6 +8,11 @@ const StoriesBar = ({ stories, currentUserId, onCreateStory, onViewStory }) => {
   const hasOwnStory = stories.some(s => s.user_id === currentUserId);
   const ownStories = stories.filter(s => s.user_id === currentUserId);
   const otherStories = stories.filter(s => s.user_id !== currentUserId);
+  
+  const getThumbnail = (url, type) => {
+    if (!url || type !== 'video') return url;
+    return url.replace('/video/upload/', '/image/upload/') + '.jpg';
+  };
 
   return (
     <ScrollView 
@@ -194,15 +199,6 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 29,
-  },
-  videoOverlay: {
-    position: 'absolute',
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
 
