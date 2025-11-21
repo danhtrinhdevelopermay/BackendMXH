@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, ScrollView, TouchableOpacity, StyleSheet, Text, Image } from 'react-native';
+import { View, ScrollView, TouchableOpacity, StyleSheet, Text, Image, ImageBackground } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import UserAvatar from './UserAvatar';
@@ -21,30 +22,37 @@ const StoriesBar = ({ stories, currentUserId, currentUser, onCreateStory, onView
         onPress={onCreateStory}
         activeOpacity={0.7}
       >
-        <View style={styles.createStoryCard}>
-          <View style={styles.createStoryContent}>
-            <View style={styles.createAvatarWithBadge}>
-              {currentUser?.avatar_url ? (
-                <Image
-                  source={{ uri: currentUser.avatar_url }}
-                  style={styles.createAvatarImage}
-                />
-              ) : (
-                <View style={styles.createAvatarCircle}>
-                  <Ionicons name="person" size={32} color="#6B7280" />
+        <ImageBackground
+          source={currentUser?.avatar_url ? { uri: currentUser.avatar_url } : null}
+          style={styles.createStoryCard}
+          resizeMode="cover"
+        >
+          <BlurView intensity={80} style={styles.createStoryBlur}>
+            <View style={styles.createStoryOverlay} />
+            <View style={styles.createStoryContent}>
+              <View style={styles.createAvatarWithBadge}>
+                {currentUser?.avatar_url ? (
+                  <Image
+                    source={{ uri: currentUser.avatar_url }}
+                    style={styles.createAvatarImage}
+                  />
+                ) : (
+                  <View style={styles.createAvatarCircle}>
+                    <Ionicons name="person" size={32} color="#6B7280" />
+                  </View>
+                )}
+                <View style={styles.createAddBadge}>
+                  <Ionicons name="add" size={14} color="#fff" />
                 </View>
-              )}
-              <View style={styles.createAddBadge}>
-                <Ionicons name="add" size={14} color="#fff" />
               </View>
             </View>
-          </View>
-          <View style={styles.createStoryNameContainer}>
-            <Text style={styles.createStoryNameText} numberOfLines={1}>
-              Your Story
-            </Text>
-          </View>
-        </View>
+            <View style={styles.createStoryNameContainer}>
+              <Text style={styles.createStoryNameText} numberOfLines={1}>
+                Your Story
+              </Text>
+            </View>
+          </BlurView>
+        </ImageBackground>
       </TouchableOpacity>
 
       {hasOwnStory && ownStories.map((story) => (
@@ -163,15 +171,28 @@ const styles = StyleSheet.create({
     height: 160,
     borderRadius: 16,
     overflow: 'hidden',
-    backgroundColor: '#F3F4F6',
     position: 'relative',
     borderWidth: 1.5,
     borderColor: '#E5E7EB',
+  },
+  createStoryBlur: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  createStoryOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.3)',
   },
   createStoryContent: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 5,
   },
   createAvatarWithBadge: {
     position: 'relative',
@@ -211,11 +232,12 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingVertical: 8,
-    backgroundColor: 'rgba(255,255,255,0.95)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 10,
   },
   createStoryNameText: {
     fontSize: 11,
-    color: '#1F2937',
+    color: '#fff',
     textAlign: 'center',
     fontWeight: '500',
   },
