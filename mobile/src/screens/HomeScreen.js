@@ -35,6 +35,7 @@ import { useAlert } from "../context/AlertContext";
 import UserAvatar from "../components/UserAvatar";
 import VerifiedBadge from "../components/VerifiedBadge";
 import ReactionsModal from "../components/ReactionsModal";
+import StoriesBar from "../components/StoriesBar";
 import LikeButton from "../components/LikeButton";
 import ShareModal from "../components/ShareModal";
 
@@ -205,60 +206,6 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate("PostDetail", { postId, videoPosition });
   };
 
-  const renderStoryItem = (item, index) => {
-    const isOwnStory = index === 0;
-    const displayUrl = item.thumbnail_url || item.media_url;
-    
-    return (
-      <TouchableOpacity 
-        key={index}
-        style={styles.storyItem}
-        onPress={() => isOwnStory ? navigation.navigate("CreateStory") : navigation.navigate("ViewStory", { userId: item.user_id })}
-      >
-        <LinearGradient
-          colors={isOwnStory ? ['#e0e0e0', '#e0e0e0'] : ['#FF6B35', '#F7931E', '#FF6B35']}
-          style={styles.storyGradient}
-        >
-          <View style={styles.storyInner}>
-            {isOwnStory ? (
-              <View style={styles.ownStoryAvatar}>
-                <UserAvatar user={user} size={60} />
-                <View style={styles.addStoryButton}>
-                  <Ionicons name="add" size={16} color="#fff" />
-                </View>
-              </View>
-            ) : displayUrl ? (
-              <>
-                <Image
-                  source={{ uri: displayUrl }}
-                  style={styles.storyImage}
-                />
-                <View style={styles.storyAvatarBadge}>
-                  {item.avatar_url ? (
-                    <Image
-                      source={{ uri: item.avatar_url }}
-                      style={styles.storyAvatarImage}
-                    />
-                  ) : (
-                    <View style={styles.storyAvatarPlaceholder}>
-                      <Text style={styles.storyAvatarInitial}>
-                        {(item.full_name || item.username || '?')[0].toUpperCase()}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-              </>
-            ) : (
-              <UserAvatar user={item} userId={item.user_id} size={60} />
-            )}
-          </View>
-        </LinearGradient>
-        <Text style={styles.storyLabel} numberOfLines={1}>
-          {isOwnStory ? 'Bạn' : item.username}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
 
   const renderHeader = () => (
     <View style={styles.headerWrapper}>
@@ -272,15 +219,12 @@ const HomeScreen = ({ navigation }) => {
         </View>
       </Pressable>
 
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        style={styles.storiesContainer}
-        contentContainerStyle={styles.storiesContent}
-      >
-        {renderStoryItem({ user_id: user?.id }, 0)}
-        {stories.map((story, index) => renderStoryItem(story, index + 1))}
-      </ScrollView>
+      <StoriesBar
+        stories={stories}
+        currentUserId={user?.id}
+        onCreateStory={() => navigation.navigate("CreateStory")}
+        onViewStory={(userId) => navigation.navigate("ViewStory", { userId })}
+      />
     </View>
   );
 
