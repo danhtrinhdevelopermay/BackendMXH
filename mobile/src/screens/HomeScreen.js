@@ -74,7 +74,6 @@ const HomeScreen = ({ navigation }) => {
   const fetchStories = async () => {
     try {
       const response = await storyAPI.getAllStories();
-      console.log('Stories from API:', JSON.stringify(response.data?.[0], null, 2));
       setStories(response.data);
     } catch (error) {
       console.error("Failed to fetch stories:", error);
@@ -206,9 +205,14 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate("PostDetail", { postId, videoPosition });
   };
 
+  const getStoryThumbnail = (mediaUrl, mediaType) => {
+    if (!mediaUrl || mediaType !== 'video') return mediaUrl;
+    return mediaUrl.replace('/video/upload/', '/video/upload/so_0,w_100,h_100,c_thumb/');
+  };
+
   const renderStoryItem = (item, index) => {
     const isOwnStory = index === 0;
-    console.log('renderStoryItem:', { index, isOwnStory, hasMediaUrl: !!item.media_url, mediaUrl: item.media_url?.substring(0, 50) });
+    const thumbnailUrl = getStoryThumbnail(item.media_url, item.media_type);
     return (
       <TouchableOpacity 
         key={index}
@@ -229,9 +233,8 @@ const HomeScreen = ({ navigation }) => {
               </View>
             ) : item.media_url ? (
               <Image
-                source={{ uri: item.media_url }}
+                source={{ uri: thumbnailUrl }}
                 style={styles.storyImage}
-                onError={(error) => console.log('Image load error:', error)}
               />
             ) : (
               <UserAvatar user={item} userId={item.user_id} size={60} />
