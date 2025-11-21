@@ -197,7 +197,14 @@ const HomeScreen = ({ navigation }) => {
       );
     }
     
-    return <Text style={styles.statText}>{totalReactions} lượt cảm xúc</Text>;
+    return (
+      <View style={styles.reactionStatsWrapper}>
+        <View style={styles.reactionStat}>
+          <Text style={styles.reactionIcon}>👍</Text>
+          <Text style={styles.reactionStatCount}>{totalReactions}</Text>
+        </View>
+      </View>
+    );
   };
 
   const formatTimeAgo = (dateString) => {
