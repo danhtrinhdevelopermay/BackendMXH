@@ -48,7 +48,6 @@
       "apiUrl": "https://4affabee-fa74-496e-8587-b0b07482fdd3-00-2awe3z9fomi9h.pike.replit.dev",
       "oneSignalAppId": "${ONESIGNAL_APP_ID}",
       "eas": {
-        "projectId": "ed0e199d-4d88-42e9-bd35-efed57c80d1a",
         "build": {
           "experimental": {
             "ios": {
