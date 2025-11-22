@@ -210,4 +210,9 @@ export const otpAPI = {
   changePasswordWithOTP: (otpCode, newPassword) => api.post('/otp/change-password', { otpCode, newPassword }),
 };
 
+export const reelsAPI = {
+  getReels: (params) => api.get('/reels', { params }),
+  getTikTokVideos: (params) => api.get('/reels/tiktok', { params }),
+};
+
 export default api;

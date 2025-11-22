@@ -37,6 +37,7 @@ import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import CameraScreen from '../screens/CameraScreen';
 import ImageEditorScreen from '../screens/ImageEditorScreen';
 import ViewAvatarScreen from '../screens/ViewAvatarScreen';
+import ReelsScreen from '../screens/ReelsScreen';
 import NotificationBell from '../components/NotificationBell';
 
 const Stack = createStackNavigator();
@@ -655,6 +656,15 @@ const NavigationWrapper = () => {
                 ...modalTransition,
                 presentation: 'transparentModal',
                 cardStyle: { backgroundColor: 'transparent' },
+              }} 
+            />
+            <Stack.Screen 
+              name="Reels" 
+              component={ReelsScreen} 
+              options={{ 
+                headerShown: false,
+                ...fadeTransition,
+                presentation: 'fullScreenModal',
               }} 
             />
           </>

@@ -300,6 +300,13 @@ const HomeScreen = ({ navigation }) => {
           </Text>
           {activeTab === 'recommendations' && <View style={styles.tabIndicator} />}
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.reelsButton}
+          onPress={() => navigation.navigate('Reels')}
+        >
+          <Ionicons name="play-circle" size={24} color="#1f2937" />
+          <Text style={styles.reelsButtonText}>Reels</Text>
+        </TouchableOpacity>
       </View>
 
       <Pressable
@@ -703,6 +710,21 @@ const styles = StyleSheet.create({
     height: 3,
     backgroundColor: '#1f2937',
     borderRadius: 2,
+  },
+  reelsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#f0f2f5',
+    borderRadius: 12,
+    marginLeft: 'auto',
+  },
+  reelsButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#1f2937',
   },
   topGradient: {
     position: 'absolute',
