@@ -561,7 +561,7 @@ const HomeScreen = ({ navigation }) => {
       />
 
       <LinearGradient
-        colors={['rgba(255, 255, 255, 1)', 'rgba(255, 255, 255, 0.8)', 'rgba(255, 255, 255, 0)']}
+        colors={['#C5F3E8', '#B3E8F5', 'rgba(245, 245, 245, 0)']}
         style={styles.topGradient}
         pointerEvents="none"
       />
@@ -587,7 +587,7 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F5F5F5",
   },
   fixedHeader: {
     position: 'absolute',
@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
   appLogo: {
     fontSize: 28,
     fontWeight: '900',
-    color: '#1877f2',
+    color: '#1f2937',
     letterSpacing: -0.5,
   },
   headerActions: {
@@ -616,9 +616,14 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f0f2f5',
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   listContent: {
     flexGrow: 1,
@@ -626,14 +631,14 @@ const styles = StyleSheet.create({
     paddingBottom: 85,
   },
   headerWrapper: {
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
   },
   topGradient: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: 120,
+    height: 200,
     zIndex: 999,
   },
   createPostBox: {
@@ -645,8 +650,13 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 16,
     gap: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
   },
   createPostInput: {
     flex: 1,
@@ -656,7 +666,7 @@ const styles = StyleSheet.create({
     color: '#9ca3af',
   },
   storiesContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
     paddingTop: 12,
     paddingBottom: 16,
   },
@@ -670,10 +680,10 @@ const styles = StyleSheet.create({
   },
   storyGradient: {
     borderRadius: 16,
-    padding: 2,
+    padding: 2.5,
   },
   storyInner: {
-    borderRadius: 14,
+    borderRadius: 13.5,
     overflow: 'hidden',
     backgroundColor: '#fff',
   },
@@ -739,13 +749,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginHorizontal: 16,
     marginBottom: 16,
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
   },
   postHeader: {
     flexDirection: 'row',
