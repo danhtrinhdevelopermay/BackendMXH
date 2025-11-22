@@ -72,23 +72,30 @@ exports.getTikTokVideos = async (req, res) => {
 
     if (response.data && response.data.data) {
       // Transform TikTok data to match our schema
-      const tiktokVideos = response.data.data.videos.map(video => ({
-        id: `tiktok_${video.id}`,
-        source: 'tiktok',
-        media_url: video.cover_image_url,
-        video_url: video.share_url,
-        caption: video.title || video.video_description,
-        user: {
-          username: video.username || 'TikTok User',
-          full_name: video.username || 'TikTok User',
-          is_verified: false,
-        },
-        reaction_count: video.like_count || 0,
-        comment_count: video.comment_count || 0,
-        share_count: video.share_count || 0,
-        view_count: video.view_count || 0,
-        created_at: video.create_time,
-      }));
+      const tiktokVideos = response.data.data.videos.map(video => {
+        const coverUrl = video.cover_image_url || 'https://via.placeholder.com/400x600/000000/FFFFFF/?text=TikTok+Video';
+        return {
+          id: `tiktok_${video.id}`,
+          source: 'tiktok',
+          cover_image_url: coverUrl,
+          media_url: coverUrl,
+          video_url: video.share_url,
+          share_url: video.share_url,
+          embed_link: video.embed_link,
+          caption: video.title || video.video_description,
+          user: {
+            username: video.username || 'TikTok User',
+            full_name: video.username || 'TikTok User',
+            is_verified: false,
+          },
+          reaction_count: video.like_count || 0,
+          comment_count: video.comment_count || 0,
+          share_count: video.share_count || 0,
+          view_count: video.view_count || 0,
+          created_at: video.create_time,
+          is_playable: false,
+        };
+      });
 
       res.json(tiktokVideos);
     } else {
@@ -173,23 +180,30 @@ exports.getCombinedReels = async (req, res) => {
         );
 
         if (response.data && response.data.data && response.data.data.videos && Array.isArray(response.data.data.videos)) {
-          const tiktokVideos = response.data.data.videos.map(video => ({
-            id: `tiktok_${video.id}`,
-            source: 'tiktok',
-            media_url: video.cover_image_url,
-            video_url: video.share_url,
-            caption: video.title || video.video_description,
-            user: {
-              username: video.username || 'TikTok User',
-              full_name: video.username || 'TikTok User',
-              is_verified: false,
-            },
-            reaction_count: video.like_count || 0,
-            comment_count: video.comment_count || 0,
-            share_count: video.share_count || 0,
-            view_count: video.view_count || 0,
-            created_at: video.create_time,
-          }));
+          const tiktokVideos = response.data.data.videos.map(video => {
+            const coverUrl = video.cover_image_url || 'https://via.placeholder.com/400x600/000000/FFFFFF/?text=TikTok+Video';
+            return {
+              id: `tiktok_${video.id}`,
+              source: 'tiktok',
+              cover_image_url: coverUrl,
+              media_url: coverUrl,
+              video_url: video.share_url,
+              share_url: video.share_url,
+              embed_link: video.embed_link,
+              caption: video.title || video.video_description,
+              user: {
+                username: video.username || 'TikTok User',
+                full_name: video.username || 'TikTok User',
+                is_verified: false,
+              },
+              reaction_count: video.like_count || 0,
+              comment_count: video.comment_count || 0,
+              share_count: video.share_count || 0,
+              view_count: video.view_count || 0,
+              created_at: video.create_time,
+              is_playable: false,
+            };
+          });
 
           // Mix TikTok videos with database videos only if we have TikTok videos
           if (tiktokVideos.length > 0) {

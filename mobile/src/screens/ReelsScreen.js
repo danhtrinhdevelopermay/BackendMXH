@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   StatusBar,
+  Image,
+  Linking,
 } from 'react-native';
 import { Text } from 'react-native-paper';
 import { Video } from 'expo-av';
@@ -56,6 +58,24 @@ const ReelItem = ({ item, isActive, navigation, onLike, onComment, onShare }) =>
   };
 
   const handleVideoPress = async () => {
+    if (isTikTok) {
+      // Open TikTok video in browser/app
+      if (item.share_url) {
+        try {
+          const supported = await Linking.canOpenURL(item.share_url);
+          if (supported) {
+            await Linking.openURL(item.share_url);
+          } else {
+            onShare(item);
+          }
+        } catch (error) {
+          console.error('Failed to open TikTok URL:', error);
+          onShare(item);
+        }
+      }
+      return;
+    }
+    
     if (videoRef.current) {
       if (status.isPlaying) {
         await videoRef.current.pauseAsync();
@@ -65,26 +85,49 @@ const ReelItem = ({ item, isActive, navigation, onLike, onComment, onShare }) =>
     }
   };
 
-  const mediaUrl = item.media_url || `${API_URL}/api/media/${item.id}`;
+  const videoUrl = item.media_url || `${API_URL}/api/media/${item.id}`;
 
   return (
     <View style={styles.reelContainer}>
-      <TouchableOpacity 
-        style={styles.videoContainer} 
-        activeOpacity={1}
-        onPress={handleVideoPress}
-      >
-        <Video
-          ref={videoRef}
-          source={{ uri: mediaUrl }}
-          style={styles.video}
-          resizeMode="cover"
-          shouldPlay={isActive}
-          isLooping
-          isMuted={false}
-          onPlaybackStatusUpdate={setStatus}
-        />
-      </TouchableOpacity>
+      {isTikTok ? (
+        // TikTok preview (static image)
+        <TouchableOpacity 
+          style={styles.videoContainer} 
+          activeOpacity={0.9}
+          onPress={handleVideoPress}
+        >
+          <Image
+            source={{ uri: item.cover_image_url || item.media_url || 'https://via.placeholder.com/400x600/000000/FFFFFF/?text=TikTok+Video' }}
+            style={styles.video}
+            resizeMode="cover"
+          />
+          {/* TikTok Play Overlay */}
+          <View style={styles.tiktokOverlay}>
+            <View style={styles.tiktokPlayButton}>
+              <Ionicons name="logo-tiktok" size={40} color="#fff" />
+              <Text style={styles.tiktokPlayText}>Mở trên TikTok</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      ) : (
+        // Regular video playback
+        <TouchableOpacity 
+          style={styles.videoContainer} 
+          activeOpacity={1}
+          onPress={handleVideoPress}
+        >
+          <Video
+            ref={videoRef}
+            source={{ uri: videoUrl }}
+            style={styles.video}
+            resizeMode="cover"
+            shouldPlay={isActive}
+            isLooping
+            isMuted={false}
+            onPlaybackStatusUpdate={setStatus}
+          />
+        </TouchableOpacity>
+      )}
 
       {/* Gradient Overlay */}
       <LinearGradient
@@ -96,9 +139,20 @@ const ReelItem = ({ item, isActive, navigation, onLike, onComment, onShare }) =>
       <View style={styles.userInfo}>
         <TouchableOpacity
           style={styles.userRow}
-          onPress={() => navigation.navigate('Profile', { userId: item.user_id })}
+          onPress={() => {
+            if (!isTikTok && item.user_id) {
+              navigation.navigate('Profile', { userId: item.user_id });
+            }
+          }}
+          disabled={isTikTok}
         >
-          <UserAvatar userId={item.user_id} size={40} />
+          {!isTikTok && item.user_id ? (
+            <UserAvatar userId={item.user_id} size={40} />
+          ) : (
+            <View style={styles.defaultAvatar}>
+              <Ionicons name="logo-tiktok" size={24} color="#fff" />
+            </View>
+          )}
           <View style={styles.userDetails}>
             <View style={styles.nameRow}>
               <Text style={styles.userName}>{item.user?.full_name || item.user?.username}</Text>
@@ -106,9 +160,11 @@ const ReelItem = ({ item, isActive, navigation, onLike, onComment, onShare }) =>
             </View>
             <Text style={styles.username}>@{item.user?.username}</Text>
           </View>
-          <TouchableOpacity style={styles.followButton}>
-            <Text style={styles.followButtonText}>Follow</Text>
-          </TouchableOpacity>
+          {!isTikTok && (
+            <TouchableOpacity style={styles.followButton}>
+              <Text style={styles.followButtonText}>Follow</Text>
+            </TouchableOpacity>
+          )}
         </TouchableOpacity>
 
         {item.caption && (
@@ -130,11 +186,14 @@ const ReelItem = ({ item, isActive, navigation, onLike, onComment, onShare }) =>
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => onComment(item)}
+          style={[styles.actionButton, isTikTok && styles.actionButtonDisabled]}
+          onPress={() => !isTikTok && onComment(item)}
+          disabled={isTikTok}
         >
-          <Ionicons name="chatbubble-outline" size={30} color="#fff" />
-          <Text style={styles.actionText}>{formatCount(item.comment_count || 0)}</Text>
+          <Ionicons name="chatbubble-outline" size={30} color={isTikTok ? '#666' : '#fff'} />
+          <Text style={[styles.actionText, isTikTok && styles.actionTextDisabled]}>
+            {formatCount(item.comment_count || 0)}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
@@ -142,19 +201,14 @@ const ReelItem = ({ item, isActive, navigation, onLike, onComment, onShare }) =>
           onPress={() => onShare(item)}
         >
           <Ionicons name="arrow-redo-outline" size={30} color="#fff" />
-          <Text style={styles.actionText}>Share</Text>
+          <Text style={styles.actionText}>
+            {isTikTok ? 'Mở' : 'Share'}
+          </Text>
         </TouchableOpacity>
-
-        {item.source === 'tiktok' && (
-          <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="logo-tiktok" size={30} color="#fff" />
-            <Text style={styles.actionText}>TikTok</Text>
-          </TouchableOpacity>
-        )}
       </View>
 
-      {/* Play/Pause Indicator */}
-      {!status.isPlaying && status.isBuffering !== true && (
+      {/* Play/Pause Indicator (only for regular videos) */}
+      {!isTikTok && !status.isPlaying && status.isBuffering !== true && (
         <View style={styles.playPauseOverlay}>
           <Ionicons name="play-circle" size={80} color="rgba(255,255,255,0.7)" />
         </View>
@@ -207,9 +261,24 @@ const ReelsScreen = ({ navigation }) => {
     navigation.navigate('Comments', { postId: reel.id });
   };
 
-  const handleShare = (reel) => {
-    // Implement share functionality
-    showAlert('Chia sẻ', 'Tính năng chia sẻ đang được phát triển', 'info');
+  const handleShare = async (reel) => {
+    if (reel.source === 'tiktok' && reel.share_url) {
+      // Open TikTok video in browser/app for TikTok reels
+      try {
+        const supported = await Linking.canOpenURL(reel.share_url);
+        if (supported) {
+          await Linking.openURL(reel.share_url);
+        } else {
+          showAlert('Lỗi', 'Không thể mở video TikTok', 'error');
+        }
+      } catch (error) {
+        console.error('Failed to open TikTok URL:', error);
+        showAlert('Lỗi', 'Không thể mở video TikTok', 'error');
+      }
+    } else {
+      // Implement share functionality for regular posts
+      showAlert('Chia sẻ', 'Tính năng chia sẻ đang được phát triển', 'info');
+    }
   };
 
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
@@ -350,6 +419,14 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     flex: 1,
   },
+  defaultAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#333',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -392,10 +469,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
+  actionButtonDisabled: {
+    opacity: 0.5,
+  },
   actionText: {
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
+  },
+  actionTextDisabled: {
+    color: '#666',
   },
   playPauseOverlay: {
     position: 'absolute',
@@ -405,6 +488,29 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  tiktokOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tiktokPlayButton: {
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 32,
+    paddingVertical: 20,
+    borderRadius: 16,
+    alignItems: 'center',
+    gap: 8,
+  },
+  tiktokPlayText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
   emptyContainer: {
     height: height,
