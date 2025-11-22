@@ -2,10 +2,23 @@ const { Resend } = require('resend');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// Email configuration - use environment variables for production
+const FROM_EMAIL = process.env.FROM_EMAIL || 'onboarding@resend.dev';
+const FROM_NAME = process.env.FROM_NAME || 'Shatter';
+const IS_TEST_MODE = FROM_EMAIL === 'onboarding@resend.dev';
+
+// Log email service mode on startup
+if (IS_TEST_MODE) {
+  console.warn('⚠️ Email service running in TEST MODE - emails limited to authorized addresses only');
+  console.warn('📝 To enable production mode: Set FROM_EMAIL and FROM_NAME environment variables with your verified domain');
+} else {
+  console.log(`✅ Email service running in PRODUCTION MODE - sending from: ${FROM_NAME} <${FROM_EMAIL}>`);
+}
+
 const sendOTPEmail = async (email, otpCode, userName) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Shatter <onboarding@resend.dev>',
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
       to: [email],
       subject: 'Mã xác minh đổi mật khẩu - Shatter',
       html: `
@@ -103,16 +116,21 @@ const sendOTPEmail = async (email, otpCode, userName) => {
 
     if (error) {
       console.error('❌ Resend error:', error);
-      // In development/test mode, allow OTP to work even if email fails
-      if (error.statusCode === 403 && error.name === 'validation_error') {
-        console.warn('⚠️ Email service in test mode - OTP code created but email not sent. Code:', otpCode);
-        return { success: true, testMode: true, message: 'Test mode: OTP created but email not sent' };
+      // In test mode, allow OTP to work even if email fails (for unauthorized recipients)
+      if (IS_TEST_MODE && error.statusCode === 403 && error.name === 'validation_error') {
+        console.warn('⚠️ TEST MODE: Email not sent (recipient not authorized). OTP code:', otpCode);
+        return { 
+          success: true, 
+          testMode: true, 
+          otpCode: otpCode, // Include OTP in response for test mode
+          message: 'Test mode: OTP created but email cannot be sent to unauthorized addresses' 
+        };
       }
-      throw new Error('Failed to send OTP email');
+      throw new Error('Failed to send OTP email: ' + (error.message || 'Unknown error'));
     }
 
     console.log('✅ OTP email sent successfully:', data);
-    return { success: true, data };
+    return { success: true, testMode: false, data };
   } catch (error) {
     console.error('❌ Error sending OTP email:', error);
     throw error;
@@ -122,7 +140,7 @@ const sendOTPEmail = async (email, otpCode, userName) => {
 const sendPasswordChangedNotification = async (email, userName) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'Shatter <onboarding@resend.dev>',
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
       to: [email],
       subject: 'Mật khẩu đã được thay đổi - Shatter',
       html: `
@@ -213,11 +231,20 @@ const sendPasswordChangedNotification = async (email, userName) => {
 
     if (error) {
       console.error('❌ Resend error:', error);
-      throw new Error('Failed to send notification email');
+      // In test mode, don't fail on email errors (notification is optional)
+      if (IS_TEST_MODE && error.statusCode === 403 && error.name === 'validation_error') {
+        console.warn('⚠️ TEST MODE: Password change notification not sent (recipient not authorized)');
+        return { 
+          success: true, 
+          testMode: true, 
+          message: 'Test mode: Password changed but notification email not sent' 
+        };
+      }
+      throw new Error('Failed to send notification email: ' + (error.message || 'Unknown error'));
     }
 
     console.log('✅ Password changed notification sent successfully:', data);
-    return { success: true, data };
+    return { success: true, testMode: false, data };
   } catch (error) {
     console.error('❌ Error sending notification email:', error);
     throw error;
