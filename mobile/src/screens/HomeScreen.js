@@ -66,8 +66,6 @@ const HomeScreen = ({ navigation }) => {
       let response;
       if (activeTab === 'recommendations') {
         response = await recommendationAPI.getRecommendedPosts({ limit: 20 });
-      } else if (activeTab === 'share') {
-        response = await postAPI.getSharedPosts({ limit: 20 });
       } else {
         response = await postAPI.getNewsFeed();
       }
@@ -301,21 +299,6 @@ const HomeScreen = ({ navigation }) => {
             Đề xuất
           </Text>
           {activeTab === 'recommendations' && <View style={styles.tabIndicator} />}
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'share' && styles.activeTab]}
-          onPress={() => setActiveTab('share')}
-        >
-          <Ionicons 
-            name="share-social" 
-            size={16} 
-            color={activeTab === 'share' ? '#1f2937' : '#9ca3af'} 
-            style={{ marginRight: 4 }}
-          />
-          <Text style={[styles.tabText, activeTab === 'share' && styles.activeTabText]}>
-            Chia sẻ
-          </Text>
-          {activeTab === 'share' && <View style={styles.tabIndicator} />}
         </TouchableOpacity>
       </View>
 
