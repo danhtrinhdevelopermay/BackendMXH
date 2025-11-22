@@ -45,7 +45,7 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "apiUrl": "https://3bce035f-b500-4891-8b57-2c5b232ee199-00-1hbda7pdv07ay.pike.replit.dev",
+      "apiUrl": "https://224d249b-e95b-419d-aa63-6e979c310717-00-1m2qcu8litzip.pike.replit.dev",
       "oneSignalAppId": "${ONESIGNAL_APP_ID}",
       "eas": {
         "projectId": "ed0e199d-4d88-42e9-bd35-efed57c80d1a",
