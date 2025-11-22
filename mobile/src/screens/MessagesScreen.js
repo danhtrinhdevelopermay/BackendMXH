@@ -120,7 +120,7 @@ const MessagesScreen = ({ navigation }) => {
 
   const renderConversation = React.useCallback(({ item }) => {
     const isUnread = !item.is_read && item.sender_id !== item.other_user_id;
-    const isOnline = Math.random() > 0.5; // TODO: Replace with real online status
+    const isOnline = Math.random() > 0.5;
     
     return (
       <TouchableOpacity 
@@ -129,37 +129,45 @@ const MessagesScreen = ({ navigation }) => {
           userName: item.full_name || item.username,
           userAvatar: item.avatar_url
         })}
-        activeOpacity={0.8}
+        activeOpacity={0.95}
         style={styles.conversationItem}
       >
-        <View style={styles.avatarContainer}>
-          <UserAvatar 
-            user={item}
-            userId={item.other_user_id}
-            size={56}
-          />
-          {isOnline && <View style={styles.onlineDot} />}
-        </View>
-        
-        <View style={styles.conversationContent}>
-          <View style={styles.topRow}>
-            <View style={styles.nameRow}>
-              <Text style={[styles.userName, isUnread && styles.unreadName]} numberOfLines={1}>
-                {item.full_name || item.username}
-              </Text>
-              {item.streak_count > 0 && <StreakIcon count={item.streak_count} size="small" />}
-            </View>
-            {isUnread && <View style={styles.unreadBadge} />}
+        <View style={styles.conversationInner}>
+          <View style={styles.avatarContainer}>
+            <UserAvatar 
+              user={item}
+              userId={item.other_user_id}
+              size={56}
+            />
+            {isOnline && <View style={styles.onlineDot} />}
           </View>
           
-          <View style={styles.messageRow}>
-            <Text 
-              style={[styles.lastMessage, isUnread && styles.unreadMessage]} 
-              numberOfLines={1}
-            >
-              {item.last_message || 'Bắt đầu trò chuyện'}
-            </Text>
-            <Text style={styles.timeText}>· {formatTime(item.last_message_time)}</Text>
+          <View style={styles.conversationContent}>
+            <View style={styles.topRow}>
+              <View style={styles.nameRow}>
+                <Text style={[styles.userName, isUnread && styles.unreadName]} numberOfLines={1}>
+                  {item.full_name || item.username}
+                </Text>
+                {item.streak_count > 0 && (
+                  <StreakIcon count={item.streak_count} size="small" />
+                )}
+              </View>
+              <Text style={styles.timeText}>{formatTime(item.last_message_time)}</Text>
+            </View>
+            
+            <View style={styles.messageRow}>
+              <View style={styles.lastMessageContainer}>
+                {!item.is_read && item.sender_id !== item.other_user_id && (
+                  <View style={styles.unreadDot} />
+                )}
+                <Text 
+                  style={[styles.lastMessage, isUnread && styles.unreadMessage]} 
+                  numberOfLines={2}
+                >
+                  {item.last_message || 'Bắt đầu trò chuyện'}
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
       </TouchableOpacity>
@@ -325,11 +333,13 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   conversationItem: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  conversationInner: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: '#fff',
   },
   avatarContainer: {
     position: 'relative',
@@ -337,17 +347,18 @@ const styles = StyleSheet.create({
   },
   onlineDot: {
     position: 'absolute',
-    bottom: 2,
-    right: 2,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: '#31A24C',
-    borderWidth: 2,
+    bottom: 0,
+    right: 0,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#44B700',
+    borderWidth: 3,
     borderColor: '#fff',
   },
   conversationContent: {
     flex: 1,
+    justifyContent: 'center',
   },
   topRow: {
     flexDirection: 'row',
@@ -359,40 +370,48 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    marginRight: 8,
+    gap: 4,
   },
   userName: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '500',
     color: '#050505',
-    marginRight: 4,
+    letterSpacing: 0.1,
   },
   unreadName: {
-    fontWeight: '600',
-  },
-  unreadBadge: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#0084FF',
+    fontWeight: '700',
   },
   messageRow: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  lastMessageContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+    gap: 6,
+  },
+  unreadDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#0084FF',
+    marginTop: 2,
   },
   lastMessage: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#65676B',
     flex: 1,
-    marginRight: 4,
+    lineHeight: 18,
   },
   unreadMessage: {
     color: '#050505',
-    fontWeight: '500',
+    fontWeight: '600',
   },
   timeText: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#65676B',
+    marginLeft: 4,
   },
   emptyContainer: {
     flex: 1,
