@@ -36,6 +36,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import CameraScreen from '../screens/CameraScreen';
 import ImageEditorScreen from '../screens/ImageEditorScreen';
+import ViewAvatarScreen from '../screens/ViewAvatarScreen';
 import NotificationBell from '../components/NotificationBell';
 
 const Stack = createStackNavigator();
@@ -644,6 +645,16 @@ const NavigationWrapper = () => {
               options={{ 
                 headerShown: false,
                 ...slideFromRightTransition,
+              }} 
+            />
+            <Stack.Screen 
+              name="ViewAvatar" 
+              component={ViewAvatarScreen} 
+              options={{ 
+                headerShown: false,
+                ...modalTransition,
+                presentation: 'transparentModal',
+                cardStyle: { backgroundColor: 'transparent' },
               }} 
             />
           </>

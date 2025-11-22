@@ -112,7 +112,18 @@ const ProfileScreen = ({ route, navigation }) => {
       </View>
 
       <View style={styles.profileInfo}>
-        <View style={styles.avatarWrapper}>
+        <TouchableOpacity 
+          style={styles.avatarWrapper}
+          onPress={() => {
+            if (profileUser?.id) {
+              navigation.navigate('ViewAvatar', {
+                userId: profileUser.id,
+                userName: profileUser.full_name || profileUser.username
+              });
+            }
+          }}
+          activeOpacity={0.8}
+        >
           {profileUser?.id ? (
             <Image
               source={{ uri: `${API_URL}/api/avatar/${profileUser.id}?${Date.now()}` }}
@@ -123,7 +134,7 @@ const ProfileScreen = ({ route, navigation }) => {
               <Text style={styles.avatarText}>{profileUser?.username?.[0]?.toUpperCase() || 'U'}</Text>
             </View>
           )}
-        </View>
+        </TouchableOpacity>
 
         <View style={styles.nameRow}>
           <Text style={styles.displayName}>{profileUser?.full_name || profileUser?.username}</Text>
