@@ -1,10 +1,6 @@
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
-const { neonConfig } = require('@neondatabase/serverless');
 const { Pool } = require('pg');
-
-neonConfig.useSecureWebSocket = false;
-neonConfig.pipelineConnect = false;
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -17,9 +13,7 @@ const primaryPool = new Pool({
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  ssl: true
 });
 
 let secondaryPool = null;
@@ -29,9 +23,7 @@ if (process.env.DATABASE_URL_SECONDARY) {
     max: 10,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 10000,
-    ssl: {
-      rejectUnauthorized: false
-    }
+    ssl: true
   });
   console.log('✅ Secondary database configured for failover');
 }
