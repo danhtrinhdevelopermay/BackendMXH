@@ -22,6 +22,8 @@ const ChangePasswordScreen = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [timeLeft, setTimeLeft] = useState(300);
   const [canResend, setCanResend] = useState(false);
+  const [testModeCode, setTestModeCode] = useState(null);
+  const [isTestMode, setIsTestMode] = useState(false);
 
   const otpInputs = useRef([]);
 
@@ -54,7 +56,16 @@ const ChangePasswordScreen = ({ navigation }) => {
       setStep(2);
       setTimeLeft(300);
       setCanResend(false);
-      showAlert('Thành công', 'Mã OTP đã được gửi đến email của bạn', 'success');
+      
+      // Handle test mode
+      if (response.data.testMode && response.data.otpCode) {
+        setIsTestMode(true);
+        setTestModeCode(response.data.otpCode);
+        showAlert('Chế độ Test', `Mã OTP: ${response.data.otpCode}`, 'info');
+      } else {
+        setIsTestMode(false);
+        showAlert('Thành công', 'Mã OTP đã được gửi đến email của bạn', 'success');
+      }
     } catch (error) {
       console.error('Error sending OTP:', error);
       showAlert('Lỗi', error.response?.data?.error || 'Không thể gửi mã OTP', 'error');
@@ -218,6 +229,31 @@ const ChangePasswordScreen = ({ navigation }) => {
       <Text style={styles.subtitle}>
         Chúng tôi đã gửi mã xác minh 6 số đến {email}
       </Text>
+
+      {isTestMode && testModeCode && (
+        <View style={styles.testModeBox}>
+          <View style={styles.testModeHeader}>
+            <Ionicons name="flask" size={18} color="#f59e0b" />
+            <Text style={styles.testModeTitle}>Chế độ Test</Text>
+          </View>
+          <Text style={styles.testModeSubtitle}>
+            Dịch vụ email đang ở chế độ test. Sử dụng mã dưới đây:
+          </Text>
+          <View style={styles.testCodeBox}>
+            <Text style={styles.testCode}>{testModeCode}</Text>
+            <TouchableOpacity 
+              onPress={() => {
+                const digits = testModeCode.split('');
+                setOtp(digits);
+              }}
+              style={styles.copyButton}
+            >
+              <Ionicons name="copy" size={18} color="#667eea" />
+              <Text style={styles.copyButtonText}>Dán vào</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
 
       <View style={styles.otpContainer}>
         {otp.map((digit, index) => (
@@ -580,6 +616,59 @@ const styles = StyleSheet.create({
   tipText: {
     fontSize: 13,
     color: '#6b7280',
+  },
+  testModeBox: {
+    backgroundColor: '#fef3c7',
+    borderLeftWidth: 4,
+    borderLeftColor: '#f59e0b',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  testModeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  testModeTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#92400e',
+  },
+  testModeSubtitle: {
+    fontSize: 13,
+    color: '#92400e',
+    marginBottom: 12,
+  },
+  testCodeBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fcd34d',
+    borderRadius: 8,
+    padding: 12,
+    gap: 8,
+  },
+  testCode: {
+    flex: 1,
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#78350f',
+    letterSpacing: 4,
+  },
+  copyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+    gap: 4,
+  },
+  copyButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#667eea',
   },
 });
 

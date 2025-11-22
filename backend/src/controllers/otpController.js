@@ -38,16 +38,28 @@ const sendOTP = async (req, res) => {
       [userId, user.email, otpCode, 'password_reset', expiresAt]
     );
 
-    await sendOTPEmail(user.email, otpCode, user.full_name);
+    const emailResult = await sendOTPEmail(user.email, otpCode, user.full_name);
 
     console.log(`✅ OTP sent to user ${userId} (${user.email})`);
 
-    res.json({
-      success: true,
-      message: 'Mã OTP đã được gửi đến email của bạn',
-      email: user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3'),
-      expiresIn: 300
-    });
+    // In test mode, return the OTP code for testing
+    if (emailResult.testMode) {
+      res.json({
+        success: true,
+        message: 'Mã OTP đã được tạo (Test Mode: Xem mã dưới đây)',
+        email: user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3'),
+        otpCode: otpCode,
+        expiresIn: 300,
+        testMode: true
+      });
+    } else {
+      res.json({
+        success: true,
+        message: 'Mã OTP đã được gửi đến email của bạn',
+        email: user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3'),
+        expiresIn: 300
+      });
+    }
   } catch (error) {
     console.error('Error sending OTP:', error);
     res.status(500).json({ error: 'Không thể gửi mã OTP. Vui lòng thử lại sau.' });
