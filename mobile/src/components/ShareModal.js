@@ -213,11 +213,16 @@ const ShareModal = ({ visible, onDismiss, post }) => {
     friend.username?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (!post) return null;
+  if (!visible) return null;
 
   return (
     <Portal>
-      <Modal visible={visible} onDismiss={onDismiss} contentContainerStyle={styles.modal}>
+      <Modal 
+        visible={visible} 
+        onDismiss={onDismiss} 
+        contentContainerStyle={styles.modal}
+        dismissable={true}
+      >
         <View style={styles.header}>
           <Text style={styles.title}>Chia sẻ bài viết</Text>
           <TouchableOpacity onPress={onDismiss} style={styles.closeButton}>
@@ -225,7 +230,11 @@ const ShareModal = ({ visible, onDismiss, post }) => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.content} 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Tùy chọn chia sẻ</Text>
             
@@ -243,7 +252,7 @@ const ShareModal = ({ visible, onDismiss, post }) => {
               <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
             </TouchableOpacity>
 
-            {post.media_url && (
+            {post && post.media_url && (
               <>
                 <TouchableOpacity style={styles.option} onPress={handleShareMedia}>
                   <LinearGradient
@@ -361,7 +370,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     borderRadius: 24,
     maxHeight: '80%',
-    overflow: 'hidden',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   header: {
     flexDirection: 'row',
@@ -381,6 +394,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 20,
   },
   section: {
     padding: 20,
