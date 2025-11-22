@@ -88,16 +88,26 @@ const ProfileScreen = ({ route, navigation }) => {
         </TouchableOpacity>
         <View style={styles.topActions}>
           {isOwnProfile && (
-            <TouchableOpacity 
-              style={styles.editBtn}
-              onPress={() => navigation.navigate('EditProfile')}
-            >
-              <Text style={styles.editBtnText}>Edit</Text>
+            <>
+              <TouchableOpacity 
+                style={styles.editBtn}
+                onPress={() => navigation.navigate('EditProfile')}
+              >
+                <Text style={styles.editBtnText}>Edit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.settingsBtn}
+                onPress={() => navigation.navigate('Settings')}
+              >
+                <Ionicons name="settings" size={24} color="#1a1a1a" />
+              </TouchableOpacity>
+            </>
+          )}
+          {!isOwnProfile && (
+            <TouchableOpacity style={styles.menuBtn}>
+              <Ionicons name="menu" size={28} color="#1a1a1a" />
             </TouchableOpacity>
           )}
-          <TouchableOpacity style={styles.menuBtn}>
-            <Ionicons name="menu" size={28} color="#1a1a1a" />
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -324,6 +334,12 @@ const styles = StyleSheet.create({
     color: '#1a1a1a',
   },
   menuBtn: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  settingsBtn: {
     width: 36,
     height: 36,
     alignItems: 'center',
