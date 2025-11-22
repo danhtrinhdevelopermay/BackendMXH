@@ -204,4 +204,10 @@ export const recommendationAPI = {
   getUserPreferences: () => api.get('/recommendations/preferences'),
 };
 
+export const otpAPI = {
+  sendOTP: () => api.post('/otp/send'),
+  verifyOTP: (otpCode) => api.post('/otp/verify', { otpCode }),
+  changePasswordWithOTP: (otpCode, newPassword) => api.post('/otp/change-password', { otpCode, newPassword }),
+};
+
 export default api;

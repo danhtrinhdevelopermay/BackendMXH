@@ -33,6 +33,7 @@ import CreateStoryScreen from '../screens/CreateStoryScreen';
 import ViewStoryScreen from '../screens/ViewStoryScreen';
 import CreateThoughtScreen from '../screens/CreateThoughtScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import ChangePasswordScreen from '../screens/ChangePasswordScreen';
 import CameraScreen from '../screens/CameraScreen';
 import ImageEditorScreen from '../screens/ImageEditorScreen';
 import NotificationBell from '../components/NotificationBell';
@@ -580,6 +581,14 @@ const NavigationWrapper = () => {
             <Stack.Screen 
               name="Settings" 
               component={SettingsScreen} 
+              options={{ 
+                headerShown: false,
+                ...slideFromRightTransition,
+              }} 
+            />
+            <Stack.Screen 
+              name="ChangePassword" 
+              component={ChangePasswordScreen} 
               options={{ 
                 headerShown: false,
                 ...slideFromRightTransition,

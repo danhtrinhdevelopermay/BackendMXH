@@ -242,6 +242,12 @@ const SettingsScreen = ({ navigation }) => {
             onPress={() => navigation.navigate('EditProfile')}
           />
           <SettingItem
+            icon="lock-closed-outline"
+            title="Đổi mật khẩu"
+            subtitle="Bảo mật tài khoản với mã OTP"
+            onPress={() => navigation.navigate('ChangePassword')}
+          />
+          <SettingItem
             icon="log-out-outline"
             title="Đăng xuất"
             onPress={() => {
