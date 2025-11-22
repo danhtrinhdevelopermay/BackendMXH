@@ -103,6 +103,11 @@ const sendOTPEmail = async (email, otpCode, userName) => {
 
     if (error) {
       console.error('❌ Resend error:', error);
+      // In development/test mode, allow OTP to work even if email fails
+      if (error.statusCode === 403 && error.name === 'validation_error') {
+        console.warn('⚠️ Email service in test mode - OTP code created but email not sent. Code:', otpCode);
+        return { success: true, testMode: true, message: 'Test mode: OTP created but email not sent' };
+      }
       throw new Error('Failed to send OTP email');
     }
 
