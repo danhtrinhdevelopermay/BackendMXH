@@ -199,4 +199,9 @@ export const aiAPI = {
   generateIceBreaker: (data) => api.post('/ai/generate-ice-breaker', data),
 };
 
+export const recommendationAPI = {
+  getRecommendedPosts: (params) => api.get('/recommendations', { params }),
+  getUserPreferences: () => api.get('/recommendations/preferences'),
+};
+
 export default api;

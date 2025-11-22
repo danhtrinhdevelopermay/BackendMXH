@@ -21,6 +21,7 @@ const streakRoutes = require('./src/routes/streaks');
 const appVersionsRoutes = require('./src/routes/appVersions');
 const aiRoutes = require('./src/routes/ai');
 const archiveRoutes = require('./src/routes/archive');
+const recommendationRoutes = require('./src/routes/recommendations');
 const { authenticateToken } = require('./src/middleware/auth');
 const pool = require('./src/config/database');
 const cloudinary = require('./src/config/cloudinary');
@@ -99,6 +100,7 @@ app.use('/api/streaks', streakRoutes);
 app.use('/api/app-versions', appVersionsRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api', archiveRoutes);
+app.use('/api/recommendations', recommendationRoutes);
 
 app.get('/api/auto-reactions/status', authenticateToken, (req, res) => {
   res.json(autoReactionService.getStats());

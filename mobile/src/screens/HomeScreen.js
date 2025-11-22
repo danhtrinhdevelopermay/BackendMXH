@@ -29,7 +29,7 @@ import Constants from "expo-constants";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-import { postAPI, reactionAPI, storyAPI } from "../api/api";
+import { postAPI, reactionAPI, storyAPI, recommendationAPI } from "../api/api";
 import { AuthContext } from "../context/AuthContext";
 import { useAlert } from "../context/AlertContext";
 import UserAvatar from "../components/UserAvatar";
@@ -56,13 +56,19 @@ const HomeScreen = ({ navigation }) => {
   const [mediaErrors, setMediaErrors] = useState({});
   const [shareModalVisible, setShareModalVisible] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [activeTab, setActiveTab] = useState('newsfeed');
   const videoRefs = useRef({});
 
   const API_URL = Constants.expoConfig?.extra?.apiUrl || "http://localhost:5000";
 
   const fetchPosts = async () => {
     try {
-      const response = await postAPI.getNewsFeed();
+      let response;
+      if (activeTab === 'recommendations') {
+        response = await recommendationAPI.getRecommendedPosts({ limit: 20 });
+      } else {
+        response = await postAPI.getNewsFeed();
+      }
       setPosts(response.data);
     } catch (error) {
       showAlert("Error", "Failed to fetch posts", "error");
@@ -84,7 +90,7 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     fetchPosts();
     fetchStories();
-  }, []);
+  }, [activeTab]);
 
   useFocusEffect(
     useCallback(() => {
@@ -269,6 +275,33 @@ const HomeScreen = ({ navigation }) => {
 
   const renderHeader = () => (
     <View style={styles.headerWrapper}>
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'newsfeed' && styles.activeTab]}
+          onPress={() => setActiveTab('newsfeed')}
+        >
+          <Text style={[styles.tabText, activeTab === 'newsfeed' && styles.activeTabText]}>
+            Bảng tin
+          </Text>
+          {activeTab === 'newsfeed' && <View style={styles.tabIndicator} />}
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'recommendations' && styles.activeTab]}
+          onPress={() => setActiveTab('recommendations')}
+        >
+          <Ionicons 
+            name="sparkles" 
+            size={16} 
+            color={activeTab === 'recommendations' ? '#1f2937' : '#9ca3af'} 
+            style={{ marginRight: 4 }}
+          />
+          <Text style={[styles.tabText, activeTab === 'recommendations' && styles.activeTabText]}>
+            Đề xuất
+          </Text>
+          {activeTab === 'recommendations' && <View style={styles.tabIndicator} />}
+        </TouchableOpacity>
+      </View>
+
       <Pressable
         style={styles.createPostBox}
         onPress={() => navigation.navigate("CreatePost")}
@@ -626,7 +659,50 @@ const styles = StyleSheet.create({
     paddingBottom: 85,
   },
   headerWrapper: {
+    backgroundColor: 'transparent',
+  },
+  tabContainer: {
+    flexDirection: 'row',
     backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 12,
+    borderRadius: 16,
+    padding: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 12,
+    position: 'relative',
+  },
+  activeTab: {
+    backgroundColor: '#f0f2f5',
+  },
+  tabText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#9ca3af',
+  },
+  activeTabText: {
+    color: '#1f2937',
+  },
+  tabIndicator: {
+    position: 'absolute',
+    bottom: 0,
+    left: 12,
+    right: 12,
+    height: 3,
+    backgroundColor: '#1f2937',
+    borderRadius: 2,
   },
   topGradient: {
     position: 'absolute',
