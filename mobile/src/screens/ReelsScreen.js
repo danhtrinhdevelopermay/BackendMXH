@@ -14,6 +14,7 @@ import { Text } from 'react-native-paper';
 import { Video } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import { AuthContext } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
 import { reelsAPI, reactionAPI, commentAPI } from '../api/api';
@@ -86,9 +87,24 @@ const ReelItem = ({ item, isActive, navigation, onLike, onComment, onShare }) =>
   };
 
   const videoUrl = item.media_url || `${API_URL}/api/media/${item.id}`;
+  const backgroundImageUrl = item.cover_image_url || item.media_url || `${API_URL}/api/media/${item.id}`;
 
   return (
     <View style={styles.reelContainer}>
+      {/* Blurred Background Layer */}
+      <View style={StyleSheet.absoluteFillObject}>
+        <Image
+          source={{ uri: backgroundImageUrl }}
+          style={styles.backgroundImage}
+          resizeMode="cover"
+          blurRadius={0}
+        />
+        <BlurView intensity={60} style={StyleSheet.absoluteFillObject}>
+          <View style={styles.blurOverlay} />
+        </BlurView>
+      </View>
+
+      {/* Main Content Layer */}
       {isTikTok ? (
         // TikTok preview (static image)
         <TouchableOpacity 
@@ -389,9 +405,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     position: 'relative',
   },
+  backgroundImage: {
+    width: width,
+    height: height,
+  },
+  blurOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+  },
   videoContainer: {
     flex: 1,
-    backgroundColor: '#000',
   },
   video: {
     width: width,
