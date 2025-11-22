@@ -1,0 +1,50 @@
+2025-11-22T08:31:04.449064783Z   code: 'MODULE_NOT_FOUND',
+2025-11-22T08:31:04.449068293Z   requireStack: [
+2025-11-22T08:31:04.449070904Z     '/opt/render/project/src/backend/src/services/emailService.js',
+2025-11-22T08:31:04.449073644Z     '/opt/render/project/src/backend/src/controllers/otpController.js',
+2025-11-22T08:31:04.449076544Z     '/opt/render/project/src/backend/src/routes/otp.js',
+2025-11-22T08:31:04.449079144Z     '/opt/render/project/src/backend/server.js'
+2025-11-22T08:31:04.449081934Z   ]
+2025-11-22T08:31:04.449084794Z }
+2025-11-22T08:31:04.449087144Z 
+2025-11-22T08:31:04.449089664Z Node.js v22.16.0
+2025-11-22T08:31:06.38199113Z ==> Exited with status 1
+2025-11-22T08:31:06.55526478Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+2025-11-22T08:31:10.528800191Z ==> Running 'cd backend && npm start'
+2025-11-22T08:31:11.445287899Z 
+2025-11-22T08:31:11.44531455Z > social-media-backend@1.0.0 start
+2025-11-22T08:31:11.44531917Z > node server.js
+2025-11-22T08:31:11.44532159Z 
+2025-11-22T08:31:11.729060719Z [dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+2025-11-22T08:31:13.425251206Z [dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+2025-11-22T08:31:13.720344754Z ✅ Secondary database configured for failover
+2025-11-22T08:31:15.330576043Z node:internal/modules/cjs/loader:1404
+2025-11-22T08:31:15.330596513Z   throw err;
+2025-11-22T08:31:15.330599853Z   ^
+2025-11-22T08:31:15.330602504Z 
+2025-11-22T08:31:15.330605234Z Error: Cannot find module 'resend'
+2025-11-22T08:31:15.330608174Z Require stack:
+2025-11-22T08:31:15.330611364Z - /opt/render/project/src/backend/src/services/emailService.js
+2025-11-22T08:31:15.330614214Z - /opt/render/project/src/backend/src/controllers/otpController.js
+2025-11-22T08:31:15.330616384Z - /opt/render/project/src/backend/src/routes/otp.js
+2025-11-22T08:31:15.330618594Z - /opt/render/project/src/backend/server.js
+2025-11-22T08:31:15.330620694Z     at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)
+2025-11-22T08:31:15.330623054Z     at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)
+2025-11-22T08:31:15.330625724Z     at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)
+2025-11-22T08:31:15.330628064Z     at Function._load (node:internal/modules/cjs/loader:1211:37)
+2025-11-22T08:31:15.330630644Z     at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+2025-11-22T08:31:15.330632984Z     at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+2025-11-22T08:31:15.330635325Z     at Module.require (node:internal/modules/cjs/loader:1487:12)
+2025-11-22T08:31:15.330637845Z     at require (node:internal/modules/helpers:135:16)
+2025-11-22T08:31:15.330640725Z     at Object.<anonymous> (/opt/render/project/src/backend/src/services/emailService.js:1:20)
+2025-11-22T08:31:15.330645055Z     at Module._compile (node:internal/modules/cjs/loader:1730:14) {
+2025-11-22T08:31:15.330648125Z   code: 'MODULE_NOT_FOUND',
+2025-11-22T08:31:15.330651585Z   requireStack: [
+2025-11-22T08:31:15.330654445Z     '/opt/render/project/src/backend/src/services/emailService.js',
+2025-11-22T08:31:15.330657355Z     '/opt/render/project/src/backend/src/controllers/otpController.js',
+2025-11-22T08:31:15.330660005Z     '/opt/render/project/src/backend/src/routes/otp.js',
+2025-11-22T08:31:15.330663225Z     '/opt/render/project/src/backend/server.js'
+2025-11-22T08:31:15.330665665Z   ]
+2025-11-22T08:31:15.330668015Z }
+2025-11-22T08:31:15.330670305Z 
+2025-11-22T08:31:15.330672775Z Node.js v22.16.0
