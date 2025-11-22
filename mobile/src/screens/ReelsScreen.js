@@ -27,6 +27,7 @@ const ReelItem = ({ item, isActive, navigation, onLike, onComment, onShare }) =>
   const [liked, setLiked] = useState(item.user_reaction === 'like');
   const [likeCount, setLikeCount] = useState(item.reaction_count || 0);
   const API_URL = Constants.expoConfig?.extra?.apiUrl || 'http://localhost:5000';
+  const isTikTok = item.source === 'tiktok';
 
   useEffect(() => {
     if (isActive && videoRef.current) {
@@ -37,10 +38,21 @@ const ReelItem = ({ item, isActive, navigation, onLike, onComment, onShare }) =>
   }, [isActive]);
 
   const handleLike = async () => {
+    if (isTikTok) return; // TikTok videos can't be liked
+    
     const newLiked = !liked;
+    const prevLiked = liked;
+    const prevCount = likeCount;
+    
     setLiked(newLiked);
     setLikeCount(prev => newLiked ? prev + 1 : prev - 1);
-    await onLike(item.id, newLiked);
+    
+    try {
+      await onLike(item.id, newLiked);
+    } catch (error) {
+      setLiked(prevLiked);
+      setLikeCount(prevCount);
+    }
   };
 
   const handleVideoPress = async () => {
@@ -184,14 +196,10 @@ const ReelsScreen = ({ navigation }) => {
   }, []);
 
   const handleLike = async (reelId, isLiked) => {
-    try {
-      if (isLiked) {
-        await reactionAPI.addReaction(reelId, { reaction_type: 'like' });
-      } else {
-        await reactionAPI.removeReaction(reelId);
-      }
-    } catch (error) {
-      console.error('Failed to update like:', error);
+    if (isLiked) {
+      await reactionAPI.addReaction(reelId, { reaction_type: 'like' });
+    } else {
+      await reactionAPI.removeReaction(reelId);
     }
   };
 

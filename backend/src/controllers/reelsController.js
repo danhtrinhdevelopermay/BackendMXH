@@ -26,7 +26,6 @@ exports.getReels = async (req, res) => {
       FROM posts p
       JOIN users u ON p.user_id = u.id
       WHERE p.media_type LIKE 'video%'
-      AND p.deleted_at IS NULL
       ORDER BY p.created_at DESC
       LIMIT $2 OFFSET $3`,
       [userId, limit, offset]
@@ -118,6 +117,16 @@ exports.getCombinedReels = async (req, res) => {
     const userId = req.user.id;
     const { limit = 20 } = req.query;
 
+    // Try to fetch TikTok videos first to determine DB query size
+    const tiktokAccessToken = process.env.TIKTOK_ACCESS_TOKEN;
+    let dbLimit = limit; // Default to full limit
+    
+    if (tiktokAccessToken) {
+      // If TikTok is configured, we'll try to get 30% from TikTok
+      // So we only need 70% from DB
+      dbLimit = Math.floor(limit * 0.7);
+    }
+
     // Get video posts from database
     const videoPosts = await db.query(
       `SELECT 
@@ -137,16 +146,15 @@ exports.getCombinedReels = async (req, res) => {
       FROM posts p
       JOIN users u ON p.user_id = u.id
       WHERE p.media_type LIKE 'video%'
-      AND p.deleted_at IS NULL
       ORDER BY p.created_at DESC
       LIMIT $2`,
-      [userId, Math.floor(limit * 0.7)] // 70% from database
+      [userId, dbLimit]
     );
 
     let combinedReels = videoPosts.rows;
+    let tiktokFetchSuccess = false;
 
     // Try to fetch TikTok videos if configured
-    const tiktokAccessToken = process.env.TIKTOK_ACCESS_TOKEN;
     if (tiktokAccessToken) {
       try {
         const tiktokApiUrl = 'https://open.tiktokapis.com/v2/video/list/';
@@ -164,7 +172,7 @@ exports.getCombinedReels = async (req, res) => {
           }
         );
 
-        if (response.data && response.data.data && response.data.data.videos) {
+        if (response.data && response.data.data && response.data.data.videos && Array.isArray(response.data.data.videos)) {
           const tiktokVideos = response.data.data.videos.map(video => ({
             id: `tiktok_${video.id}`,
             source: 'tiktok',
@@ -183,15 +191,51 @@ exports.getCombinedReels = async (req, res) => {
             created_at: video.create_time,
           }));
 
-          // Mix TikTok videos with database videos
-          combinedReels = [...combinedReels, ...tiktokVideos]
-            .sort(() => Math.random() - 0.5) // Shuffle
-            .slice(0, limit);
+          // Mix TikTok videos with database videos only if we have TikTok videos
+          if (tiktokVideos.length > 0) {
+            tiktokFetchSuccess = true;
+            combinedReels = [...combinedReels, ...tiktokVideos]
+              .sort(() => Math.random() - 0.5) // Shuffle
+              .slice(0, limit);
+          }
         }
       } catch (tiktokError) {
         console.error('Error fetching TikTok videos:', tiktokError.message);
-        // Continue with just database videos if TikTok fails
+        // TikTok failed, we'll need to fetch more from DB below
       }
+    }
+
+    // If we still don't have enough reels (TikTok failed or returned fewer than expected),
+    // fetch additional DB videos to meet the limit
+    if (combinedReels.length < limit) {
+      // Count how many DB videos we already have (excluding TikTok videos)
+      const dbVideosCount = combinedReels.filter(r => !r.source || r.source !== 'tiktok').length;
+      const neededCount = limit - combinedReels.length;
+      
+      const additionalVideos = await db.query(
+        `SELECT 
+          p.*,
+          u.username,
+          u.full_name,
+          u.is_verified,
+          (SELECT COUNT(*) FROM reactions WHERE post_id = p.id) as reaction_count,
+          (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count,
+          (SELECT reaction_type FROM reactions WHERE post_id = p.id AND user_id = $1) as user_reaction,
+          json_build_object(
+            'id', u.id,
+            'username', u.username,
+            'full_name', u.full_name,
+            'is_verified', u.is_verified
+          ) as user
+        FROM posts p
+        JOIN users u ON p.user_id = u.id
+        WHERE p.media_type LIKE 'video%'
+        ORDER BY p.created_at DESC
+        LIMIT $2 OFFSET $3`,
+        [userId, neededCount, dbVideosCount]
+      );
+      
+      combinedReels = [...combinedReels, ...additionalVideos.rows];
     }
 
     res.json(combinedReels);
