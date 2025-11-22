@@ -399,6 +399,7 @@ const HomeScreen = ({ navigation }) => {
             : `${API_URL}${item.media_url}`;
           const isVideo = item.media_type?.startsWith("video/");
           const isVisible = visibleItems.includes(item.id);
+          const shouldAutoPlay = visibleItems[0] === item.id;
           const hasError = mediaErrors[item.id];
 
           const aspectRatio =
@@ -444,9 +445,10 @@ const HomeScreen = ({ navigation }) => {
                     source={{ uri: mediaUrl }}
                     style={mediaStyle}
                     resizeMode="cover"
-                    shouldPlay={false}
+                    shouldPlay={shouldAutoPlay}
                     isLooping
                     isMuted={false}
+                    useNativeControls={false}
                     onError={(error) => {
                       console.log("Video error:", error);
                       handleMediaError();
