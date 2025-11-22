@@ -99,7 +99,7 @@ const ReelItem = ({ item, isActive, navigation, onLike, onComment, onShare }) =>
           <Image
             source={{ uri: item.cover_image_url || item.media_url || 'https://via.placeholder.com/400x600/000000/FFFFFF/?text=TikTok+Video' }}
             style={styles.video}
-            resizeMode="cover"
+            resizeMode="contain"
           />
           {/* TikTok Play Overlay */}
           <View style={styles.tiktokOverlay}>
@@ -120,7 +120,7 @@ const ReelItem = ({ item, isActive, navigation, onLike, onComment, onShare }) =>
             ref={videoRef}
             source={{ uri: videoUrl }}
             style={styles.video}
-            resizeMode="cover"
+            resizeMode="contain"
             shouldPlay={isActive}
             isLooping
             isMuted={false}
