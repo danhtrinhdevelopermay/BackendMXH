@@ -1,4 +1,4 @@
-const pool = require('../db');
+const pool = require('../../src/config/database');
 const { sendOTPEmail, sendPasswordChangedNotification } = require('../services/emailService');
 const bcrypt = require('bcrypt');
 
