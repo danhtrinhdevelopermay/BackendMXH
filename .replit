@@ -1,4 +1,4 @@
-modules = ["nodejs-20", "python-3.11", "postgresql-16", "java-graalvm22.3"]
+modules = ["nodejs-20", "python-3.11", "java-graalvm22.3", "postgresql-16"]
 [agent]
 expertMode = true
 integrations = ["javascript_database:1.0.0", "google-drive:1.0.0", "javascript_gemini:1.0.0"]
@@ -121,3 +121,8 @@ externalPort = 3003
 [[ports]]
 localPort = 43429
 externalPort = 6000
+
+[userenv]
+
+[userenv.shared]
+RESEND_API_KEY = "re_PML8CD4G_KCYeq7z45vmMKk5PUD269QCs"
