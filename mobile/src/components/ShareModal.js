@@ -80,7 +80,11 @@ const ShareModal = ({ visible, onDismiss, post }) => {
 
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Quyền truy cập', 'Cần quyền truy cập để lưu media');
+        Alert.alert(
+          'Cần quyền truy cập', 
+          'Expo Go không hỗ trợ đầy đủ quyền media library. Vui lòng build ứng dụng để sử dụng tính năng này hoặc dùng "Chia sẻ link".',
+          [{ text: 'OK' }]
+        );
         return;
       }
 
@@ -100,11 +104,15 @@ const ShareModal = ({ visible, onDismiss, post }) => {
         await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
       }
 
-      Alert.alert('Thành công', 'Đã lưu media vào thư viện');
+      Alert.alert('Thành công', 'Đã lưu media vào thư viện trong album Shatter');
       onDismiss();
     } catch (error) {
       console.error('Error downloading media:', error);
-      Alert.alert('Lỗi', 'Không thể tải xuống media');
+      Alert.alert(
+        'Lỗi', 
+        `Không thể tải xuống: ${error.message}. Tính năng này hoạt động tốt nhất trên ứng dụng đã build.`,
+        [{ text: 'OK' }]
+      );
     } finally {
       setLoading(false);
     }
@@ -120,7 +128,11 @@ const ShareModal = ({ visible, onDismiss, post }) => {
       }
 
       if (!(await Sharing.isAvailableAsync())) {
-        Alert.alert('Lỗi', 'Chia sẻ không khả dụng trên thiết bị này');
+        Alert.alert(
+          'Không khả dụng', 
+          'Chia sẻ media không hoạt động trên Expo Go. Vui lòng sử dụng "Chia sẻ link" hoặc build ứng dụng để sử dụng đầy đủ tính năng.',
+          [{ text: 'OK' }]
+        );
         return;
       }
 
@@ -138,10 +150,15 @@ const ShareModal = ({ visible, onDismiss, post }) => {
         UTI: isVideo ? 'public.movie' : 'public.image',
       });
 
+      Alert.alert('Thành công', 'Đã chia sẻ media');
       onDismiss();
     } catch (error) {
       console.error('Error sharing media:', error);
-      Alert.alert('Lỗi', 'Không thể chia sẻ media');
+      Alert.alert(
+        'Lỗi', 
+        `Không thể chia sẻ media: ${error.message}. Hãy thử "Chia sẻ link" thay thế.`,
+        [{ text: 'OK' }]
+      );
     } finally {
       setLoading(false);
     }
